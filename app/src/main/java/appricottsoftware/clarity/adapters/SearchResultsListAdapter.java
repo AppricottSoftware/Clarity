@@ -20,10 +20,6 @@ import appricottsoftware.clarity.models.Podcast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by karen on 1/16/18.
- */
-
 public class SearchResultsListAdapter extends RecyclerView.Adapter<SearchResultsListAdapter.ViewHolder> {
 
     private ArrayList<Podcast> podcasts;
