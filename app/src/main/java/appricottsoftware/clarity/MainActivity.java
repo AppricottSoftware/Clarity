@@ -11,18 +11,25 @@ import android.view.MenuItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.sync.ClarityApp;
 import cz.msebera.android.httpclient.Header;
 
+import static appricottsoftware.clarity.sync.ClarityApp.getGson;
+
 public class MainActivity extends AppCompatActivity {
+
+    private ArrayList<Podcast> searchResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
     }
 
     @Override
@@ -32,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Query
-
-                getPodcasts(query);
+                // Focus on the activity, minimize keyboard
                 searchView.clearFocus();
+                // Query for podcasts once user enters text
+                getPodcasts(query);
                 return true;
             }
 
@@ -48,13 +55,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    // Make an API call to get podcasts
     private void getPodcasts(String query) {
         Log.e("MainActivity", "On Query text" + query);
+        // Specify the callback functions for the response handler
         ClarityApp.getRestClient().getFullTextSearch(0, query, 0, "episode", new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 Log.e("MainActivity 1", response.toString());
+                addPodcasts(response);
             }
 
             @Override
@@ -90,5 +100,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("MainActivity 6", "");
             }
         });
+    }
+
+    private void addPodcasts(JSONObject response) {
+        // Convert the JSON into Podcasts objects (our model)
+        try {
+            JSONArray resp = response.getJSONArray("results");
+            for(int i = 0; i < response.length(); i++) {
+                Podcast p = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Podcast.class);
+                searchResults.add(p);
+                Log.e("MainActivityAddPodcasts", String.valueOf(resp.getJSONObject(i)));
+            }
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
