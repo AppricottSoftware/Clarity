@@ -6,4 +6,5 @@
     android:layout_height="match_parent"
     tools:context="appricottsoftware.clarity.MainActivity">
 
+
 </android.support.constraint.ConstraintLayout>
