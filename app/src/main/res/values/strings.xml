@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Clarity</string>
+
+    <string name="login_activity_toolbar">Login</string>
+    <string name="register_activity_toolbar">Register</string>
+    <string name="home_activity_toolbar">Home</string>
 </resources>
