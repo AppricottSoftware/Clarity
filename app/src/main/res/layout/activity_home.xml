@@ -1,9 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="appricottsoftware.clarity.HomeActivity">
+    android:layout_height="match_parent">
 
-</android.support.constraint.ConstraintLayout>
+    <!--Main layout-->
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--Actionbar-->
+        <include
+            layout="@layout/toolbar_home_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!--Fragment host layout-->
+        <FrameLayout
+            android:id="@+id/fl_home_activity"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </FrameLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <!--Nav drawer-->
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nv_drawer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@android:color/white"
+        app:menu="@menu/menu_nav_drawer"
+        app:headerLayout="@layout/header_nav_drawer"/>
+
+</android.support.v4.widget.DrawerLayout>
+

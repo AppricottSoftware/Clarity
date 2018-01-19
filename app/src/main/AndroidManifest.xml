@@ -14,7 +14,7 @@
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="portrait"
-            android:label="@string/login_activity_toolbar">
+            android:label="@string/toolbar_login_activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,12 +22,12 @@
         </activity>
         <activity android:name=".RegisterActivity"
             android:screenOrientation="portrait"
-            android:label="@string/register_activity_toolbar">
+            android:label="@string/toolbar_register_activity">
         </activity>
         <activity
             android:name=".HomeActivity"
             android:screenOrientation="portrait"
-            android:label="@string/home_activity_toolbar">
+            android:label="@string/toolbar_home_activity">
         </activity>
         <activity
             android:name=".MainActivity"
