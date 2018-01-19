@@ -1,7 +1,16 @@
 <resources>
     <string name="app_name">Clarity</string>
 
-    <string name="login_activity_toolbar">Login</string>
-    <string name="register_activity_toolbar">Register</string>
-    <string name="home_activity_toolbar">Home</string>
+    <string name="nav_drawer_channel">Channels</string>
+    <string name="nav_drawer_like">Likes</string>
+    <string name="nav_drawer_setting">Settings</string>
+    <string name="nav_drawer_logout">Logout</string>
+    <string name="nav_drawer_header">Your name here</string>
+    <string name="nav_drawer_open">Open navigation drawer</string>
+    <string name="nav_drawer_close">Close navigation drawer</string>
+
+
+    <string name="toolbar_login_activity">Login</string>
+    <string name="toolbar_register_activity">Register</string>
+    <string name="toolbar_home_activity">Home</string>
 </resources>
