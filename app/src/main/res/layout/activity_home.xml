@@ -25,7 +25,6 @@
             android:id="@+id/fl_home_activity_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
             app:layout_constraintBottom_toTopOf="@id/fl_home_activity_player"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +37,6 @@
             android:id="@+id/fl_home_activity_player"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:background="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
