@@ -2,26 +2,24 @@
 <com.sothree.slidinguppanel.SlidingUpPanelLayout
     xmlns:sothree="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/slplHome"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/supl_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
     sothree:umanoPanelHeight="72dp"
-    sothree:umanoShadowHeight="5dp">
+    sothree:umanoShadowHeight="5dp"
+    sothree:umanoParallaxOffset="72dp"
+    sothree:umanoFadeColor="@color/colorAccent">
 
     <android.support.v4.widget.DrawerLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
 
         <!--Main layout-->
-        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

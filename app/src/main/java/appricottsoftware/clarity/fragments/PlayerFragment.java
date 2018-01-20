@@ -3,11 +3,16 @@ package appricottsoftware.clarity.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import appricottsoftware.clarity.R;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -15,6 +20,9 @@ import butterknife.ButterKnife;
  */
 
 public class PlayerFragment extends Fragment {
+
+    @BindView(R.id.tv_player_fragment_open) TextView tvPlayerFragmentOpen;
+    @BindView(R.id.tv_player_fragment_closed) TextView tvPlayerFragmentClosed;
 
     @Nullable
     @Override
@@ -27,5 +35,17 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
+    }
+
+    // Hide/show view elements to make fragment full screen
+    public void openPanel() {
+        tvPlayerFragmentOpen.setVisibility(View.VISIBLE);
+        tvPlayerFragmentClosed.setVisibility(View.GONE);
+    }
+
+    // Hide/show view elements to make fragment bottom strip
+    public void closePanel() {
+        tvPlayerFragmentOpen.setVisibility(View.GONE);
+        tvPlayerFragmentClosed.setVisibility(View.VISIBLE);
     }
 }
