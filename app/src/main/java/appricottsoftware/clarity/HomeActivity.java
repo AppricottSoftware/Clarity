@@ -5,17 +5,20 @@ import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.ViewParent;
 
-import appricottsoftware.clarity.fragments.ChannelFragment;
+import appricottsoftware.clarity.adapters.TabPagerAdapter;
+import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
@@ -29,6 +32,10 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.nv_drawer) NavigationView nvDrawer;
 
     private ActionBarDrawerToggle drawerToggle;
+
+    private static HomeFragment homeFragment;
+    private static LikeFragment likeFragment;
+    private static SettingFragment settingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +99,14 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setUpDrawer() {
-        nvDrawer.setCheckedItem(R.id.nav_channel_fragment);
+        homeFragment = new HomeFragment();
+        likeFragment = new LikeFragment();
+        settingFragment = new SettingFragment();
+
+        nvDrawer.setCheckedItem(R.id.nav_home_fragment);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.fl_home_activity_main, new ChannelFragment())
+                .replace(R.id.fl_home_activity_main, homeFragment)
                 .commit();
 
         nvDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -110,16 +121,15 @@ public class HomeActivity extends AppCompatActivity {
     private void selectDrawer(MenuItem item) {
         // Make fragment
         Fragment fragment = null;
-        Class fragmentClass = null;
         switch(item.getItemId()) {
-            case R.id.nav_channel_fragment:
-                fragmentClass = ChannelFragment.class;
+            case R.id.nav_home_fragment:
+                fragment = homeFragment;
                 break;
             case R.id.nav_like_fragment:
-                fragmentClass = LikeFragment.class;
+                fragment = likeFragment;
                 break;
             case R.id.nav_setting_fragment:
-                fragmentClass = SettingFragment.class;
+                fragment = settingFragment;
                 break;
             case R.id.nav_logout:
                 logout();
@@ -129,9 +139,6 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         try {
-            // Make a new fragment instance
-            fragment = (Fragment) fragmentClass.newInstance();
-
             // Insert fragment into frame layout
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Clarity</string>
 
-    <string name="nav_drawer_channel">Channels</string>
+    <string name="nav_drawer_home">Home</string>
     <string name="nav_drawer_like">Likes</string>
     <string name="nav_drawer_setting">Settings</string>
     <string name="nav_drawer_logout">Logout</string>
