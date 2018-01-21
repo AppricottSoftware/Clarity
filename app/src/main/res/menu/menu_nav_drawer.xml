@@ -5,9 +5,9 @@
         android:id="@+id/nav_group_1"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_channel_fragment"
+            android:id="@+id/nav_home_fragment"
             android:icon="@drawable/ic_nav_drawer_channel"
-            android:title="@string/nav_drawer_channel"/>
+            android:title="@string/nav_drawer_home" />
         <item
             android:id="@+id/nav_like_fragment"
             android:icon="@drawable/ic_nav_drawer_like"
@@ -18,7 +18,7 @@
         android:id="@+id/nav_group_2"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_settings_fragment"
+            android:id="@+id/nav_setting_fragment"
             android:icon="@drawable/ic_nav_drawer_setting"
             android:title="@string/nav_drawer_setting"/>
         <item

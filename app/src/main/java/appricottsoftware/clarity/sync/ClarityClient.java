@@ -4,10 +4,6 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-/**
- * Created by karen on 1/16/18.
- */
-
 public class ClarityClient {
     private static final String REST_URL = "https://listennotes.p.mashape.com/api/v1/";
     private static final String REST_KEY = "Hby2uMRdnVmshRhKh3lhPsp2k3v9p1dtegYjsn7FsGgMLy67xQ";

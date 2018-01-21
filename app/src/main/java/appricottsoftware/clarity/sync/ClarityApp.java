@@ -5,9 +5,6 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 
-/**
- * Created by karen on 1/16/18.
- */
 // Keep a state for the entire app for API calls
 public class ClarityApp extends Application {
 
