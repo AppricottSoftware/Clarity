@@ -10,11 +10,8 @@ import android.view.ViewGroup;
 import appricottsoftware.clarity.R;
 import butterknife.ButterKnife;
 
-/**
- * Created by karen on 1/19/18.
- */
-
 public class SettingFragment extends Fragment {
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
