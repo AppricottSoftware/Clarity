@@ -10,10 +10,6 @@ import android.view.ViewGroup;
 import appricottsoftware.clarity.R;
 import butterknife.ButterKnife;
 
-/**
- * Created by karen on 1/19/18.
- */
-
 public class PlayerFragment extends Fragment {
 
     @Nullable

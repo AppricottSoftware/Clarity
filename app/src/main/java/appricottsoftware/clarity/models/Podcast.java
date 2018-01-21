@@ -1,9 +1,5 @@
 package appricottsoftware.clarity.models;
 
-/**
- * Created by karen on 1/16/18.
- */
-
 public class Podcast {
 
     private String image;
