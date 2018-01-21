@@ -1,58 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
+<com.sothree.slidinguppanel.SlidingUpPanelLayout
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
+    android:id="@+id/supl_home"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    sothree:umanoPanelHeight="72dp"
+    sothree:umanoShadowHeight="5dp"
+    sothree:umanoParallaxOffset="72dp"
+    sothree:umanoFadeColor="@color/colorAccent">
 
-    <!--Main layout-->
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <!--Actionbar-->
-        <include
-            layout="@layout/toolbar_home_activity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <!--Main view Fragment-->
-        <FrameLayout
-            android:id="@+id/fl_home_activity_main"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:layout_constraintBottom_toTopOf="@id/fl_home_activity_player"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintVertical_bias="0">
-        </FrameLayout>
-
-        <!--Music Player Fragment at bottom-->
-        <FrameLayout
-            android:id="@+id/fl_home_activity_player"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-        </FrameLayout>
-
-    </android.support.constraint.ConstraintLayout>
-
-    <!--Nav drawer-->
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nv_drawer"
-        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@android:color/white"
-        app:menu="@menu/menu_nav_drawer"
-        app:headerLayout="@layout/header_nav_drawer"/>
+        android:gravity="center">
 
-</android.support.v4.widget.DrawerLayout>
+        <!--Main layout-->
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!--Actionbar-->
+            <include
+                layout="@layout/toolbar_home_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!--Main view Fragment-->
+            <FrameLayout
+                android:id="@+id/fl_home_activity_main"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0">
+            </FrameLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <!--Nav drawer-->
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nv_drawer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@android:color/white"
+            app:menu="@menu/menu_nav_drawer"
+            app:headerLayout="@layout/header_nav_drawer"/>
+
+    </android.support.v4.widget.DrawerLayout>
+
+    <!--Music Player Fragment at bottom-->
+    <FrameLayout
+        android:id="@+id/fl_home_activity_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|top">
+    </FrameLayout>
+
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
 
