@@ -14,8 +14,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewParent;
+
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import appricottsoftware.clarity.adapters.TabPagerAdapter;
 import appricottsoftware.clarity.fragments.HomeFragment;
@@ -30,12 +34,14 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @BindView(R.id.nv_drawer) NavigationView nvDrawer;
+    @BindView(R.id.supl_home) SlidingUpPanelLayout suplPanel;
 
     private ActionBarDrawerToggle drawerToggle;
 
     private static HomeFragment homeFragment;
     private static LikeFragment likeFragment;
     private static SettingFragment settingFragment;
+    private static PlayerFragment playerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +59,16 @@ public class HomeActivity extends AppCompatActivity {
         drawerToggle = setUpDrawerToggle();
         drawerLayout.addDrawerListener(drawerToggle);
 
+        // Set up the player fragment
         setUpPlayer();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Set the initial player to be open or closed
+        updatePlayer();
     }
 
     @Override
@@ -76,7 +91,6 @@ public class HomeActivity extends AppCompatActivity {
         if(drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -86,10 +100,39 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setUpPlayer() {
+        playerFragment = new PlayerFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.fl_home_activity_player, new PlayerFragment())
+                .replace(R.id.fl_home_activity_player, playerFragment)
                 .commit();
+
+        // Update panel layout when swiping up or down
+        suplPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) { }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                if(previousState == SlidingUpPanelLayout.PanelState.COLLAPSED
+                        && newState == SlidingUpPanelLayout.PanelState.DRAGGING) {
+                    // Opening panel, change fragment layout to full screen
+                    playerFragment.openPanel();
+                } else if(previousState == SlidingUpPanelLayout.PanelState.EXPANDED
+                        && newState == SlidingUpPanelLayout.PanelState.DRAGGING) {
+                    // Closing panel, change fragment layout to bottom strip
+                    playerFragment.closePanel();
+                }
+            }
+        });
+    }
+
+    private void updatePlayer() {
+        // Get the current state of the panel and update the fragment
+        if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            playerFragment.closePanel();
+        } else if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            playerFragment.openPanel();
+        }
     }
 
     private void logout() {
