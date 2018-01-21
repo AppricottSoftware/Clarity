@@ -15,10 +15,6 @@ import appricottsoftware.clarity.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by karen on 1/19/18.
- */
-
 public class PlayerFragment extends Fragment {
 
     @BindView(R.id.tv_player_fragment_open) TextView tvPlayerFragmentOpen;

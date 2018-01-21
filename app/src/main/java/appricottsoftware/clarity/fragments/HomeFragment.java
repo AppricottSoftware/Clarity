@@ -15,10 +15,6 @@ import appricottsoftware.clarity.adapters.TabPagerAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by karen on 1/19/18.
- */
-
 public class HomeFragment extends Fragment {
 
     @BindView(R.id.vp_tabs) ViewPager vpTabs;

@@ -10,10 +10,6 @@ import android.view.ViewGroup;
 import appricottsoftware.clarity.R;
 import butterknife.ButterKnife;
 
-/**
- * Created by karen on 1/19/18.
- */
-
 public class LikeFragment extends Fragment {
 
     @Nullable
@@ -28,6 +24,4 @@ public class LikeFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
     }
-
-
 }
