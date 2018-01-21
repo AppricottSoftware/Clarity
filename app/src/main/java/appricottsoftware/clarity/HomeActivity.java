@@ -1,21 +1,27 @@
 package appricottsoftware.clarity;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewParent;
 
+import appricottsoftware.clarity.adapters.TabPagerAdapter;
+import appricottsoftware.clarity.fragments.HomeFragment;
+import appricottsoftware.clarity.fragments.LikeFragment;
+import appricottsoftware.clarity.fragments.PlayerFragment;
+import appricottsoftware.clarity.fragments.SettingFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -27,6 +33,10 @@ public class HomeActivity extends AppCompatActivity {
 
     private ActionBarDrawerToggle drawerToggle;
 
+    private static HomeFragment homeFragment;
+    private static LikeFragment likeFragment;
+    private static SettingFragment settingFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,11 +47,13 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Set up nav drawer option clicking
-        setUpDrawer(nvDrawer);
+        setUpDrawer();
 
         // Set up drawer toggling
         drawerToggle = setUpDrawerToggle();
         drawerLayout.addDrawerListener(drawerToggle);
+
+        setUpPlayer();
     }
 
     @Override
@@ -73,14 +85,31 @@ public class HomeActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
+    private void setUpPlayer() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fl_home_activity_player, new PlayerFragment())
+                .commit();
+    }
+
     private void logout() {
         Intent loginActivityIntent = new Intent(this, LoginActivity.class);
         startActivity(loginActivityIntent);
         finish();
     }
 
-    private void setUpDrawer(NavigationView nView) {
-        nView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+    private void setUpDrawer() {
+        homeFragment = new HomeFragment();
+        likeFragment = new LikeFragment();
+        settingFragment = new SettingFragment();
+
+        nvDrawer.setCheckedItem(R.id.nav_home_fragment);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fl_home_activity_main, homeFragment)
+                .commit();
+
+        nvDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 selectDrawer(item);
@@ -92,13 +121,15 @@ public class HomeActivity extends AppCompatActivity {
     private void selectDrawer(MenuItem item) {
         // Make fragment
         Fragment fragment = null;
-        Class fragmentClass;
         switch(item.getItemId()) {
-            case R.id.nav_channel_fragment:
+            case R.id.nav_home_fragment:
+                fragment = homeFragment;
                 break;
             case R.id.nav_like_fragment:
+                fragment = likeFragment;
                 break;
-            case R.id.nav_settings_fragment:
+            case R.id.nav_setting_fragment:
+                fragment = settingFragment;
                 break;
             case R.id.nav_logout:
                 logout();
@@ -107,16 +138,22 @@ public class HomeActivity extends AppCompatActivity {
                 break;
         }
 
-        // Make a new fragment instance
+        try {
+            // Insert fragment into frame layout
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fl_home_activity_main, fragment)
+                    .commit();
 
-        // Insert fragment into frame layout
-
-        // Highlight the choice
-        item.setChecked(true);
-        // Set toolbar title
-        setTitle(item.getTitle());
-        // Close nav drawer
-        drawerLayout.closeDrawers();
+            // Highlight the choice
+            item.setChecked(true);
+            // Set toolbar title
+            setTitle(item.getTitle());
+            // Close nav drawer
+            drawerLayout.closeDrawers();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private ActionBarDrawerToggle setUpDrawerToggle() {
