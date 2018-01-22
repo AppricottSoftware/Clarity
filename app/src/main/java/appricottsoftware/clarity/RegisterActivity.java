@@ -42,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String emailString = email.getText().toString();
                 String hashedPassword;
                 hashedPassword = Hash_Password(password.getText().toString());
-                
+
                 // create instance of clarityClient
                 // pass information to database to store
 
