@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -13,6 +14,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @BindView(R.id.bt_login) Button btLogin;
     @BindView(R.id.bt_register) Button btRegister;
+    @BindView(R.id.et_email) EditText etEmail;
+    @BindView(R.id.et_password) EditText etPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +31,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.bt_login:
-                Intent homeActivityIntent = new Intent(this, HomeActivity.class);
-                startActivity(homeActivityIntent);
+                String strEmail = etEmail.getText().toString();
+                String strPassword = etPassword.getText().toString();
+
+                if (isAuthenticated()) {
+                    Intent homeActivityIntent = new Intent(this, HomeActivity.class);
+                    startActivity(homeActivityIntent);
+                }
+
                 finish();
                 break;
             case R.id.bt_register:
@@ -40,7 +49,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             default:
                 break;
         }
+    }
 
+    public boolean isAuthenticated() {
+        return true;
     }
 
 }
