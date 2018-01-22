@@ -39,10 +39,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch(v.getId()) {
             case R.id.bt_register:
 
+                String emailString = email.getText().toString();
                 String hashedPassword;
                 hashedPassword = Hash_Password(password.getText().toString());
-
-                Log.i("40char hashed pass", hashedPassword);
+                
                 // create instance of clarityClient
                 // pass information to database to store
 

@@ -18,6 +18,4 @@
     <string name="email_hint">email</string>
     <string name="password_hint">password</string>
 
-    <string name="dummy_pass">apples</string>
-
 </resources>
