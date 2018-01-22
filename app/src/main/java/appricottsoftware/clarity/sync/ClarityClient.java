@@ -29,4 +29,18 @@ public class ClarityClient {
         params.put("type", type);
         client.get(REST_URL + "search", params, handler);
     }
+
+    public void checkLogin(String email, String password, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.addHeader("Accept", "application/json");
+        client.addHeader("Content-type", "application/json");
+
+
+        RequestParams params = new RequestParams();
+        params.put("email", email);
+        params.put("password", password);
+
+        client.get("138.68.242.53:8080", params, handler);
+    }
+
 }
