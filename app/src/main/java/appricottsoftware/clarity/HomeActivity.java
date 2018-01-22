@@ -113,12 +113,12 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-                if(previousState == SlidingUpPanelLayout.PanelState.COLLAPSED
-                        && newState == SlidingUpPanelLayout.PanelState.DRAGGING) {
+                if(previousState == SlidingUpPanelLayout.PanelState.DRAGGING
+                        && newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     // Opening panel, change fragment layout to full screen
                     playerFragment.openPanel();
-                } else if(previousState == SlidingUpPanelLayout.PanelState.EXPANDED
-                        && newState == SlidingUpPanelLayout.PanelState.DRAGGING) {
+                } else if(previousState == SlidingUpPanelLayout.PanelState.DRAGGING
+                        && newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                     // Closing panel, change fragment layout to bottom strip
                     playerFragment.closePanel();
                 }
