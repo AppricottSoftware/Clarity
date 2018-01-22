@@ -39,9 +39,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch(v.getId()) {
             case R.id.bt_register:
 
-                String hashedPassword = null;
+                String hashedPassword;
                 hashedPassword = Hash_Password(password.getText().toString());
 
+                Log.i("40char hashed pass", hashedPassword);
+                // create instance of clarityClient
+                // pass information to database to store
 
                 Intent homeActivityIntent = new Intent(this, HomeActivity.class);
                 homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -64,17 +67,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             hashedPassword = bytesToHex( bytes );
         }
-        catch(NoSuchAlgorithmException e)
-        {
-            e.printStackTrace();
-        }
-        catch(UnsupportedEncodingException e)
+        catch(NoSuchAlgorithmException | UnsupportedEncodingException e)
         {
             e.printStackTrace();
         }
         return hashedPassword;
     }
-
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
     public static String bytesToHex( byte[] bytes )
