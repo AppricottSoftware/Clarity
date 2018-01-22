@@ -42,6 +42,7 @@
         android:ems="10"
         android:hint="@string/password_hint"
         android:inputType="textPassword"
+        android:text="@string/dummy_pass"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/bt_register"
         app:layout_constraintEnd_toEndOf="parent"
