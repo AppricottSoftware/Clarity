@@ -9,7 +9,7 @@
 
     <!--Fragment Collapsed-->
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/rl_player_fragment_collapsed"
+        android:id="@+id/rl_collapse"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,7 +18,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
-            android:id="@+id/iv_player_fragment_collapse_cover"
+            android:id="@+id/iv_collapse_cover"
             android:layout_width="@dimen/player_fragment_cover"
             android:layout_height="@dimen/player_fragment_cover"
             app:srcCompat="@drawable/ic_launcher_background"
@@ -27,12 +27,12 @@
             android:padding="@dimen/player_fragment_padding"/>
 
         <TextView
-            android:id="@+id/tv_player_fragment_collapse_title"
+            android:id="@+id/tv_collapse_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/iv_player_fragment_collapse_cover"
-            app:layout_constraintEnd_toStartOf="@id/cl_fragment_collapse_play_pause"
-            app:layout_constraintTop_toTopOf="@id/iv_player_fragment_collapse_cover"
+            app:layout_constraintStart_toEndOf="@id/iv_collapse_cover"
+            app:layout_constraintEnd_toStartOf="@id/cl_collapse_play_pause"
+            app:layout_constraintTop_toTopOf="@id/iv_collapse_cover"
             android:paddingTop="@dimen/player_fragment_padding"
             android:ellipsize="marquee"
             android:singleLine="true"
@@ -41,26 +41,26 @@
             android:text="This is the podcast title."/>
 
         <TextView
-            android:id="@+id/tv_player_fragment_collapse_description"
+            android:id="@+id/tv_collapse_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/iv_player_fragment_collapse_cover"
-            app:layout_constraintEnd_toStartOf="@id/cl_fragment_collapse_play_pause"
-            app:layout_constraintTop_toBottomOf="@id/tv_player_fragment_collapse_title"
+            app:layout_constraintStart_toEndOf="@id/iv_collapse_cover"
+            app:layout_constraintEnd_toStartOf="@id/cl_collapse_play_pause"
+            app:layout_constraintTop_toBottomOf="@id/tv_collapse_title"
             android:ellipsize="marquee"
             android:singleLine="true"
             android:textColor="@android:color/white"
             android:text="This is a description of the podcast that is playing in this player."/>
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/cl_fragment_collapse_play_pause"
+            android:id="@+id/cl_collapse_play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@id/ib_player_fragment_collapse_skip"
-            app:layout_constraintTop_toTopOf="@id/iv_player_fragment_collapse_cover">
+            app:layout_constraintEnd_toStartOf="@id/ib_collapse_skip"
+            app:layout_constraintTop_toTopOf="@id/iv_collapse_cover">
 
             <ImageButton
-                android:id="@+id/ib_player_fragment_collapse_play"
+                android:id="@+id/ib_collapse_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:scaleType="fitXY"
@@ -69,7 +69,7 @@
                 android:padding="@dimen/player_fragment_padding"/>
 
             <ImageButton
-                android:id="@+id/ib_player_fragment_collapse_pause"
+                android:id="@+id/ib_collapse_pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:scaleType="fitXY"
@@ -79,68 +79,22 @@
 
         </android.support.constraint.ConstraintLayout>
 
-
-
         <ImageButton
-            android:id="@+id/ib_player_fragment_collapse_skip"
+            android:id="@+id/ib_collapse_skip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_player_fragment_collapse_cover"
+            app:layout_constraintTop_toTopOf="@id/iv_collapse_cover"
             android:scaleType="fitXY"
             android:background="@android:color/transparent"
             app:srcCompat="@drawable/ic_player_skip"
             android:padding="@dimen/player_fragment_padding"/>
 
-        <!--<ImageButton-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@android:color/transparent"-->
-        <!--android:scaleType="fitXY"-->
-        <!--app:srcCompat="@drawable/ic_player_dislike"/>-->
-
-
-        <!--<ImageButton-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@android:color/transparent"-->
-        <!--android:scaleType="fitXY"-->
-        <!--app:srcCompat="@drawable/ic_player_dislike"/>-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/tv_player_fragment_closed"-->
-        <!--android:layout_width="200dp"-->
-        <!--android:layout_height="200dp"-->
-        <!--android:scaleType="fitXY"-->
-        <!--android:text="Player Fragment (state = COLLAPSED)"-->
-        <!--android:textColor="@android:color/white"/>-->
-
-        <!--<ImageButton-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="@android:color/transparent"-->
-        <!--android:scaleType="fitXY"-->
-        <!--app:srcCompat="@drawable/ic_player_dislike"/>-->
-
-
-        <!--<ImageButton-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@android:color/transparent"-->
-            <!--android:scaleType="fitXY"-->
-            <!--app:srcCompat="@drawable/ic_player_dislike"/>-->
-
-        <!--<ImageButton-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="@android:color/transparent"-->
-            <!--app:srcCompat="@drawable/ic_player_like"/>-->
-
     </android.support.constraint.ConstraintLayout>
 
     <!--Fragment Expanded-->
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/rl_player_fragment_expanded"
+        android:id="@+id/rl_expand"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -148,15 +102,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!--<TextView-->
-        <!--android:id="@+id/tv_player_fragment_open"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Player Fragment (state = EXPANDED)"-->
-        <!--android:textColor="@android:color/white"/>-->
-
         <ImageButton
-            android:id="@+id/ib_player_fragment_expand_like"
+            android:id="@+id/ib_expand_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -167,25 +114,25 @@
             app:srcCompat="@drawable/ic_player_like" />
 
         <ImageButton
-            android:id="@+id/ib_player_fragment_expand_dislike"
+            android:id="@+id/ib_expand_dislike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:padding="@dimen/player_fragment_padding"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/ib_player_fragment_expand_like"
+            app:layout_constraintStart_toEndOf="@id/ib_expand_like"
             app:srcCompat="@drawable/ic_player_dislike" />
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/cl_player_fragment_expand_play_pause"
+            android:id="@+id/cl_expand_play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/ib_player_fragment_expand_skip">
+            app:layout_constraintEnd_toStartOf="@id/ib_expand_skip">
 
             <ImageButton
-                android:id="@+id/ib_player_fragment_expand_play"
+                android:id="@+id/ib_expand_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -194,7 +141,7 @@
                 app:srcCompat="@drawable/ic_player_play" />
 
             <ImageButton
-                android:id="@+id/ib_player_fragment_expand_pause"
+                android:id="@+id/ib_expand_pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -205,7 +152,7 @@
         </android.support.constraint.ConstraintLayout>
 
         <ImageButton
-            android:id="@+id/ib_player_fragment_expand_skip"
+            android:id="@+id/ib_expand_skip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -216,7 +163,7 @@
             app:srcCompat="@drawable/ic_player_skip" />
 
         <TextView
-            android:id="@+id/tv_player_fragment_expand_speed"
+            android:id="@+id/tv_expand_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/player_fragment_padding"
@@ -225,51 +172,51 @@
             android:textColor="@android:color/white"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/cl_player_fragment_expand_play_pause"
-            app:layout_constraintStart_toEndOf="@id/ib_player_fragment_expand_dislike"
-            app:layout_constraintTop_toTopOf="@id/ib_player_fragment_expand_dislike" />
+            app:layout_constraintEnd_toStartOf="@id/cl_expand_play_pause"
+            app:layout_constraintStart_toEndOf="@id/ib_expand_dislike"
+            app:layout_constraintTop_toTopOf="@id/ib_expand_dislike" />
 
         <android.support.v7.widget.AppCompatSeekBar
-            android:id="@+id/sb_player_fragment_expand_seek"
+            android:id="@+id/sb_expand_seek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:padding="@dimen/player_fragment_padding"
             android:progressTint="@android:color/white"
             android:thumbTint="@android:color/white"
-            app:layout_constraintBottom_toTopOf="@id/ib_player_fragment_expand_like"
-            app:layout_constraintEnd_toStartOf="@id/tv_player_fragment_expand_time_remaining"
-            app:layout_constraintStart_toEndOf="@id/tv_player_fragment_expand_time_elapsed" />
+            app:layout_constraintBottom_toTopOf="@id/ib_expand_like"
+            app:layout_constraintEnd_toStartOf="@id/tv_expand_time_remaining"
+            app:layout_constraintStart_toEndOf="@id/tv_expand_time_elapsed" />
 
         <TextView
-            android:id="@+id/tv_player_fragment_expand_time_elapsed"
+            android:id="@+id/tv_expand_time_elapsed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
             android:text="00:00:00"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/sb_player_fragment_expand_seek"
-            app:layout_constraintBottom_toBottomOf="@id/sb_player_fragment_expand_seek"
+            app:layout_constraintTop_toTopOf="@id/sb_expand_seek"
+            app:layout_constraintBottom_toBottomOf="@id/sb_expand_seek"
             android:paddingStart="@dimen/player_fragment_padding"/>
 
         <TextView
-            android:id="@+id/tv_player_fragment_expand_time_remaining"
+            android:id="@+id/tv_expand_time_remaining"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
             android:text="00:00:00"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/sb_player_fragment_expand_seek"
-            app:layout_constraintBottom_toBottomOf="@id/sb_player_fragment_expand_seek"
+            app:layout_constraintTop_toTopOf="@id/sb_expand_seek"
+            app:layout_constraintBottom_toBottomOf="@id/sb_expand_seek"
             android:paddingEnd="@dimen/player_fragment_padding"/>
 
         <TextView
-            android:id="@+id/tv_player_fragment_expand_title"
+            android:id="@+id/tv_expand_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_player_fragment_expand_cover"
-            app:layout_constraintBottom_toTopOf="@id/tv_player_fragment_expand_description"
+            app:layout_constraintTop_toBottomOf="@id/iv_expand_cover"
+            app:layout_constraintBottom_toTopOf="@id/tv_expand_description"
             android:gravity="center"
             android:textStyle="bold"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -282,13 +229,13 @@
             android:paddingEnd="@dimen/player_fragment_padding"/>
 
         <TextView
-            android:id="@+id/tv_player_fragment_expand_description"
+            android:id="@+id/tv_expand_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_player_fragment_expand_title"
-            app:layout_constraintBottom_toTopOf="@id/sb_player_fragment_expand_seek"
+            app:layout_constraintTop_toBottomOf="@id/tv_expand_title"
+            app:layout_constraintBottom_toTopOf="@id/sb_expand_seek"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@android:color/white"
             android:ellipsize="marquee"
@@ -298,7 +245,7 @@
             android:padding="@dimen/player_fragment_padding"/>
 
         <ImageView
-            android:id="@+id/iv_player_fragment_expand_cover"
+            android:id="@+id/iv_expand_cover"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:paddingTop="@dimen/player_fragment_cover_padding"
@@ -308,7 +255,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tv_player_fragment_expand_title"
+            app:layout_constraintBottom_toTopOf="@id/tv_expand_title"
             app:srcCompat="@drawable/ic_launcher_background" />
 
     </android.support.constraint.ConstraintLayout>

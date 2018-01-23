@@ -4,9 +4,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatSeekBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,14 +21,29 @@ import butterknife.ButterKnife;
 
 public class PlayerFragment extends Fragment implements View.OnClickListener {
 
-    @BindView(R.id.rl_player_fragment_expanded) ConstraintLayout rlPlayerFragmentExpanded;
-    @BindView(R.id.rl_player_fragment_collapsed) ConstraintLayout rlPlayerFragmentCollapsed;
+    // Collapsed state view elements
+    @BindView(R.id.rl_collapse) ConstraintLayout rlCollapse;
+    @BindView(R.id.iv_collapse_cover) ImageView ivCollapseCover;
+    @BindView(R.id.tv_collapse_title) TextView tvCollapseTitle;
+    @BindView(R.id.tv_collapse_description) TextView tvCollapseDescription;
+    @BindView(R.id.ib_collapse_play) ImageButton ibCollapsePlay;
+    @BindView(R.id.ib_collapse_pause) ImageButton ibCollapsePause;
+    @BindView(R.id.ib_collapse_skip) ImageButton ibCollapseSkip;
 
-    @BindView(R.id.tv_player_fragment_collapse_title) TextView tvPlayerFragmentCollapseTitle;
-    @BindView(R.id.tv_player_fragment_collapse_description) TextView tvPlayerFragmentCollapseDescription;
-
-    @BindView(R.id.tv_player_fragment_expand_title) TextView tvPlayerFragmentExpandTitle;
-    @BindView(R.id.tv_player_fragment_expand_description) TextView tvPlayerFragmentExpandDescription;
+    // Expanded state view elements
+    @BindView(R.id.rl_expand) ConstraintLayout rlExpand;
+    @BindView(R.id.ib_expand_like) ImageButton ibExpandLike;
+    @BindView(R.id.ib_expand_dislike) ImageButton ibExpandDislike;
+    @BindView(R.id.ib_expand_play) ImageButton ibExpandPlay;
+    @BindView(R.id.ib_expand_pause) ImageButton ibExpandPause;
+    @BindView(R.id.ib_expand_skip) ImageButton ibExpandSkip;
+    @BindView(R.id.tv_expand_speed) TextView tvExpandSpeed;
+    @BindView(R.id.sb_expand_seek) AppCompatSeekBar sbExpandSeek;
+    @BindView(R.id.tv_expand_time_elapsed) TextView tvExpandTimeElapsed;
+    @BindView(R.id.tv_expand_time_remaining) TextView tvExpandTimeRemaining;
+    @BindView(R.id.tv_expand_title) TextView tvExpandTitle;
+    @BindView(R.id.tv_expand_description) TextView tvExpandDescription;
+    @BindView(R.id.iv_expand_cover) ImageView ivExpandCover;
 
     @Nullable
     @Override
@@ -38,11 +56,7 @@ public class PlayerFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
-        tvPlayerFragmentCollapseTitle.setSelected(true);
-        tvPlayerFragmentCollapseDescription.setSelected(true);
 
-        tvPlayerFragmentExpandTitle.setSelected(true);
-        tvPlayerFragmentExpandDescription.setSelected(true);
     }
 
     @Override
@@ -52,14 +66,22 @@ public class PlayerFragment extends Fragment implements View.OnClickListener {
 
     // Hide/show view elements to make fragment full screen
     public void openPanel() {
-        rlPlayerFragmentExpanded.setVisibility(View.VISIBLE);
-        rlPlayerFragmentCollapsed.setVisibility(View.GONE);
+        rlExpand.setVisibility(View.VISIBLE);
+        rlCollapse.setVisibility(View.GONE);
+
+        // Set marquee scrolling
+        tvExpandTitle.setSelected(true);
+        tvExpandDescription.setSelected(true);
     }
 
     // Hide/show view elements to make fragment bottom strip
     public void closePanel() {
-        rlPlayerFragmentExpanded.setVisibility(View.GONE);
-        rlPlayerFragmentCollapsed.setVisibility(View.VISIBLE);
+        rlExpand.setVisibility(View.GONE);
+        rlCollapse.setVisibility(View.VISIBLE);
+
+        // Set marquee scrolling
+        tvCollapseTitle.setSelected(true);
+        tvCollapseDescription.setSelected(true);
     }
 
     public void loadPlaylist(ArrayList<Podcast> podcasts) {
