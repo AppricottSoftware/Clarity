@@ -57,9 +57,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
         }
     }
-git
-
-
 
     public boolean isAuthenticated(String email, String password) {
         ClarityApp.getRestClient().checkLogin(email, password, new JsonHttpResponseHandler() {
