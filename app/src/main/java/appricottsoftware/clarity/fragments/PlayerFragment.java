@@ -9,14 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.models.Podcast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlayerFragment extends Fragment {
+public class PlayerFragment extends Fragment implements View.OnClickListener {
 
-//    @BindView(R.id.tv_player_fragment_open) TextView tvPlayerFragmentOpen;
-//    @BindView(R.id.tv_player_fragment_closed) TextView tvPlayerFragmentClosed;
     @BindView(R.id.rl_player_fragment_expanded) ConstraintLayout rlPlayerFragmentExpanded;
     @BindView(R.id.rl_player_fragment_collapsed) ConstraintLayout rlPlayerFragmentCollapsed;
 
@@ -42,6 +43,10 @@ public class PlayerFragment extends Fragment {
 
         tvPlayerFragmentExpandTitle.setSelected(true);
         tvPlayerFragmentExpandDescription.setSelected(true);
+    }
+
+    @Override
+    public void onClick(View v) {
 
     }
 
@@ -49,15 +54,27 @@ public class PlayerFragment extends Fragment {
     public void openPanel() {
         rlPlayerFragmentExpanded.setVisibility(View.VISIBLE);
         rlPlayerFragmentCollapsed.setVisibility(View.GONE);
-//        tvPlayerFragmentOpen.setVisibility(View.VISIBLE);
-//        tvPlayerFragmentClosed.setVisibility(View.GONE);
     }
 
     // Hide/show view elements to make fragment bottom strip
     public void closePanel() {
         rlPlayerFragmentExpanded.setVisibility(View.GONE);
         rlPlayerFragmentCollapsed.setVisibility(View.VISIBLE);
-//        tvPlayerFragmentOpen.setVisibility(View.GONE);
-//        tvPlayerFragmentClosed.setVisibility(View.VISIBLE);
+    }
+
+    public void loadPlaylist(ArrayList<Podcast> podcasts) {
+
+    }
+
+    public void play(Podcast podcast) {
+
+    }
+
+    public void pause() {
+
+    }
+
+    public void skip() {
+
     }
 }

@@ -21,15 +21,19 @@ import android.view.ViewParent;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.util.ArrayList;
+
 import appricottsoftware.clarity.adapters.TabPagerAdapter;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
+import appricottsoftware.clarity.models.PlayerInterface;
+import appricottsoftware.clarity.models.Podcast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
@@ -124,6 +128,27 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    // Player interface functions
+    @Override
+    public void loadPlaylist(ArrayList<Podcast> podcasts) {
+        playerFragment.loadPlaylist(podcasts);
+    }
+
+    @Override
+    public void play(Podcast podcast) {
+        playerFragment.play(podcast);
+    }
+
+    @Override
+    public void pause() {
+        playerFragment.pause();
+    }
+
+    @Override
+    public void skip() {
+        playerFragment.skip();
     }
 
     private void updatePlayer() {
