@@ -38,6 +38,7 @@ public class ClarityClient {
 
 
         RequestParams params = new RequestParams();
+        params.put("typeOfRequest", "verifyLogin");
         params.put("email", email);
         params.put("password", password);
 
