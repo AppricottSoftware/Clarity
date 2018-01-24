@@ -1,8 +1,13 @@
 package appricottsoftware.clarity.sync;
 
+import android.util.Log;
+
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import cz.msebera.android.httpclient.Header;
 
 public class ClarityClient {
     private static final String REST_URL = "https://listennotes.p.mashape.com/api/v1/";
@@ -10,8 +15,6 @@ public class ClarityClient {
     private static final String POSTENDPOINT = "";
 
     // Insert API calls here //
-
-
     // Calls the /search endpoint (fulltextsearch)
     // Parameters //
     // offset: Offset for search results, for pagination. You'll use next_offset from response for this parameter.
@@ -36,13 +39,23 @@ public class ClarityClient {
         client.addHeader("Accept", "application/json");
         client.addHeader("Content-type", "application/json");
 
-
         RequestParams params = new RequestParams();
         params.put("typeOfRequest", "verifyLogin");
         params.put("email", email);
         params.put("password", password);
 
-        client.get(POSTENDPOINT, params, handler);
+        client.get(POSTENDPOINT, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                System.out.println(response);
+            }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable
+                    error)
+            {
+                error.printStackTrace(System.out);
+            }
+        });
     }
 
 }
