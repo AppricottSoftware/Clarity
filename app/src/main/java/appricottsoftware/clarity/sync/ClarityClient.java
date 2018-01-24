@@ -12,7 +12,7 @@ import cz.msebera.android.httpclient.Header;
 public class ClarityClient {
     private static final String REST_URL = "https://listennotes.p.mashape.com/api/v1/";
     private static final String REST_KEY = "";
-    private static final String POSTENDPOINT = "";
+    private static final String POSTENDPOINT = "http://138.68.242.53:8080";
 
     // Insert API calls here //
     // Calls the /search endpoint (fulltextsearch)
@@ -47,7 +47,7 @@ public class ClarityClient {
         client.get(POSTENDPOINT, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                System.out.println(response);
+                System.out.println("Success");
             }
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable
