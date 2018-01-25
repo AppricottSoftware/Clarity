@@ -53,7 +53,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private String Hash_Password(String originalPassword) {
+    public String Hash_Password(String originalPassword) {
         String hashedPassword = null;
         try
         {

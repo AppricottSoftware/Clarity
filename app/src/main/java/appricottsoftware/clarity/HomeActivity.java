@@ -1,5 +1,6 @@
 package appricottsoftware.clarity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
@@ -19,6 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookRequestError;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import appricottsoftware.clarity.adapters.TabPagerAdapter;
@@ -29,6 +36,8 @@ import appricottsoftware.clarity.fragments.SettingFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+
+
 public class HomeActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -37,6 +46,7 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.supl_home) SlidingUpPanelLayout suplPanel;
 
     private ActionBarDrawerToggle drawerToggle;
+    private String loginType;   // "1" is e-mail password, "2" is facebook, "3" is google
 
     private static HomeFragment homeFragment;
     private static LikeFragment likeFragment;
@@ -48,6 +58,9 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+
+        // Get Login Type
+        loginType = getIntent().getStringExtra("loginType");
 
         // Replace toolbar
         setSupportActionBar(toolbar);
@@ -175,8 +188,19 @@ public class HomeActivity extends AppCompatActivity {
                 fragment = settingFragment;
                 break;
             case R.id.nav_logout:
-                logout();
-                break;
+                switch(loginType) {
+                    case "1":
+                        break;
+                    case "2":
+                        LoginManager.getInstance().logOut();
+                        logout();
+                        break;
+                    case "3":
+                        break;
+                    default:
+                        logout();
+                        break;
+                }
             default:
                 break;
         }
