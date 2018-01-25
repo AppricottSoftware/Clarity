@@ -6,7 +6,8 @@ import com.loopj.android.http.RequestParams;
 
 public class ClarityClient {
     private static final String REST_URL = "https://listennotes.p.mashape.com/api/v1/";
-    private static final String REST_KEY = "Hby2uMRdnVmshRhKh3lhPsp2k3v9p1dtegYjsn7FsGgMLy67xQ";
+    private static final String REST_KEY = "";
+    private static final String POSTENDPOINT = "";
 
     // Insert API calls here //
 
@@ -29,4 +30,18 @@ public class ClarityClient {
         params.put("type", type);
         client.get(REST_URL + "search", params, handler);
     }
+
+    public void checkLogin(String email, String password, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.addHeader("Accept", "application/json");
+        client.addHeader("Content-type", "application/json");
+
+
+        RequestParams params = new RequestParams();
+        params.put("email", email);
+        params.put("password", password);
+
+        client.get(POSTENDPOINT, params, handler);
+    }
+
 }
