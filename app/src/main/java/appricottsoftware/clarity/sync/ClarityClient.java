@@ -1,12 +1,15 @@
 package appricottsoftware.clarity.sync;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import appricottsoftware.clarity.R;
+import cz.msebera.android.httpclient.Header;
 
 public class ClarityClient {
     private static String PODCAST_API_URL;
@@ -19,8 +22,6 @@ public class ClarityClient {
     }
 
     // Insert API calls here //
-
-
     // Calls the /search endpoint (fulltextsearch)
     // Parameters //
     // offset: Offset for search results, for pagination. You'll use next_offset from response for this parameter.
@@ -45,12 +46,23 @@ public class ClarityClient {
         client.addHeader("Accept", "application/json");
         client.addHeader("Content-type", "application/json");
 
-
         RequestParams params = new RequestParams();
+        params.put("typeOfRequest", "verifyLogin");
         params.put("email", email);
         params.put("password", password);
 
-        client.get(POSTENDPOINT, params, handler);
+        client.get(POSTENDPOINT, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                System.out.println("Success");
+            }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable
+                    error)
+            {
+                error.printStackTrace(System.out);
+            }
+        });
     }
 
 }
