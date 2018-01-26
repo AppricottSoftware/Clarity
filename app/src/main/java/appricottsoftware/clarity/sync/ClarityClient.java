@@ -7,14 +7,13 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-
 import appricottsoftware.clarity.R;
 import cz.msebera.android.httpclient.Header;
 
 public class ClarityClient {
     private static String PODCAST_API_URL;
     private static String PODCAST_API_KEY;
-    private static final String POSTENDPOINT = "";
+    private static final String POSTENDPOINT = "http://138.68.242.53:8080";
 
     public ClarityClient(Context context) {
         PODCAST_API_URL = context.getString(R.string.listen_notes_api_url);
