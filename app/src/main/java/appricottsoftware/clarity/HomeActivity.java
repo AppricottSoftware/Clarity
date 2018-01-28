@@ -94,18 +94,6 @@ public class HomeActivity extends AppCompatActivity {
 
         // Set the initial player to be open or closed
         updatePlayer();
-
-        // For Google
-        if (loginType == "3") {
-            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestEmail()
-                    .build();
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                    .build();
-            mGoogleApiClient.connect();
-            super.onStart();
-        }
     }
 
     @Override
