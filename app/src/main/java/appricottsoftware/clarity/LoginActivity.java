@@ -52,6 +52,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private static final String EMAIL = "email";
     private CallbackManager callbackManager;
+    private AccessTokenTracker accessTokenTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btRegister.setOnClickListener(this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        accessTokenTracker.stopTracking();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -134,7 +140,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void facebookLoginCheck() {
         Profile fbProfile = Profile.getCurrentProfile();
-        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+        accessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
                                                        AccessToken currentAccessToken) {
@@ -175,6 +181,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             });
 
                     request.executeAsync();
+                    login("2");
                 }
 
                 @Override
@@ -199,6 +206,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         accessTokenTracker.startTracking();
     }
 
+    // "1" is e-mail password, "2" is facebook, "3" is google
     private void login(String loginType) {
         Intent homeActivityIntent = new Intent(LoginActivity.this, HomeActivity.class);
         homeActivityIntent.putExtra("loginType", loginType);
