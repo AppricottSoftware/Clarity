@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookRequestError;
@@ -26,6 +27,14 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import appricottsoftware.clarity.adapters.TabPagerAdapter;
@@ -33,6 +42,7 @@ import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
+import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -52,6 +62,8 @@ public class HomeActivity extends AppCompatActivity {
     private static LikeFragment likeFragment;
     private static SettingFragment settingFragment;
     private static PlayerFragment playerFragment;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +94,18 @@ public class HomeActivity extends AppCompatActivity {
 
         // Set the initial player to be open or closed
         updatePlayer();
+
+        // For Google
+        if (loginType == "3") {
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestEmail()
+                    .build();
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .build();
+            mGoogleApiClient.connect();
+            super.onStart();
+        }
     }
 
     @Override
@@ -192,12 +216,17 @@ public class HomeActivity extends AppCompatActivity {
                     case "1":
                         break;
                     case "2":
+                        // Logout Facebook
                         LoginManager.getInstance().logOut();
                         logout();
                         break;
                     case "3":
+                        // Logout Google
+                        googleLogoutAndRevoke();
+                        logout();
                         break;
                     default:
+                        Toast.makeText(getApplicationContext(),"Default", Toast.LENGTH_SHORT).show();
                         logout();
                         break;
                 }
@@ -225,5 +254,26 @@ public class HomeActivity extends AppCompatActivity {
 
     private ActionBarDrawerToggle setUpDrawerToggle() {
         return new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
+    }
+
+    private void googleLogoutAndRevoke() {
+        ClarityClient clarityClient = new ClarityClient(this);
+        GoogleSignInClient mGoogleSignInClient = new ClarityClient(this).getGoogleSignInClient();
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
+
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
+        clarityClient.clearGoogleSignInClient();
     }
 }

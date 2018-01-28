@@ -1,11 +1,8 @@
 package appricottsoftware.clarity;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,18 +16,23 @@ import com.facebook.GraphResponse;
 import com.facebook.LoggingBehavior;
 import com.facebook.Profile;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import appricottsoftware.clarity.sync.ClarityApp;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
+
 import java.util.Arrays;
 
+import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
@@ -39,20 +41,23 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    @BindView(R.id.bt_login) Button btLogin;
-    @BindView(R.id.bt_register) Button btRegister;
-    @BindView(R.id.bt_loginFacebook) LoginButton btFacebook;
+    @BindView(R.id.btn_login) Button btnLogin;
+    @BindView(R.id.btn_register) Button btnRegister;
+    @BindView(R.id.btn_loginFacebook) LoginButton btnFacebook;
+    @BindView(R.id.btn_loginGoogle) SignInButton btnGoogle;
     @BindView(R.id.et_email) EditText etEmail;
     @BindView(R.id.et_password) EditText etPassword;
 
     private static final String EMAIL = "email";
-    private CallbackManager callbackManager;
-    private AccessTokenTracker accessTokenTracker;
+    private CallbackManager fbCallbackManager;
+    private AccessTokenTracker fbAccessTokenTracker;
+    private GoogleSignInAccount googleAccount;
+    private GoogleSignInClient googleSignInClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,28 +65,49 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        facebookLoginCheck();
+        btnLogin.setOnClickListener(this);
+        btnRegister.setOnClickListener(this);
+        btnGoogle.setOnClickListener(this);
+        btnGoogle.setSize(SignInButton.SIZE_WIDE);
 
-        btLogin.setOnClickListener(this);
-        btRegister.setOnClickListener(this);
+        facebookLogin();
+        googleLogin();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        googleAccount = GoogleSignIn.getLastSignedInAccount(this);
+        if (googleAccount != null) {
+            login("3");
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        accessTokenTracker.stopTracking();
+        fbAccessTokenTracker.stopTracking();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        fbCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == 3) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
     }
 
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
-            case R.id.bt_login:
+            case R.id.btn_login:
                 RegisterActivity a = new RegisterActivity();
                 String strPassword = a.Hash_Password(etPassword.getText().toString());
                 String strEmail = etEmail.getText().toString();
@@ -93,10 +119,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 finish();
                 break;
-            case R.id.bt_register:
+            case R.id.btn_register:
                 Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
                 startActivity(registerActivityIntent);
                 finish();
+                break;
+            case R.id.btn_loginGoogle:
+                googleSignIn();
                 break;
             default:
                 break;
@@ -138,9 +167,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         return true;
     }
 
-    private void facebookLoginCheck() {
+    private void facebookLogin() {
         Profile fbProfile = Profile.getCurrentProfile();
-        accessTokenTracker = new AccessTokenTracker() {
+        fbAccessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
                                                        AccessToken currentAccessToken) {
@@ -151,10 +180,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         };
 
         if (fbProfile == null) {
-            callbackManager = CallbackManager.Factory.create();
-            btFacebook = findViewById(R.id.bt_loginFacebook);
-            btFacebook.setReadPermissions(Arrays.asList(EMAIL));
-            btFacebook.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            fbCallbackManager = CallbackManager.Factory.create();
+            btnFacebook = findViewById(R.id.btn_loginFacebook);
+            btnFacebook.setReadPermissions(Arrays.asList(EMAIL));
+            btnFacebook.registerCallback(fbCallbackManager, new FacebookCallback<LoginResult>() {
                 @Override
                 public void onSuccess(LoginResult loginResult) {
                     // App code
@@ -203,7 +232,36 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             // fbid = fbProfile.getId();
             login("2");
         }
-        accessTokenTracker.startTracking();
+        fbAccessTokenTracker.startTracking();
+    }
+
+    private void googleLogin() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
+        ClarityClient clarityClient = new ClarityClient(this);
+        clarityClient.setGoogleSignInClient(googleSignInClient);
+    }
+
+    private void googleSignIn() {
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, 3);
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            // Signed in successfully, show authenticated UI.
+            login("3");
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w("Google Login", "signInResult:failed code=" + e.getStatusCode());
+            //updateUI(null);
+        }
     }
 
     // "1" is e-mail password, "2" is facebook, "3" is google

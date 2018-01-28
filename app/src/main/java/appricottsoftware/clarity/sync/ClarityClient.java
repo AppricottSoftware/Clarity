@@ -3,6 +3,7 @@ package appricottsoftware.clarity.sync;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -14,6 +15,7 @@ public class ClarityClient {
     private static String PODCAST_API_URL;
     private static String PODCAST_API_KEY;
     private static final String POSTENDPOINT = "";
+    private static GoogleSignInClient googleSignInClient;
 
     public ClarityClient(Context context) {
         PODCAST_API_URL = context.getString(R.string.listen_notes_api_url);
@@ -62,6 +64,18 @@ public class ClarityClient {
                 error.printStackTrace(System.out);
             }
         });
+    }
+
+    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
+        this.googleSignInClient = googleSignInClient;
+    }
+
+    public GoogleSignInClient getGoogleSignInClient() {
+        return this.googleSignInClient;
+    }
+
+    public void clearGoogleSignInClient() {
+        googleSignInClient = null;
     }
 
 }
