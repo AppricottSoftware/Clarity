@@ -13,6 +13,7 @@
     <string name="toolbar_login_activity">Login</string>
     <string name="toolbar_register_activity">Register</string>
     <string name="toolbar_home_activity">Home</string>
+    <string name="splash_content_desc">Logo Gif</string>
 
     <string name="register_button">Register</string>
     <string name="email_hint">email</string>
