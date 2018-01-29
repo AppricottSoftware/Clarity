@@ -5,5 +5,8 @@
     <dimen name="nav_drawer_padding">16dp</dimen>
     <dimen name="nav_drawer_header_height">160dp</dimen>
 
-    <dimen name="survey_prompt_text_size">24sp</dimen>
+    <dimen name="survey_prompt_text_size">18sp</dimen>
+    <dimen name="survey_cat_text_size">14sp</dimen>
+    <dimen name="survey_prompt_LR_padding">48dp</dimen>
+
 </resources>

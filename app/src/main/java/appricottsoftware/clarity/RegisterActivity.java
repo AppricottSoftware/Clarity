@@ -23,7 +23,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
 
-    boolean seeSurvey = false;
+    boolean seeSurvey = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
