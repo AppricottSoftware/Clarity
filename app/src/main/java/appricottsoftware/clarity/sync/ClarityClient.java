@@ -1,25 +1,29 @@
 package appricottsoftware.clarity.sync;
 
 import android.content.Context;
-import android.util.Log;
+import android.content.res.Resources;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
+
 import appricottsoftware.clarity.R;
-import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
+import cz.msebera.android.httpclient.protocol.HTTP;
 
 public class ClarityClient {
-    private static String PODCAST_API_URL;
-    private static String PODCAST_API_KEY;
-    private static final String POSTENDPOINT = "";
+//    private static String PODCAST_API_URL;
+//    private static String PODCAST_API_KEY;
+//    private static String REGISTER_REQUEST_URL;
     private static GoogleSignInClient googleSignInClient;
 
     public ClarityClient(Context context) {
-        PODCAST_API_URL = context.getString(R.string.listen_notes_api_url);
-        PODCAST_API_KEY = context.getString(R.string.listen_notes_api_key);
+//        PODCAST_API_URL = Resources.getSystem().getString(R.string.listen_notes_api_url);
+//        PODCAST_API_KEY = Resources.getSystem().getString(R.string.listen_notes_api_key);
+//        REGISTER_REQUEST_URL = Resources.getSystem().getString(R.string.register_request_url);
     }
 
     // Insert API calls here //
@@ -32,38 +36,33 @@ public class ClarityClient {
     public void getFullTextSearch(int offset, String q, int sort_by_date, String type, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
-        client.addHeader("X-Mashape-Key", PODCAST_API_KEY);
+        client.addHeader("X-Mashape-Key", "");
         // Next, we add the parameters for the api call (see function description above)
         RequestParams params = new RequestParams();
         params.put("offset", offset);
         params.put("q", q);
         params.put("sort_by_date", sort_by_date);
         params.put("type", type);
-        client.get(PODCAST_API_URL + "search", params, handler);
+        client.get("search", params, handler);
     }
 
-    public void checkLogin(String email, String password, JsonHttpResponseHandler handler) {
+    public void RegisterRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
+        // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
-        client.addHeader("Accept", "application/json");
-        client.addHeader("Content-type", "application/json");
 
-        RequestParams params = new RequestParams();
-        params.put("typeOfRequest", "verifyLogin");
-        params.put("email", email);
-        params.put("password", password);
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("email", email);
+            jsonParams.put("password", password);
 
-        client.get(POSTENDPOINT, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                System.out.println("Success");
-            }
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable
-                    error)
-            {
-                error.printStackTrace(System.out);
-            }
-        });
+            StringEntity entity = new StringEntity(jsonParams.toString());
+//            entity.setContentType(HTTP.CONTENT_TYPE, "application/json");
+            client.post(context, context.getString(R.string.register_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
