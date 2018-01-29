@@ -23,7 +23,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
 
-    boolean seeSurvey = true;
+    boolean seeSurvey = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +52,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     startActivity(surveyActivityIntent);
                     finish();
                 } else {
+
+                    // After successful save of user info on back end
+                    // Switch to home activity
+
+
                     Intent homeActivityIntent = new Intent(this, HomeActivity.class);
                     homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(homeActivityIntent);
