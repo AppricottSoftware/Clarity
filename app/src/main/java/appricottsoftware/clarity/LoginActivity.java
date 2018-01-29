@@ -110,8 +110,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_login:
-                RegisterActivity a = new RegisterActivity();
-                String strPassword = a.Hash_Password(etPassword.getText().toString());
+                String strPassword = new RegisterActivity().Hash_Password(etPassword.getText().toString());
                 String strEmail = etEmail.getText().toString();
 
                 if (isAuthenticated(strEmail, strPassword)) {
@@ -122,9 +121,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 finish();
                 break;
             case R.id.btn_register:
-                Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
-                startActivity(registerActivityIntent);
-                finish();
+                register();
                 break;
             case R.id.btn_loginGoogle:
                 googleSignIn();
@@ -272,6 +269,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Intent homeActivityIntent = new Intent(LoginActivity.this, HomeActivity.class);
         homeActivityIntent.putExtra("loginType", loginType);
         startActivity(homeActivityIntent);
+        finish();
+    }
+
+    private void register() {
+        Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
+        startActivity(registerActivityIntent);
         finish();
     }
 }
