@@ -3,11 +3,15 @@ package appricottsoftware.clarity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -16,14 +20,20 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
+import appricottsoftware.clarity.sync.ClarityApp;
+import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cz.msebera.android.httpclient.Header;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.bt_register) Button btRegister;
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
+
+    boolean seeSurvey = false;
+    private static final String TAG = "RegisterActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +49,67 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch(v.getId()) {
             case R.id.bt_register:
 
-                String hashedPassword = null;
-                hashedPassword = Hash_Password(password.getText().toString());
+                String emailString = email.getText().toString();
+                String hashedPassword = Hash_Password(password.getText().toString());
+
+                // create instance of clarityClient
+                // pass information to database to store
+
+                if (seeSurvey == true){
+                    Intent surveyActivityIntent = new Intent(this, SurveyActivity.class);
+                    surveyActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(surveyActivityIntent);
+                    finish();
+                } else {
+
+                    // After successful save of user info on back end
+                    // Switch to home activity
 
 
-                Intent homeActivityIntent = new Intent(this, HomeActivity.class);
-                homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(homeActivityIntent);
-                finish();
+                    Intent homeActivityIntent = new Intent(this, HomeActivity.class);
+                    homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(homeActivityIntent);
+                    finish();
+                }
+            
+                ClarityApp.getRestClient().RegisterRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        Log.e(TAG, "onSuccess1 : " + response.toString() );
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        Log.e(TAG, "onSuccess2 : " + response.toString());
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        Log.e(TAG, "onFailue1 : " + errorResponse.toString());
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                        Log.e(TAG, "onFailue2 : " + errorResponse.toString());
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        Log.e(TAG, "onFailue3 : " + responseString.toString());
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        Log.e(TAG, "onSuccess3 : " + responseString.toString());
+                        super.onSuccess(statusCode, headers, responseString);
+                    }
+                });
+
                 break;
             default:
                 break;
@@ -64,17 +127,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             hashedPassword = bytesToHex( bytes );
         }
-        catch(NoSuchAlgorithmException e)
-        {
-            e.printStackTrace();
-        }
-        catch(UnsupportedEncodingException e)
+        catch(NoSuchAlgorithmException | UnsupportedEncodingException e)
         {
             e.printStackTrace();
         }
         return hashedPassword;
     }
-
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
     public static String bytesToHex( byte[] bytes )
@@ -88,7 +146,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
         return new String( hexChars );
     }
-}
+
+
+} //end RegisterActivity
 
 
 
