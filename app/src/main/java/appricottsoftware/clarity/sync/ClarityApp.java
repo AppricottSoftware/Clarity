@@ -21,7 +21,7 @@ public class ClarityApp extends Application {
     // Get the single instance of the API client
     public static ClarityClient getRestClient() {
         if(clarityClient == null) {
-            clarityClient = new ClarityClient();
+            clarityClient = new ClarityClient(context);
         }
         return clarityClient;
     }

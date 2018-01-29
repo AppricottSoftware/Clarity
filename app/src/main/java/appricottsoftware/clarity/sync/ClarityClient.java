@@ -1,16 +1,32 @@
 package appricottsoftware.clarity.sync;
 
+import android.content.Context;
+import android.content.res.Resources;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONObject;
+
+import appricottsoftware.clarity.R;
+import cz.msebera.android.httpclient.entity.StringEntity;
+import cz.msebera.android.httpclient.protocol.HTTP;
+
 public class ClarityClient {
-    private static final String REST_URL = "https://listennotes.p.mashape.com/api/v1/";
-    private static final String REST_KEY = "Hby2uMRdnVmshRhKh3lhPsp2k3v9p1dtegYjsn7FsGgMLy67xQ";
+//    private static String PODCAST_API_URL;
+//    private static String PODCAST_API_KEY;
+//    private static String REGISTER_REQUEST_URL;
+    private static GoogleSignInClient googleSignInClient;
+
+    public ClarityClient(Context context) {
+//        PODCAST_API_URL = Resources.getSystem().getString(R.string.listen_notes_api_url);
+//        PODCAST_API_KEY = Resources.getSystem().getString(R.string.listen_notes_api_key);
+//        REGISTER_REQUEST_URL = Resources.getSystem().getString(R.string.register_request_url);
+    }
 
     // Insert API calls here //
-
-
     // Calls the /search endpoint (fulltextsearch)
     // Parameters //
     // offset: Offset for search results, for pagination. You'll use next_offset from response for this parameter.
@@ -20,13 +36,45 @@ public class ClarityClient {
     public void getFullTextSearch(int offset, String q, int sort_by_date, String type, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
-        client.addHeader("X-Mashape-Key", REST_KEY);
+        client.addHeader("X-Mashape-Key", "");
         // Next, we add the parameters for the api call (see function description above)
         RequestParams params = new RequestParams();
         params.put("offset", offset);
         params.put("q", q);
         params.put("sort_by_date", sort_by_date);
         params.put("type", type);
-        client.get(REST_URL + "search", params, handler);
+        client.get("search", params, handler);
     }
+
+    public void RegisterRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
+        // Create the rest client and add header(s)
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("email", email);
+            jsonParams.put("password", password);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+//            entity.setContentType(HTTP.CONTENT_TYPE, "application/json");
+            client.post(context, context.getString(R.string.register_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
+        this.googleSignInClient = googleSignInClient;
+    }
+
+    public GoogleSignInClient getGoogleSignInClient() {
+        return this.googleSignInClient;
+    }
+
+    public void clearGoogleSignInClient() {
+        googleSignInClient = null;
+    }
+
 }
