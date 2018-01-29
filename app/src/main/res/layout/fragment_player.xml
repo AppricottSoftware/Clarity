@@ -31,7 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toEndOf="@id/iv_collapse_cover"
-            app:layout_constraintEnd_toStartOf="@id/cl_collapse_play_pause"
+            app:layout_constraintEnd_toStartOf="@id/ib_collapse_play_pause"
             app:layout_constraintTop_toTopOf="@id/iv_collapse_cover"
             android:paddingTop="@dimen/player_fragment_padding"
             android:ellipsize="marquee"
@@ -45,39 +45,25 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toEndOf="@id/iv_collapse_cover"
-            app:layout_constraintEnd_toStartOf="@id/cl_collapse_play_pause"
+            app:layout_constraintEnd_toStartOf="@id/ib_collapse_play_pause"
             app:layout_constraintTop_toBottomOf="@id/tv_collapse_title"
             android:ellipsize="marquee"
             android:singleLine="true"
             android:textColor="@android:color/white"
             android:text="This is a description of the podcast that is playing in this player."/>
 
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/cl_collapse_play_pause"
+
+        <ImageButton
+            android:id="@+id/ib_collapse_play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:scaleType="fitXY"
             app:layout_constraintEnd_toStartOf="@id/ib_collapse_skip"
-            app:layout_constraintTop_toTopOf="@id/iv_collapse_cover">
-
-            <ImageButton
-                android:id="@+id/ib_collapse_play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_player_play"
-                android:padding="@dimen/player_fragment_padding"/>
-
-            <ImageButton
-                android:id="@+id/ib_collapse_pause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_player_pause"
-                android:padding="@dimen/player_fragment_padding"/>
-
-        </android.support.constraint.ConstraintLayout>
+            app:layout_constraintTop_toTopOf="@id/iv_collapse_cover"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_player_play"
+            android:padding="@dimen/player_fragment_padding">
+        </ImageButton>
 
         <ImageButton
             android:id="@+id/ib_collapse_skip"
@@ -124,32 +110,17 @@
             app:layout_constraintStart_toEndOf="@id/ib_expand_like"
             app:srcCompat="@drawable/ic_player_dislike" />
 
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/cl_expand_play_pause"
+        <ImageButton
+            android:id="@+id/ib_expand_play_pause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/ib_expand_skip">
-
-            <ImageButton
-                android:id="@+id/ib_expand_play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:padding="@dimen/player_fragment_padding"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/ic_player_play" />
-
-            <ImageButton
-                android:id="@+id/ib_expand_pause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:padding="@dimen/player_fragment_padding"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/ic_player_pause" />
-
-        </android.support.constraint.ConstraintLayout>
+            app:layout_constraintEnd_toStartOf="@id/ib_expand_skip"
+            android:background="@android:color/transparent"
+            android:padding="@dimen/player_fragment_padding"
+            app:srcCompat="@drawable/ic_player_play">
+        </ImageButton>
 
         <ImageButton
             android:id="@+id/ib_expand_skip"
@@ -172,7 +143,7 @@
             android:textColor="@android:color/white"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/cl_expand_play_pause"
+            app:layout_constraintEnd_toStartOf="@id/ib_expand_play_pause"
             app:layout_constraintStart_toEndOf="@id/ib_expand_dislike"
             app:layout_constraintTop_toTopOf="@id/ib_expand_dislike" />
 

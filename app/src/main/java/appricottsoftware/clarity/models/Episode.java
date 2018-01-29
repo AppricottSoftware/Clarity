@@ -1,75 +1,76 @@
 package appricottsoftware.clarity.models;
 
+import android.media.MediaMetadata;
+import android.support.v4.media.MediaMetadataCompat;
+
+import org.parceler.Parcel;
+
+import java.util.ArrayList;
+
+import appricottsoftware.clarity.sync.ClarityApp;
+import appricottsoftware.clarity.sync.ClarityClient;
+
+@Parcel
 public class Episode {
 
     /* Sample API Response
-          "image": "http://is1.mzstatic.com/image/thumb/Music71/v4/36/40/fd/3640fdd7-8dd3-8e30-0880-f5147fa9f8a1/source/600x600bb.jpg",
-          "title_original": "News in Slow French #253 - Language learning in the context of current events",
-          "publisher_highlighted": "Linguistica 360",
-          "podcast_title_original": "French Podcast",
-          "pub_date_ms": 1451622600000,
-          "description_highlighted": "... personnes. Nous discuterons du résultat d'une étude montrant que les dirigeants élus ont une espérance de vie plus courte que les candidats qui arrivent deuxième, et nous conclurons avec le film <span class=\"ln-search-highlight\">Star</span> <span class=\"ln-search-highlight\">Wars</span>",
-          "id": "4b7ae5ea786247d0a2002202debe246c",
-          "publisher_original": "Linguistica 360",
-          "podcast_id": "39e505db4e6f44c493614595a1507cac",
-          "description_original": "Dans la première partie, nous parlerons de la victoire de l'Irak contre l'EI à Ramadi. Nous continuerons avec les tempêtes meurtrières qui ont frappé les États-Unis à Noël et ont tué au moins43 personnes. Nous discuterons du résultat d'une étude montrant que les dirigeants élus ont une espérance de vie plus courte que les candidats qui arrivent deuxième, et nous conclurons avec le film Star Wars qui bat des records à peine une semaine après sa sortie. - L’Irak repousse l’État Islamique hors de Ramadi - Des tempêtes meurtrières frappent les États-Unis à Noël - Selon une étude les chefs d’État vieillissent plus rapidement - Star Wars bat les records du box-office mondial La deuxième partie sera consacrée comme toujours à la langue et la culture françaises. Dans la section grammaticale, nous reverrons la forme interrogative et l'inversion et nous terminerons l'épisode d'aujourd'hui avec une nouvelle expression idiomatique : « Avoir/Prendre la grosse tête ».",
-          "podcast_title_highlighted": "French Podcast",
-          "audio": "http://traffic.libsyn.com/nsf/nsf253-itunes.mp3?dest-id=63713",
-          "itunes_id": 427774337,
-          "audio_length": "00:08:56",
-          "title_highlighted": "News in Slow French #253 - Language learning in the context of current events",
-          "rss": "http://nsf.libsyn.com/rss"
+		"pub_date_ms": 1511796600000,
+		"description_original": "What is net neutrality and why should you care about it? What happens to science and innovation, and even sites like this one, without an open internet?\n\nRead the transcript at http://www.quickanddirtytips.com/education/science/net-neutrality-repeal-and-science\nCheck out all the Quick and Dirty Tips shows:\nwww.quickanddirtytips.com/podcasts\n\nFOLLOW EVERYDAY EINSTEIN\nFacebook: https://www.facebook.com/qdteinstein \nTwitter: https://twitter.com/qdteinstein",
+		"rss": "http://www.quickanddirtytips.com/xml/einstein.xml",
+		"audio": "http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/einstein/traffic.libsyn.com/einstein/ede_263-ui3.mp3",
+		"description_highlighted": "...What is <span class=\"ln-search-highlight\">net</span> <span class=\"ln-search-highlight\">neutrality</span> and why should you care about it? What happens to science and innovation, and even sites like this one, without an open internet?\n\nRead the transcript at http",
+		"itunes_id": 510036484,
+		"title_highlighted": "263 - The End of <span class=\"ln-search-highlight\">Net</span> <span class=\"ln-search-highlight\">Neutrality</span>: What It Means For Science (and You)",
+		"publisher_original": "Macmillan Holdings, LLC",
+		"audio_length": "00:09:59",
+		"podcast_title_highlighted": "Everyday Einstein's Quick and Dirty Tips for Making Sense of Science",
+		"image": "https://d3sv2eduhewoas.cloudfront.net/channel/image/a77267bda67144dea582a918999148bc.jpeg",
+		"genres": [111, 114],
+		"title_original": "263 - The End of Net Neutrality: What It Means For Science (and You)",
+		"podcast_title_original": "Everyday Einstein's Quick and Dirty Tips for Making Sense of Science",
+		"publisher_highlighted": "Macmillan Holdings, LLC",
+		"podcast_id": "704e77179b6d4dc7a3df506e0eaa00fc",
+		"id": "72e6260159b14d569ba320b56127574f"
      */
 
-    private String image;
-    private String title_original;
-    private String publisher_highlighted;
-    private String podcast_title_original;
-    private long pub_date_ms;
-    private String description_highlighted;
-    private String id;
-    private String publisher_original;
-    private String podcast_id;
-    private String description_original;
-    private String podcast_title_highlighted;
-    private String audio;
-    private long itunes_id;
-    private String audio_length;
-    private String title_highlighted;
-    private String rss;
+    long pub_date_ms;
+    String description_original;
+    String rss;
+    String audio;
+    String description_highlighted;
+    long itunes_id;
+    String title_highlighted;
+    String publisher_original;
+    String audio_length;
+    String podcast_title_highlighted;
+    String image;
+    ArrayList<String> genres;    
+    String title_original;
+    String podcast_title_original;
+    String publisher_highlighted;
+    String podcast_id;
+    String id;
 
-    public Episode() { /* Empty constructor required by GSON */}
+    public Episode() { /* Empty constructor required by GSON and Parcel */}
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
+    public Episode(long pub_date_ms, String description_original, String rss, String audio, String description_highlighted, long itunes_id, String title_highlighted, String publisher_original, String audio_length, String podcast_title_highlighted, String image, ArrayList<String> genres, String title_original, String podcast_title_original, String publisher_highlighted, String podcast_id, String id) {
+        this.pub_date_ms = pub_date_ms;
+        this.description_original = description_original;
+        this.rss = rss;
+        this.audio = audio;
+        this.description_highlighted = description_highlighted;
+        this.itunes_id = itunes_id;
+        this.title_highlighted = title_highlighted;
+        this.publisher_original = publisher_original;
+        this.audio_length = audio_length;
+        this.podcast_title_highlighted = podcast_title_highlighted;
         this.image = image;
-    }
-
-    public String getTitle_original() {
-        return title_original;
-    }
-
-    public void setTitle_original(String title_original) {
+        this.genres = genres;
         this.title_original = title_original;
-    }
-
-    public String getPublisher_highlighted() {
-        return publisher_highlighted;
-    }
-
-    public void setPublisher_highlighted(String publisher_highlighted) {
-        this.publisher_highlighted = publisher_highlighted;
-    }
-
-    public String getPodcast_title_original() {
-        return podcast_title_original;
-    }
-
-    public void setPodcast_title_original(String podcast_title_original) {
         this.podcast_title_original = podcast_title_original;
+        this.publisher_highlighted = publisher_highlighted;
+        this.podcast_id = podcast_id;
+        this.id = id;
     }
 
     public long getPub_date_ms() {
@@ -80,38 +81,6 @@ public class Episode {
         this.pub_date_ms = pub_date_ms;
     }
 
-    public String getDescription_highlighted() {
-        return description_highlighted;
-    }
-
-    public void setDescription_highlighted(String description_highlighted) {
-        this.description_highlighted = description_highlighted;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getPublisher_original() {
-        return publisher_original;
-    }
-
-    public void setPublisher_original(String publisher_original) {
-        this.publisher_original = publisher_original;
-    }
-
-    public String getPodcast_id() {
-        return podcast_id;
-    }
-
-    public void setPodcast_id(String podcast_id) {
-        this.podcast_id = podcast_id;
-    }
-
     public String getDescription_original() {
         return description_original;
     }
@@ -120,12 +89,12 @@ public class Episode {
         this.description_original = description_original;
     }
 
-    public String getPodcast_title_highlighted() {
-        return podcast_title_highlighted;
+    public String getRss() {
+        return rss;
     }
 
-    public void setPodcast_title_highlighted(String podcast_title_highlighted) {
-        this.podcast_title_highlighted = podcast_title_highlighted;
+    public void setRss(String rss) {
+        this.rss = rss;
     }
 
     public String getAudio() {
@@ -136,20 +105,20 @@ public class Episode {
         this.audio = audio;
     }
 
+    public String getDescription_highlighted() {
+        return description_highlighted;
+    }
+
+    public void setDescription_highlighted(String description_highlighted) {
+        this.description_highlighted = description_highlighted;
+    }
+
     public long getItunes_id() {
         return itunes_id;
     }
 
     public void setItunes_id(long itunes_id) {
         this.itunes_id = itunes_id;
-    }
-
-    public String getAudio_length() {
-        return audio_length;
-    }
-
-    public void setAudio_length(String audio_length) {
-        this.audio_length = audio_length;
     }
 
     public String getTitle_highlighted() {
@@ -160,11 +129,124 @@ public class Episode {
         this.title_highlighted = title_highlighted;
     }
 
-    public String getRss() {
-        return rss;
+    public String getPublisher_original() {
+        return publisher_original;
     }
 
-    public void setRss(String rss) {
-        this.rss = rss;
+    public void setPublisher_original(String publisher_original) {
+        this.publisher_original = publisher_original;
+    }
+
+    public String getAudio_length() {
+        return audio_length;
+    }
+
+    public void setAudio_length(String audio_length) {
+        this.audio_length = audio_length;
+    }
+
+    public String getPodcast_title_highlighted() {
+        return podcast_title_highlighted;
+    }
+
+    public void setPodcast_title_highlighted(String podcast_title_highlighted) {
+        this.podcast_title_highlighted = podcast_title_highlighted;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public ArrayList<String> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(ArrayList<String> genres) {
+        this.genres = genres;
+    }
+
+    public String getTitle_original() {
+        return title_original;
+    }
+
+    public void setTitle_original(String title_original) {
+        this.title_original = title_original;
+    }
+
+    public String getPodcast_title_original() {
+        return podcast_title_original;
+    }
+
+    public void setPodcast_title_original(String podcast_title_original) {
+        this.podcast_title_original = podcast_title_original;
+    }
+
+    public String getPublisher_highlighted() {
+        return publisher_highlighted;
+    }
+
+    public void setPublisher_highlighted(String publisher_highlighted) {
+        this.publisher_highlighted = publisher_highlighted;
+    }
+
+    public String getPodcast_id() {
+        return podcast_id;
+    }
+
+    public void setPodcast_id(String podcast_id) {
+        this.podcast_id = podcast_id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String toString() {
+        return ClarityApp.getGson().toJson(this);
+    }
+
+    public MediaMetadataCompat toMediaMetadataCompat() {
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title_original)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title_original)
+                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, description_original)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, podcast_title_original)
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, image)
+                .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, audio)
+                .putString(MediaMetadataCompat.METADATA_KEY_AUTHOR, publisher_original);
+        return builder.build();
+    }
+
+    public static Episode getSampleEpisode() {
+        Episode episode = new Episode();
+        episode.setPub_date_ms(Long.parseLong("1511796600000"));
+        episode.setDescription_original("What is net neutrality and why should you care about it? What happens to science and innovation, and even sites like this one, without an open internet?\n\nRead the transcript at http://www.quickanddirtytips.com/education/science/net-neutrality-repeal-and-science\nCheck out all the Quick and Dirty Tips shows:\nwww.quickanddirtytips.com/podcasts\n\nFOLLOW EVERYDAY EINSTEIN\nFacebook: https://www.facebook.com/qdteinstein \nTwitter: https://twitter.com/qdteinstein");
+        episode.setRss("http://www.quickanddirtytips.com/xml/einstein.xml");
+        episode.setAudio("http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/einstein/traffic.libsyn.com/einstein/ede_263-ui3.mp3");
+        episode.setDescription_highlighted("...What is <span class=\"ln-search-highlight\">net</span> <span class=\"ln-search-highlight\">neutrality</span> and why should you care about it? What happens to science and innovation, and even sites like this one, without an open internet?\n\nRead the transcript at http");
+        episode.setItunes_id(510036484);
+        episode.setTitle_highlighted("263 - The End of <span class=\"ln-search-highlight\">Net</span> <span class=\"ln-search-highlight\">Neutrality</span>: What It Means For Science (and You)");
+        episode.setPublisher_original("Macmillan Holdings, LLC");
+        episode.setAudio_length("00:09:59");
+        episode.setPodcast_title_highlighted("Everyday Einstein's Quick and Dirty Tips for Making Sense of Science");
+        episode.setImage("https://d3sv2eduhewoas.cloudfront.net/channel/image/a77267bda67144dea582a918999148bc.jpeg");
+        ArrayList<String> genres = new ArrayList<>();
+        genres.add("111");
+        genres.add("114");
+        episode.setGenres(genres);
+        episode.setTitle_original("263 - The End of Net Neutrality: What It Means For Science (and You)");
+        episode.setPodcast_title_original("Everyday Einstein's Quick and Dirty Tips for Making Sense of Science");
+        episode.setPublisher_highlighted("Macmillan Holdings, LLC");
+        episode.setPodcast_id("704e77179b6d4dc7a3df506e0eaa00fc");
+        episode.setId("72e6260159b14d569ba320b56127574f");
+        return episode;
     }
 }

@@ -1,5 +1,8 @@
 package appricottsoftware.clarity.models;
 
+import org.parceler.Parcel;
+
+@Parcel
 public class Podcast {
 
     /* Sample API Response
@@ -16,19 +19,33 @@ public class Podcast {
          "description_original": "Brought to you by Rex Overdrive and Adam Cook, comes the Star Wars Uplink podcast feed. Here you will find shows discussing and celebrating everything about Star Wars.\n\nSubscribe on Itunes!\nTwitter @starwarsuplink"
      */
 
-    private String image;
-    private String title_original;
-    private String publisher_highlighted;
-    private long itunes_id;
-    private String lastest_pub_date_ms;
-    private String id;
-    private String description_highlighted;
-    private String title_highlighted;
-    private String publisher_original;
-    private String rss;
-    private String description_original;
+    String image;
+    String title_original;
+    String publisher_highlighted;
+    long itunes_id;
+    String lastest_pub_date_ms;
+    String id;
+    String description_highlighted;
+    String title_highlighted;
+    String publisher_original;
+    String rss;
+    String description_original;
 
-    public Podcast() { /* Empty constructor required by GSON */}
+    public Podcast() { /* Empty constructor required by GSON and Parcel */}
+
+    public Podcast(String image, String title_original, String publisher_highlighted, long itunes_id, String lastest_pub_date_ms, String id, String description_highlighted, String title_highlighted, String publisher_original, String rss, String description_original) {
+        this.image = image;
+        this.title_original = title_original;
+        this.publisher_highlighted = publisher_highlighted;
+        this.itunes_id = itunes_id;
+        this.lastest_pub_date_ms = lastest_pub_date_ms;
+        this.id = id;
+        this.description_highlighted = description_highlighted;
+        this.title_highlighted = title_highlighted;
+        this.publisher_original = publisher_original;
+        this.rss = rss;
+        this.description_original = description_original;
+    }
 
     public String getImage() {
         return image;

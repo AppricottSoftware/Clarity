@@ -3,9 +3,7 @@ package appricottsoftware.clarity.models;
 import java.util.ArrayList;
 
 public interface PlayerInterface {
-
-    public void loadPlaylist(ArrayList<Podcast> podcasts);
-    public void play(Podcast podcast);
-    public void pause();
-    public void skip();
+    public void playChannel(Channel channel);
+    public void playEpisode(Episode episode);
+    public void playPodcast(Podcast podcast);
 }

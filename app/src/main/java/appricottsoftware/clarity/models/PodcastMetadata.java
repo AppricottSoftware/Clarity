@@ -1,42 +1,51 @@
 package appricottsoftware.clarity.models;
 
+import org.parceler.Parcel;
+
+@Parcel
 public class PodcastMetadata {
 
-    /* Sample API
-      "image": "http://is4.mzstatic.com/image/thumb/Music128/v4/d5/c6/50/d5c65035-505e-b006-48e5-be3f0f8f19f8/source/600x600bb.jpg",
-      "publisher": "TED",
-      "itunes_id": 160904630,
-      "lastest_pub_date_ms": 1516636594000,
-      "title": "TED Talks Daily",
-      "website": "https://www.ted.com/talks?utm_source=listennotes.com&utm_campaign=Listen+Notes&utm_medium=website",
-      "description": "Want TED Talks on the go? Every weekday, this feed brings you our latest talks in audio format. Hear thought-provoking ideas on every subject imaginable -- from Artificial Intelligence to Zoology, and everything in between -- given by the world's leading thinkers and doers. This collection of talks, given at TED and TEDx conferences around the globe, is also available in video format.",
-      "genres": [
-        "Podcasts",
-        "News & Politics",
-        "Arts",
-        "Science & Medicine",
-        "Education",
-        "Society & Culture",
-        "Technology"
-      ],
-      "id": "9d6939745ed34e3aab0eb78a408ab40d",
-      "language": "English",
-      "rss": "http://feeds.feedburner.com/TEDTalks_audio"
+    /* Sample API Response
+        "description": "How do astronomers photograph a black hole? How often do planes get hit by lightning? What does the EPA actually do? Science is all around us and transforming our world at a rapid pace. Extragalactic astrophysicist Sabrina Stierwalt is here to guide you through it. She'll help you make sense of the everyday and the once-in-a-lifetime.",
+        "title": "Everyday Einstein's Quick and Dirty Tips for Making Sense of Science",
+        "genres": ["Podcasts", "Education", "K-12"],
+        "rss": "http://www.quickanddirtytips.com/xml/einstein.xml",
+        "language": "English",
+        "itunes_id": 510036484,
+        "lastest_pub_date_ms": 1516635915000,
+        "image": "https://d3sv2eduhewoas.cloudfront.net/channel/image/a77267bda67144dea582a918999148bc.jpeg",
+        "website": "http://www.quickanddirtytips.com/everyday-einstein?utm_source=listennotes.com&utm_campaign=Listen+Notes&utm_medium=website",
+        "publisher": "Macmillan Holdings, LLC",
+        "id": "704e77179b6d4dc7a3df506e0eaa00fc"
      */
 
-    private String image;
-    private String publisher;
-    private long itunes_id;
-    private long lastest_pub_date_ms;
-    private String title;
-    private String website;
-    private String description;
-    private String[] genres;
-    private String id;
-    private String language;
-    private String rss;
+    String image;
+    String publisher;
+    long itunes_id;
+    long lastest_pub_date_ms;
+    String title;
+    String website;
+    String description;
+    String[] genres;
+    String id;
+    String language;
+    String rss;
 
-    public PodcastMetadata() { /* Empty constructor required by GSON */}
+    public PodcastMetadata() { /* Empty constructor required by GSON and Parcel */}
+
+    public PodcastMetadata(String image, String publisher, long itunes_id, long lastest_pub_date_ms, String title, String website, String description, String[] genres, String id, String language, String rss) {
+        this.image = image;
+        this.publisher = publisher;
+        this.itunes_id = itunes_id;
+        this.lastest_pub_date_ms = lastest_pub_date_ms;
+        this.title = title;
+        this.website = website;
+        this.description = description;
+        this.genres = genres;
+        this.id = id;
+        this.language = language;
+        this.rss = rss;
+    }
 
     public String getImage() {
         return image;

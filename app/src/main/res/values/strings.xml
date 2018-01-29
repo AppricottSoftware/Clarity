@@ -9,8 +9,14 @@
     <string name="nav_drawer_open">Open navigation drawer</string>
     <string name="nav_drawer_close">Close navigation drawer</string>
 
-
     <string name="toolbar_login_activity">Login</string>
     <string name="toolbar_register_activity">Register</string>
     <string name="toolbar_home_activity">Home</string>
+
+    <string name="player_service_pause">Pause</string>
+    <string name="player_service_wifi_lock">APPRICOTT_WIFI_LOCK</string>
+
+    <string name="home_activity_channel_bundle">CHANNEL</string>
+    <string name="home_activity_episode_bundle">EPISODE</string>
+    <string name="home_activity_podcast_bundle">PODCAST</string>
 </resources>

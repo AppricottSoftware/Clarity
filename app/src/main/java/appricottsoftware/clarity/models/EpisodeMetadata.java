@@ -1,46 +1,52 @@
 package appricottsoftware.clarity.models;
 
+import org.parceler.Parcel;
+
+@Parcel
 public class EpisodeMetadata {
 
     /* Sample API Response
-        "pub_date_ms": 1512403205000,
-        "audio": "http://feedproxy.google.com/~r/TEDTalks_audio/~5/sdkNwbx1FQo/JustinBaldoni_2017W.mp3",
-        "title": "Why I'm done trying to be \"man enough\" | Justin Baldoni",
-        "audio_length": 1111,
-        "description": "Justin Baldoni wants to start a dialogue with men about redefining masculinity -- to figure out ways to be not just good men but good humans. In a warm, personal talk, he shares his effort to reconcile who he is with who the world tells him a man should be. And he has a challenge for men: \"See if you can use the same qualities that you feel make you a man to go deeper,\" Baldoni says. \"Your strength, your bravery, your toughness: Are you brave enough to be vulnerable? Are you strong enough to be sensitive? Are you confident enough to listen to the women in your life?\"<img src=\"http://feeds.feedburner.com/~r/TEDTalks_audio/~4/WtYkfeP80O4\" height=\"1\" width=\"1\" alt=\"\"/>",
-        "id": "7fbabe370daf4e34a225bce232764f96",
+        "description": "What is net neutrality and why should you care about it? What happens to science and innovation, and even sites like this one, without an open internet?\r\n\r\nRead the transcript at http://www.quickanddirtytips.com/education/science/net-neutrality-repeal-and-science\r\nCheck out all the Quick and Dirty Tips shows:\r\nwww.quickanddirtytips.com/podcasts\r\n\r\nFOLLOW EVERYDAY EINSTEIN\r\nFacebook: https://www.facebook.com/qdteinstein \r\nTwitter: https://twitter.com/qdteinstein",
+        "title": "263 - The End of Net Neutrality: What It Means For Science (and You)",
         "podcast": {
-            "image": "http://is4.mzstatic.com/image/thumb/Music128/v4/d5/c6/50/d5c65035-505e-b006-48e5-be3f0f8f19f8/source/600x600bb.jpg",
-            "publisher": "TED",
-            "itunes_id": 160904630,
-            "lastest_pub_date_ms": 1516636594000,
-            "title": "TED Talks Daily",
-            "website": "https://www.ted.com/talks?utm_source=listennotes.com&utm_campaign=Listen+Notes&utm_medium=website",
-            "description": "Want TED Talks on the go? Every weekday, this feed brings you our latest talks in audio format. Hear thought-provoking ideas on every subject imaginable -- from Artificial Intelligence to Zoology, and everything in between -- given by the world's leading thinkers and doers. This collection of talks, given at TED and TEDx conferences around the globe, is also available in video format.",
-            "genres": [
-                "Podcasts",
-                "News & Politics",
-                "Arts",
-                "Science & Medicine",
-                "Education",
-                "Society & Culture",
-                "Technology"
-            ],
-            "id": "9d6939745ed34e3aab0eb78a408ab40d",
+            "description": "How do astronomers photograph a black hole? How often do planes get hit by lightning? What does the EPA actually do? Science is all around us and transforming our world at a rapid pace. Extragalactic astrophysicist Sabrina Stierwalt is here to guide you through it. She'll help you make sense of the everyday and the once-in-a-lifetime.",
+            "title": "Everyday Einstein's Quick and Dirty Tips for Making Sense of Science",
+            "genres": ["Podcasts", "Education", "K-12"],
+            "rss": "http://www.quickanddirtytips.com/xml/einstein.xml",
             "language": "English",
-            "rss": "http://feeds.feedburner.com/TEDTalks_audio"
+            "itunes_id": 510036484,
+            "lastest_pub_date_ms": 1516635915000,
+            "image": "https://d3sv2eduhewoas.cloudfront.net/channel/image/a77267bda67144dea582a918999148bc.jpeg",
+            "website": "http://www.quickanddirtytips.com/everyday-einstein?utm_source=listennotes.com&utm_campaign=Listen+Notes&utm_medium=website",
+            "publisher": "Macmillan Holdings, LLC",
+            "id": "704e77179b6d4dc7a3df506e0eaa00fc"
+        },
+        "audio": "http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/einstein/traffic.libsyn.com/einstein/ede_263-ui3.mp3",
+        "pub_date_ms": 1511796600000,
+        "audio_length": 599,
+        "id": "72e6260159b14d569ba320b56127574f"
         }
     */
 
-    private String pub_date_ms;
-    private String audio;
-    private String title;
-    private long audio_length;
-    private String description;
-    private String id;
-    private Podcast podcast;
+    String pub_date_ms;
+    String audio;
+    String title;
+    long audio_length;
+    String description;
+    String id;
+    Podcast podcast;
 
-    public EpisodeMetadata() { /* Empty constructor required by GSON */}
+    public EpisodeMetadata() { /* Empty constructor required by GSON and Parcel */}
+
+    public EpisodeMetadata(String pub_date_ms, String audio, String title, long audio_length, String description, String id, Podcast podcast) {
+        this.pub_date_ms = pub_date_ms;
+        this.audio = audio;
+        this.title = title;
+        this.audio_length = audio_length;
+        this.description = description;
+        this.id = id;
+        this.podcast = podcast;
+    }
 
     public String getPub_date_ms() {
         return pub_date_ms;
