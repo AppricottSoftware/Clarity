@@ -3,8 +3,6 @@ package appricottsoftware.clarity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,6 +22,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.bt_register) Button btRegister;
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
+
+    boolean seeSurvey = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +46,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 // create instance of clarityClient
                 // pass information to database to store
 
-                Intent homeActivityIntent = new Intent(this, HomeActivity.class);
-                homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(homeActivityIntent);
-                finish();
+                if (seeSurvey == true){
+                    Intent surveyActivityIntent = new Intent(this, SurveyActivity.class);
+                    surveyActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(surveyActivityIntent);
+                    finish();
+                } else {
+                    Intent homeActivityIntent = new Intent(this, HomeActivity.class);
+                    homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(homeActivityIntent);
+                    finish();
+                }
+
                 break;
             default:
                 break;
@@ -86,7 +94,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
         return new String( hexChars );
     }
-}
+
+
+} //end RegisterActivity
 
 
 
