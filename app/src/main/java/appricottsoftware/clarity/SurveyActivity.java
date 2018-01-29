@@ -12,5 +12,21 @@ public class SurveyActivity extends AppCompatActivity {
 
 
 
+
     }
 }
+
+
+
+
+
+/*
+
+TV & Film                   68
+Sports & Recreation         77
+Technology                  127
+History                     125
+News & Politics             99
+Religion & Spirituality     69
+
+*/
