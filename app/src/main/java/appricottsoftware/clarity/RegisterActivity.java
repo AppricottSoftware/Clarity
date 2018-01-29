@@ -3,8 +3,6 @@ package appricottsoftware.clarity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +31,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
 
+    boolean seeSurvey = false;
     private static final String TAG = "RegisterActivity";
 
     @Override
@@ -49,9 +48,30 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch(v.getId()) {
             case R.id.bt_register:
 
-                String hashedPassword = null;
+                String emailString = email.getText().toString();
+                String hashedPassword;
                 hashedPassword = Hash_Password(password.getText().toString());
 
+                // create instance of clarityClient
+                // pass information to database to store
+
+                if (seeSurvey == true){
+                    Intent surveyActivityIntent = new Intent(this, SurveyActivity.class);
+                    surveyActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(surveyActivityIntent);
+                    finish();
+                } else {
+
+                    // After successful save of user info on back end
+                    // Switch to home activity
+
+
+                    Intent homeActivityIntent = new Intent(this, HomeActivity.class);
+                    homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(homeActivityIntent);
+                    finish();
+                }
+            
                 ClarityApp.getRestClient().RegisterRequest(email.getText().toString(), password.getText().toString(), this, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -90,10 +110,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     }
                 });
 
-                Intent homeActivityIntent = new Intent(this, HomeActivity.class);
-                homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(homeActivityIntent);
-                finish();
                 break;
             default:
                 break;
@@ -111,17 +127,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             hashedPassword = bytesToHex( bytes );
         }
-        catch(NoSuchAlgorithmException e)
-        {
-            e.printStackTrace();
-        }
-        catch(UnsupportedEncodingException e)
+        catch(NoSuchAlgorithmException | UnsupportedEncodingException e)
         {
             e.printStackTrace();
         }
         return hashedPassword;
     }
-
 
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
     public static String bytesToHex( byte[] bytes )
@@ -135,7 +146,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
         return new String( hexChars );
     }
-}
+
+
+} //end RegisterActivity
 
 
 
