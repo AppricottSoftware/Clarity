@@ -3,6 +3,7 @@ package appricottsoftware.clarity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,8 +50,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             case R.id.bt_register:
 
                 String emailString = email.getText().toString();
-                String hashedPassword;
-                hashedPassword = Hash_Password(password.getText().toString());
+                String hashedPassword = Hash_Password(password.getText().toString());
 
                 // create instance of clarityClient
                 // pass information to database to store
@@ -72,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     finish();
                 }
             
-                ClarityApp.getRestClient().RegisterRequest(email.getText().toString(), password.getText().toString(), this, new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient().RegisterRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         Log.e(TAG, "onSuccess1 : " + response.toString() );

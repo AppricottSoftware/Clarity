@@ -16,25 +16,21 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".RegisterActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".HomeActivity"
-            android:label="@string/toolbar_home_activity"
-            android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".MainActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".SurveyActivity"></activity>
-    </application>
+        <activity android:name=".RegisterActivity"
             android:screenOrientation="portrait">
         </activity>
-
+        <activity
+            android:name=".HomeActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/toolbar_home_activity">
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
+        </activity>
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>

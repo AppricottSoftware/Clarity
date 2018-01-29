@@ -1,7 +1,6 @@
 package appricottsoftware.clarity.sync;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.loopj.android.http.AsyncHttpClient;
@@ -12,19 +11,12 @@ import org.json.JSONObject;
 
 import appricottsoftware.clarity.R;
 import cz.msebera.android.httpclient.entity.StringEntity;
-import cz.msebera.android.httpclient.protocol.HTTP;
 
 public class ClarityClient {
-//    private static String PODCAST_API_URL;
-//    private static String PODCAST_API_KEY;
-//    private static String REGISTER_REQUEST_URL;
+
     private static GoogleSignInClient googleSignInClient;
 
-    public ClarityClient(Context context) {
-//        PODCAST_API_URL = Resources.getSystem().getString(R.string.listen_notes_api_url);
-//        PODCAST_API_KEY = Resources.getSystem().getString(R.string.listen_notes_api_key);
-//        REGISTER_REQUEST_URL = Resources.getSystem().getString(R.string.register_request_url);
-    }
+    public ClarityClient(Context context) {}
 
     // Insert API calls here //
     // Calls the /search endpoint (fulltextsearch)
@@ -56,7 +48,6 @@ public class ClarityClient {
             jsonParams.put("password", password);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
-//            entity.setContentType(HTTP.CONTENT_TYPE, "application/json");
             client.post(context, context.getString(R.string.register_request_url), entity, "application/json", handler);
 
         } catch (Exception e) {
