@@ -46,8 +46,6 @@ import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
-
 public class HomeActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
