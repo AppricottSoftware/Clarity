@@ -92,9 +92,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Faceboo login dependency.
         fbCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
 
+        // Google login dependency.
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == 3) {
             // The Task returned from this call is always completed, no need to attach
@@ -132,6 +134,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    // HTTPS GET function to authenticate user. Currently not working.
     public boolean isAuthenticated(String email, String password) {
         ClarityApp.getRestClient().checkLogin(email, password, new JsonHttpResponseHandler() {
             @Override
@@ -229,7 +232,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         else {
             Log.d("Facebook Login", "Logged with " + fbProfile.getName());
-            // fbid = fbProfile.getId();
             login("2");
         }
         fbAccessTokenTracker.startTracking();
@@ -264,6 +266,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    // Generic login function that takes the user to HomeActivity
     // "1" is e-mail password, "2" is facebook, "3" is google
     private void login(String loginType) {
         Intent homeActivityIntent = new Intent(LoginActivity.this, HomeActivity.class);
