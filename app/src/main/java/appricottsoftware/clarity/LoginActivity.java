@@ -92,9 +92,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Faceboo login dependency.
         fbCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
 
+        // Google login dependency.
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == 3) {
             // The Task returned from this call is always completed, no need to attach
@@ -108,8 +110,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_login:
-                RegisterActivity a = new RegisterActivity();
-                String strPassword = a.Hash_Password(etPassword.getText().toString());
+                String strPassword = new RegisterActivity().Hash_Password(etPassword.getText().toString());
                 String strEmail = etEmail.getText().toString();
 
                 if (isAuthenticated(strEmail, strPassword)) {
@@ -120,9 +121,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 finish();
                 break;
             case R.id.btn_register:
-                Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
-                startActivity(registerActivityIntent);
-                finish();
+                register();
                 break;
             case R.id.btn_loginGoogle:
                 googleSignIn();
@@ -132,6 +131,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    // HTTPS GET function to authenticate user. Currently not working.
     public boolean isAuthenticated(String email, String password) {
         return true;
     }
@@ -198,7 +198,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         else {
             Log.d("Facebook Login", "Logged with " + fbProfile.getName());
-            // fbid = fbProfile.getId();
             login("2");
         }
         fbAccessTokenTracker.startTracking();
@@ -233,11 +232,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    // Generic login function that takes the user to HomeActivity
     // "1" is e-mail password, "2" is facebook, "3" is google
     private void login(String loginType) {
         Intent homeActivityIntent = new Intent(LoginActivity.this, HomeActivity.class);
         homeActivityIntent.putExtra("loginType", loginType);
         startActivity(homeActivityIntent);
+        finish();
+    }
+
+    private void register() {
+        Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
+        startActivity(registerActivityIntent);
         finish();
     }
 }
