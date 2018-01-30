@@ -38,7 +38,7 @@ public class ClarityClient {
         client.get("search", params, handler);
     }
 
-    public void RegisterRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
+    public void authenticateUser(String email, String password, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
 
@@ -48,17 +48,36 @@ public class ClarityClient {
             jsonParams.put("password", password);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.login_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void registerRequest(String username, String email, String password, String firstname,
+                                String lastname, Context context, JsonHttpResponseHandler handler) {
+        // Create the rest client and add header(s)
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("username", username);
+            jsonParams.put("email", email);
+            jsonParams.put("password", password);
+            jsonParams.put("firstname", firstname);
+            jsonParams.put("lastname", lastname);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
             client.post(context, context.getString(R.string.register_request_url), entity, "application/json", handler);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
-        this.googleSignInClient = googleSignInClient;
-    }
+    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) { this.googleSignInClient = googleSignInClient; }
 
     public GoogleSignInClient getGoogleSignInClient() {
         return this.googleSignInClient;
