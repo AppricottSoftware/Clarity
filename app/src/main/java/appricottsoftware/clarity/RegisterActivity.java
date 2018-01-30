@@ -29,6 +29,9 @@ import cz.msebera.android.httpclient.Header;
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.bt_register) Button btRegister;
+    @BindView(R.id.editText_firstname) EditText firstname;
+    @BindView(R.id.editText_lastname) EditText lastname;
+    @BindView(R.id.editText_username) EditText username;
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
 
@@ -49,12 +52,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch(v.getId()) {
             case R.id.bt_register:
 
+                String firstnameString = firstname.getText().toString();
+                String lastnameString = lastname.getText().toString();
+                String usernameString = username.getText().toString();
                 String emailString = email.getText().toString();
                 String hashedPassword = Hash_Password(password.getText().toString());
 
+                // Sanity Check to make sure all instances are populated with actual strings
+                if(firstnameString.length() == 0|| lastnameString.length() == 0 || usernameString.length() == 0 ||
+                        emailString.length() == 0 || password.getText().toString().length() == 0) {
+                    return;
+                }
+
                 // create instance of clarityClient
                 // pass information to database to store
-
                 if (seeSurvey == true){
                     Intent surveyActivityIntent = new Intent(this, SurveyActivity.class);
                     surveyActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -72,7 +83,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     finish();
                 }
 
-                ClarityApp.getRestClient().RegisterRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient().registerRequest(usernameString, emailString, hashedPassword, firstnameString, lastnameString, this, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         Log.e(TAG, "onSuccess1 : " + response.toString() );
