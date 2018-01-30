@@ -1,5 +1,6 @@
 package appricottsoftware.clarity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
@@ -18,7 +19,22 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewParent;
+import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookRequestError;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import appricottsoftware.clarity.adapters.TabPagerAdapter;
@@ -26,6 +42,7 @@ import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
+import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -37,17 +54,23 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.supl_home) SlidingUpPanelLayout suplPanel;
 
     private ActionBarDrawerToggle drawerToggle;
+    private String loginType;   // "1" is e-mail password, "2" is facebook, "3" is google
 
     private static HomeFragment homeFragment;
     private static LikeFragment likeFragment;
     private static SettingFragment settingFragment;
     private static PlayerFragment playerFragment;
 
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+
+        // Get Login Type
+        loginType = getIntent().getStringExtra("loginType");
 
         // Replace toolbar
         setSupportActionBar(toolbar);
@@ -175,8 +198,24 @@ public class HomeActivity extends AppCompatActivity {
                 fragment = settingFragment;
                 break;
             case R.id.nav_logout:
-                logout();
-                break;
+                switch(loginType) {
+                    case "1":
+                        break;
+                    case "2":
+                        // Logout Facebook
+                        LoginManager.getInstance().logOut();
+                        logout();
+                        break;
+                    case "3":
+                        // Logout Google
+                        googleLogoutAndRevoke();
+                        logout();
+                        break;
+                    default:
+                        Toast.makeText(getApplicationContext(),"Default", Toast.LENGTH_SHORT).show();
+                        logout();
+                        break;
+                }
             default:
                 break;
         }
@@ -201,5 +240,26 @@ public class HomeActivity extends AppCompatActivity {
 
     private ActionBarDrawerToggle setUpDrawerToggle() {
         return new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
+    }
+
+    private void googleLogoutAndRevoke() {
+        ClarityClient clarityClient = new ClarityClient(this);
+        GoogleSignInClient mGoogleSignInClient = new ClarityClient(this).getGoogleSignInClient();
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
+
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                    }
+                });
+        clarityClient.clearGoogleSignInClient();
     }
 }
