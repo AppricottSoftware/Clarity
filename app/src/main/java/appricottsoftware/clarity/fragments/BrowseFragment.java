@@ -6,8 +6,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.Toast;
 
+import appricottsoftware.clarity.HomeActivity;
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.adapters.ImageAdapter;
 import butterknife.ButterKnife;
 
 public class BrowseFragment extends Fragment {
@@ -23,5 +28,15 @@ public class BrowseFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
+        GridView gridview = getActivity().findViewById(R.id.gv_browse);
+        gridview.setAdapter(new ImageAdapter(getActivity()));
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                Toast.makeText(getActivity(), "" + position,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
