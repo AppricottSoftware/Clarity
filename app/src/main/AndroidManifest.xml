@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SplashActivity"
+            android:name=".HomeActivity"
             android:hardwareAccelerated="false"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -26,10 +26,10 @@
         <activity
             android:name=".RegisterActivity"
             android:screenOrientation="portrait" />
-        <activity
+        <!--activity
             android:name=".HomeActivity"
             android:label="@string/toolbar_home_activity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" /-->
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait" />
