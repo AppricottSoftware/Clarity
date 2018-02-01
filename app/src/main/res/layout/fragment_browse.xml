@@ -7,22 +7,27 @@
     android:background="@android:color/holo_orange_light">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/tvBrowseHeading"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Browse Fragment"/>
+        android:text="Recommended"
+        android:textAlignment="center" />
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/gv_browse"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:columnWidth="200dp"
         android:gravity="center"
         android:verticalSpacing="10dp"
+        android:horizontalSpacing="0dp"
         android:numColumns="2"
-        android:stretchMode="spacingWidthUniform"
+        android:stretchMode="columnWidth"
         app:layout_constraintLeft_toRightOf="parent"
         app:layout_constraintRight_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/tvBrowseHeading" />
 
 </android.support.constraint.ConstraintLayout>
