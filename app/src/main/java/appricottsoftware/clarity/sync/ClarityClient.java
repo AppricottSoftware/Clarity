@@ -2,7 +2,6 @@ package appricottsoftware.clarity.sync;
 
 import android.content.Context;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -14,9 +13,7 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ClarityClient {
 
-    private static GoogleSignInClient googleSignInClient;
-
-    public ClarityClient(Context context) {}
+    public ClarityClient() {}
 
     // Insert API calls here //
     // Calls the /search endpoint (fulltextsearch)
@@ -76,15 +73,4 @@ public class ClarityClient {
             e.printStackTrace();
         }
     }
-
-    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) { this.googleSignInClient = googleSignInClient; }
-
-    public GoogleSignInClient getGoogleSignInClient() {
-        return this.googleSignInClient;
-    }
-
-    public void clearGoogleSignInClient() {
-        googleSignInClient = null;
-    }
-
 }
