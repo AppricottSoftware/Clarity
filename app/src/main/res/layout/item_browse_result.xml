@@ -7,7 +7,7 @@
     android:id="@+id/card_view"
     android:layout_margin="6dp"
     card_view:cardBackgroundColor="#FAFAFA"
-    card_view:cardCornerRadius="12dp"
+    card_view:cardCornerRadius="2dp"
     card_view:cardElevation="6dp"
     card_view:contentPadding="0dp" >
 
@@ -32,7 +32,10 @@
             android:id="@+id/ivBrowseEpisodeName"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:text="Name"
+            android:textColor="@android:color/black"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 

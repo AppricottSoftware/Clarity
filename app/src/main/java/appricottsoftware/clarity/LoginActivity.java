@@ -209,8 +209,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(this, gso);
-        ClarityClient clarityClient = new ClarityClient(this);
-        clarityClient.setGoogleSignInClient(googleSignInClient);
+        ClarityApp clarityApp = new ClarityApp();
+        clarityApp.setGoogleSignInClient(googleSignInClient);
     }
 
     private void googleSignIn() {

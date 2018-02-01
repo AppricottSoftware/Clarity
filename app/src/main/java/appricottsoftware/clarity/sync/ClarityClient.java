@@ -14,7 +14,7 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ClarityClient {
 
-    private static GoogleSignInClient googleSignInClient;
+
 
     public ClarityClient(Context context) {}
 
@@ -55,17 +55,4 @@ public class ClarityClient {
         }
 
     }
-
-    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
-        this.googleSignInClient = googleSignInClient;
-    }
-
-    public GoogleSignInClient getGoogleSignInClient() {
-        return this.googleSignInClient;
-    }
-
-    public void clearGoogleSignInClient() {
-        googleSignInClient = null;
-    }
-
 }

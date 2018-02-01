@@ -12,9 +12,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import appricottsoftware.clarity.HomeActivity;
 import appricottsoftware.clarity.R;
-import appricottsoftware.clarity.adapters.ImageAdapter;
+import appricottsoftware.clarity.adapters.ImageTextAdapter;
 import appricottsoftware.clarity.models.Podcast;
 import butterknife.ButterKnife;
 
@@ -55,7 +54,7 @@ public class BrowseFragment extends Fragment {
         // Initialize view lookups, listeners
 
         GridView gridview = getActivity().findViewById(R.id.gv_browse);
-        gridview.setAdapter(new ImageAdapter(getActivity(), populatePodcasts()));
+        gridview.setAdapter(new ImageTextAdapter(getActivity(), populatePodcasts()));
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,

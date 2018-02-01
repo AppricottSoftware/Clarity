@@ -5,14 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import appricottsoftware.clarity.R;
@@ -22,12 +18,12 @@ import appricottsoftware.clarity.models.Podcast;
  * Created by ttony on 1/30/2018.
  */
 
-public class ImageAdapter extends BaseAdapter {
-    private Context mContext;
+public class ImageTextAdapter extends BaseAdapter {
+    private Context context;
     private ArrayList<Podcast> podcasts;
 
-    public ImageAdapter(Context c, ArrayList<Podcast> p) {
-        mContext = c;
+    public ImageTextAdapter(Context c, ArrayList<Podcast> p) {
+        context = c;
         podcasts = p;
     }
 
@@ -47,7 +43,7 @@ public class ImageAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
             holder = new ViewHolder();
@@ -65,19 +61,6 @@ public class ImageAdapter extends BaseAdapter {
 
         holder.imageView.setImageResource(podcasts.get(position).getItunes_id());
         holder.textView.setText(podcasts.get(position).getTitle_original());
-
-//        ImageView imageView;
-//        if (convertView == null) {
-//            // if it's not recycled, initialize some attributes
-//            imageView = new ImageView(mContext);
-//            imageView.setLayoutParams(new GridView.LayoutParams(450, 450));
-//            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//            imageView.setPadding(8, 8, 8, 8);
-//        } else {
-//            imageView = (ImageView) convertView;
-//        }
-//
-//        imageView.setImageResource(mThumbIds[position]);
 
         return convertView;
     }

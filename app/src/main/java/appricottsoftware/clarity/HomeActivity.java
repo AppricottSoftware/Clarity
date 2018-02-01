@@ -42,6 +42,7 @@ import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
+import appricottsoftware.clarity.sync.ClarityApp;
 import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -243,8 +244,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void googleLogoutAndRevoke() {
-        ClarityClient clarityClient = new ClarityClient(this);
-        GoogleSignInClient mGoogleSignInClient = new ClarityClient(this).getGoogleSignInClient();
+        ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
         mGoogleSignInClient.signOut()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
@@ -260,6 +261,6 @@ public class HomeActivity extends AppCompatActivity {
                         // ...
                     }
                 });
-        clarityClient.clearGoogleSignInClient();
+        clarityApp.clearGoogleSignInClient();
     }
 }
