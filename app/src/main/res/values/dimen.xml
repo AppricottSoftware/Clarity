@@ -10,4 +10,6 @@
     <dimen name="survey_prompt_LR_padding">48dp</dimen>
     <dimen name="splash_padding">25dp</dimen>
     <dimen name="splash_logo">25dp</dimen>
+
+    <dimen name="channel_buttons">18sp</dimen>
 </resources>
