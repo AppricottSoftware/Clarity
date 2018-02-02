@@ -32,7 +32,6 @@ import appricottsoftware.clarity.sync.ClarityApp;
 
 import java.util.Arrays;
 
-import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
@@ -72,6 +71,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         facebookLogin();
         googleLogin();
+
+        // TODO keep persistent login for users who register with e-mail password. Waiting on database.
     }
 
     @Override
@@ -80,8 +81,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         googleAccount = GoogleSignIn.getLastSignedInAccount(this);
         if (googleAccount != null) {
-            login("3");
+            login(getString(R.string.google_login_type));
         }
+
+        // Facebook redirection to HomeActivity is handled in facebookLogin()'s else statement.
     }
 
     @Override
@@ -92,13 +95,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Faceboo login dependency.
+        // Facebook login dependency.
         fbCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
 
         // Google login dependency.
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == 3) {
+        if (requestCode == Integer.parseInt(getString(R.string.google_request_code))) {
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -110,7 +113,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_login:
-                String strPassword = new RegisterActivity().Hash_Password(etPassword.getText().toString());
+                String strPassword = new RegisterActivity().hashPassword(etPassword.getText().toString());
                 String strEmail = etEmail.getText().toString();
 
                 if (isAuthenticated(strEmail, strPassword)) {
@@ -188,7 +191,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 @Override
                 public void onSuccess(LoginResult loginResult) {
                     // App code
-                    Log.e("Facebook Login", "onSuccess login Facebook");
                     GraphRequest request = GraphRequest.newMeRequest(
                             AccessToken.getCurrentAccessToken(),
                             new GraphRequest.GraphJSONObjectCallback() {
@@ -197,21 +199,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     FacebookSdk.setIsDebugEnabled(true);
                                     FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 
-                                    Log.e("Facebook Login", "AccessToken.getCurrentAccessToken() " + AccessToken.getCurrentAccessToken().toString());
-                                    Profile profile = Profile.getCurrentProfile();
-                                    Log.e("Facebook Login", "Current profile: " + profile);
-                                    if (profile != null) {
-                                        Log.e("Facebook Login", String.format("id = %s; name = %s; lastName = %s; uri = %s",
-                                                profile.getId(), profile.getFirstName(),
-                                                profile.getLastName(), profile.getProfilePictureUri(50, 60)));
-//                                        name = String.format("%s %s",profile.getFirstName(),profile.getLastName());
-//                                        fbid = profile.getId();
-                                    }
+                                    // Can use Profile to extract user info here
                                 }
                             });
 
                     request.executeAsync();
-                    login("2");
+                    login(getString(R.string.facebook_login_type));
                 }
 
                 @Override
@@ -228,9 +221,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
         }
+        // Handles the case when user already signed in with Facebook
         else {
-            Log.d("Facebook Login", "Logged with " + fbProfile.getName());
-            login("2");
+            login(getString(R.string.facebook_login_type));
         }
         fbAccessTokenTracker.startTracking();
     }
@@ -241,13 +234,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(this, gso);
-        ClarityClient clarityClient = new ClarityClient(this);
-        clarityClient.setGoogleSignInClient(googleSignInClient);
+        ClarityApp clarityApp = new ClarityApp();
+        clarityApp.setGoogleSignInClient(googleSignInClient);
     }
 
     private void googleSignIn() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, 3);
+        startActivityForResult(signInIntent, Integer.parseInt(getString(R.string.google_request_code)));
     }
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
@@ -255,12 +248,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
             // Signed in successfully, show authenticated UI.
-            login("3");
+            login(getString(R.string.google_login_type));
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("Google Login", "signInResult:failed code=" + e.getStatusCode());
-            //updateUI(null);
         }
     }
 

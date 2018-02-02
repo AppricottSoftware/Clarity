@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 // Keep a state for the entire app for API calls
 public class ClarityApp extends Application {
 
-    private static Context context;
     private static ClarityClient clarityClient;
     private static GoogleSignInClient googleSignInClient;
     private static Gson gson;
@@ -17,7 +16,6 @@ public class ClarityApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        ClarityApp.context = this;
     }
 
     // Get the single instance of the API client

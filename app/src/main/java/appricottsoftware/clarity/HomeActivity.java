@@ -1,48 +1,32 @@
 package appricottsoftware.clarity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.FacebookRequestError;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import appricottsoftware.clarity.adapters.TabPagerAdapter;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
-import appricottsoftware.clarity.sync.ClarityClient;
+import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -60,8 +44,6 @@ public class HomeActivity extends AppCompatActivity {
     private static LikeFragment likeFragment;
     private static SettingFragment settingFragment;
     private static PlayerFragment playerFragment;
-
-    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -204,12 +186,11 @@ public class HomeActivity extends AppCompatActivity {
                     case "2":
                         // Logout Facebook
                         LoginManager.getInstance().logOut();
-                        logout();
+                        logout();                       // This function returns to LoginActivity
                         break;
                     case "3":
                         // Logout Google
-                        googleLogoutAndRevoke();
-                        logout();
+                        googleSignOut();
                         break;
                     default:
                         Toast.makeText(getApplicationContext(),"Default", Toast.LENGTH_SHORT).show();
@@ -242,24 +223,32 @@ public class HomeActivity extends AppCompatActivity {
         return new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
     }
 
-    private void googleLogoutAndRevoke() {
-        ClarityClient clarityClient = new ClarityClient(this);
-        GoogleSignInClient mGoogleSignInClient = new ClarityClient(this).getGoogleSignInClient();
-        mGoogleSignInClient.signOut()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // ...
-                    }
-                });
+    private void googleSignOut() {
+        ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
+        if (mGoogleSignInClient != null){
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            revokeAccess();
+                        }
+                    });
+        }
+    }
 
-        mGoogleSignInClient.revokeAccess()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // ...
-                    }
-                });
-        clarityClient.clearGoogleSignInClient();
+    private void revokeAccess() {
+        ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
+        if (mGoogleSignInClient != null) {
+            mGoogleSignInClient.revokeAccess()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            logout();
+                        }
+                    });
+        }
+        clarityApp.clearGoogleSignInClient();
     }
 }

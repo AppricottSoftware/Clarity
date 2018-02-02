@@ -14,14 +14,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
 import appricottsoftware.clarity.sync.ClarityApp;
-import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
@@ -56,7 +53,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String lastnameString = lastname.getText().toString();
                 String usernameString = username.getText().toString();
                 String emailString = email.getText().toString();
-                String hashedPassword = Hash_Password(password.getText().toString());
+                String hashedPassword = hashPassword(password.getText().toString());
 
                 // Sanity Check to make sure all instances are populated with actual strings
                 if(firstnameString.length() == 0|| lastnameString.length() == 0 || usernameString.length() == 0 ||
@@ -127,7 +124,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    public String Hash_Password(String originalPassword) {
+    public String hashPassword(String originalPassword) {
         String hashedPassword = null;
         try
         {
