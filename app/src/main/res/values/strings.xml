@@ -31,6 +31,8 @@
     <string name="category_6">Religion &amp; Spirituality</string>
 
     <string name="description">description</string>
+    <string name="title">title</string>
+
     <string name="create">Create</string>
     <string name="shuffle">Shuffle</string>
 </resources>

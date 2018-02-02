@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.ArrayList;
@@ -24,9 +25,18 @@ public class ChannelFragment extends Fragment {
 
     @BindView(R.id.RecyclerView_Channels)
     RecyclerView channelRecycler;
+    @BindView(R.id.button_createChannel)
+    Button createChannelButton;
+    @BindView(R.id.button_ShuffleChannel)
+    Button suffleChannelsButton;
 
     private RecyclerView.Adapter rAdapter;
     private List<RecyclerListItem> rListItems;
+
+    /*
+    random number 10 - 20
+    int random = new Random().nextInt(21) + 10;
+     */
 
     @Nullable
     @Override

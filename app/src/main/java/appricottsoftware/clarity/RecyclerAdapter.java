@@ -1,12 +1,12 @@
 package appricottsoftware.clarity;
 
-import android.app.LauncherActivity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -19,6 +19,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
     private List<RecyclerListItem> recyclerList_ItemList;
     private Context theContext;
+
+    int selected_position = 0;
 
     public RecyclerAdapter(List<RecyclerListItem> recyclerList_ItemList, Context theContext) {
         this.recyclerList_ItemList = recyclerList_ItemList;
@@ -39,6 +41,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
         holder.textViewTitle.setText(recyclerListItem.getTitle());
         holder.textViewDescription.setText(recyclerListItem.getDescription());
         //holder.ImageViewAlbum.setImageResource(recyclerListItem.getAlbum());
+
+        holder.itemView.setBackgroundColor(selected_position == position ? Color.LTGRAY : Color.TRANSPARENT);
     }
 
     @Override
@@ -46,7 +50,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
         return recyclerList_ItemList.size();
     }
 
-    public class CustomViewHolder extends RecyclerView.ViewHolder{
+    public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         //public ImageView ImageViewAlbum;
         public TextView textViewTitle;
@@ -54,12 +58,25 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
         public CustomViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
 
             textViewTitle = itemView.findViewById(R.id.textView_title);
             textViewDescription = itemView.findViewById(R.id.textView_desc);
             //ImageViewAlbum = itemView.findViewById(R.id.imageView_album);
 
         }
+
+        @Override
+        public void onClick(View view) {
+            notifyItemChanged(selected_position);
+            selected_position = getLayoutPosition();
+            notifyItemChanged(selected_position);
+
+
+            // CHANGE CHANNEL ON CLICK
+
+        }
     }
+
 
 }

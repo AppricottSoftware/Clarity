@@ -13,7 +13,8 @@
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginBottom="4dp">
 
             <ImageView
                 android:id="@+id/imageView_create"
@@ -21,7 +22,6 @@
                 android:layout_height="64dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="16dp"
                 android:contentDescription="@string/description"
                 app:layout_constraintBottom_toTopOf="@+id/imageView_shuffle"
                 app:layout_constraintEnd_toStartOf="@+id/button_createChannel"
@@ -34,10 +34,10 @@
                 android:id="@+id/button_createChannel"
                 android:layout_width="0dp"
                 android:layout_height="64dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
                 android:background="@android:color/white"
-                android:paddingHorizontal="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:text="@string/create"
                 android:textAlignment="viewStart"
                 android:textSize="@dimen/channel_buttons"
@@ -51,6 +51,7 @@
                 android:id="@+id/imageView_shuffle"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
+                android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
@@ -66,10 +67,12 @@
                 android:id="@+id/button_ShuffleChannel"
                 android:layout_width="0dp"
                 android:layout_height="64dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="32dp"
                 android:layout_marginTop="8dp"
                 android:background="@android:color/white"
-                android:paddingHorizontal="8dp"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
                 android:text="@string/shuffle"
                 android:textAlignment="viewStart"
                 android:textSize="@dimen/channel_buttons"
@@ -87,7 +90,7 @@
         android:id="@+id/RecyclerView_Channels"
         android:layout_width="368dp"
         android:layout_height="405dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
