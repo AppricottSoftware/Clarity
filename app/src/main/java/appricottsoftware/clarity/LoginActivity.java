@@ -84,7 +84,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             login(getString(R.string.google_login_type));
         }
 
-        // Facebook redirection to HomeActivity is handled in facebookLogin()'s else statement.
+        Profile fbProfile = Profile.getCurrentProfile();
+        if (fbProfile != null) {
+            login(getString(R.string.facebook_login_type));
+            fbAccessTokenTracker.startTracking();
+        }
     }
 
     @Override
@@ -221,11 +225,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
         }
-        // Handles the case when user already signed in with Facebook
-        else {
-            login(getString(R.string.facebook_login_type));
-        }
-        fbAccessTokenTracker.startTracking();
     }
 
     private void googleLogin() {
