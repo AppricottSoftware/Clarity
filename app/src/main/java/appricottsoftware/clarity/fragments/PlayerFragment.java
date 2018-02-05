@@ -21,9 +21,12 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.MediaController;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+
+import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.util.ArrayList;
 
@@ -59,6 +62,8 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     private static final String TAG = "PlayerFragment";
 
     private MediaMetadataCompat currentMetadata;
+    private PlaybackStateCompat currentPlaybackState;
+    private boolean currentPlayState;
 
 //    private MediaControllerCompat.Callback mediaControllerCallback;
 //    private Activity fragmentActvity;
@@ -82,8 +87,6 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         tvExpandDescription.setSelected(true);
         tvCollapseTitle.setSelected(true);
         tvCollapseDescription.setSelected(true);
-
-        currentMetadata = null;
 
         // Initialize onclick listeners
 //        ibCollapsePlayPause.setOnClickListener(this);
@@ -138,16 +141,19 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         switch(state.getState()) {
             case PlaybackStateCompat.STATE_PLAYING:
                 Log.e(TAG, "onPlaybackStateChanged: State is playing " + state.getState());
-                setPlayControls();
+                setPlayPauseControls(true);
+                setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 onMetadataChanged(metadata);
                 break;
             case PlaybackStateCompat.STATE_PAUSED:
                 Log.e(TAG, "onPlaybackStateChanged: State is paused " + state.getState());
-                setPauseControls();
+                setPlayPauseControls(false);
+                setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 break;
             case PlaybackStateCompat.STATE_STOPPED:
                 Log.e(TAG, "onPlaybackStateChanged: State is stopped " + state.getState());
-                setPauseControls();
+                setPlayPauseControls(false);
+                setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 break;
             case PlaybackStateCompat.STATE_ERROR:
                 Log.e(TAG, "onPlaybackStateChanged: Error state " + state.getErrorMessage());
@@ -180,7 +186,9 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     public void buildTransportControls(@NonNull final Activity activity) {
         setControlOnClick(activity, ibCollapsePlayPause);
         setControlOnClick(activity, ibExpandPlayPause);
-        // TODO: Seek, speed setting
+        setSeekBarDrag(activity, sbExpandSeek);
+        // TODO: playback speed
+
     }
 
     private void setControlOnClick(@NonNull final Activity activity, ImageButton imageButton) {
@@ -197,15 +205,55 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         });
     }
 
-    private void setPlayControls() {
-        ibCollapsePlayPause.setImageResource(R.drawable.ic_player_pause);
-        ibExpandPlayPause.setImageResource(R.drawable.ic_player_pause);
+    private void setSeekBarDrag(@NonNull final Activity activity, SeekBar seekBar) {
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser) {
+                    Log.e(TAG, "Seeking to: " + progress);
+                    MediaControllerCompat.getMediaController(activity).getTransportControls().seekTo(progress * 1000);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) { }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
     }
 
-    private void setPauseControls() {
-        ibCollapsePlayPause.setImageResource(R.drawable.ic_player_play);
-        ibExpandPlayPause.setImageResource(R.drawable.ic_player_play);
+
+
+    private void setPlayPauseControls(boolean play) {
+        if(currentPlayState != play) {
+            // If paused, set the play/pause button to play
+            int rDrawable = R.drawable.ic_player_play;
+            // If playing, set the play/pause button to pause
+            if(play) {
+                rDrawable = R.drawable.ic_player_pause;
+            }
+            // Set both the expanded and collapsed view elements
+            ibCollapsePlayPause.setImageResource(rDrawable);
+            ibExpandPlayPause.setImageResource(rDrawable);
+
+            currentPlayState = play;
+        }
     }
+
+    private void setSeekBarControls(int progress, int totalTime) {
+        if(progress <= totalTime) {
+            sbExpandSeek.setMax(totalTime / 1000);
+            sbExpandSeek.setProgress(progress / 1000);
+            // Set the elapsed time
+            String timeElapsed = DurationFormatUtils.formatDuration(progress, "HH:mm:ss", true);
+            tvExpandTimeElapsed.setText(timeElapsed);
+            // Set the remaining time
+            String timeRemaining = DurationFormatUtils.formatDuration(totalTime - progress, "HH:mm:ss", true);
+            tvExpandTimeRemaining.setText(timeRemaining);
+        }
+    }
+
     //TODO: Remove these functions
 //    private void playAudio() {
 //        if(mediaController != null) {

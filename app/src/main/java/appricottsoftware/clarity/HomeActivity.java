@@ -380,6 +380,12 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 Log.e(TAG, "onAudioInfoChanged: " + info.toString());
                 super.onAudioInfoChanged(info);
             }
+
+            @Override
+            public void onSessionEvent(String event, Bundle extras) {
+                Log.e(TAG, "onSessionEvent" + event.toString());
+                super.onSessionEvent(event, extras);
+            }
         };
     }
 

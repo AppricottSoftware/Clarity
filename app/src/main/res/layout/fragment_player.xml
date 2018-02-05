@@ -52,7 +52,6 @@
             android:textColor="@android:color/white"
             android:text="This is a description of the podcast that is playing in this player."/>
 
-
         <ImageButton
             android:id="@+id/ib_collapse_play_pause"
             android:layout_width="wrap_content"
@@ -180,40 +179,55 @@
             app:layout_constraintBottom_toBottomOf="@id/sb_expand_seek"
             android:paddingEnd="@dimen/player_fragment_padding"/>
 
-        <TextView
-            android:id="@+id/tv_expand_title"
+        <LinearLayout
+            android:id="@+id/ll_expand_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_expand_cover"
-            app:layout_constraintBottom_toTopOf="@id/tv_expand_description"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/white"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:text="This is the podcast title."
-            android:paddingTop="@dimen/player_fragment_padding"
-            android:paddingStart="@dimen/player_fragment_padding"
-            android:paddingEnd="@dimen/player_fragment_padding"/>
+            app:layout_constraintBottom_toTopOf="@id/ll_expand_description">
 
-        <TextView
-            android:id="@+id/tv_expand_description"
+            <TextView
+                android:id="@+id/tv_expand_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@android:color/white"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:text="This is the podcast title."
+                android:paddingTop="@dimen/player_fragment_padding"
+                android:paddingStart="@dimen/player_fragment_padding"
+                android:paddingEnd="@dimen/player_fragment_padding"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_expand_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_expand_title"
-            app:layout_constraintBottom_toTopOf="@id/sb_expand_seek"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/white"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:scrollHorizontally="true"
-            android:text="This is a description of the podcast that is playing in this player."
-            android:padding="@dimen/player_fragment_padding"/>
+            app:layout_constraintTop_toBottomOf="@id/ll_expand_title"
+            app:layout_constraintBottom_toTopOf="@id/sb_expand_seek">
+
+            <TextView
+                android:id="@+id/tv_expand_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/white"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:scrollHorizontally="true"
+                android:text="This is a description of the podcast that is playing in this player."
+                android:padding="@dimen/player_fragment_padding"/>
+
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/iv_expand_cover"
@@ -226,7 +240,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tv_expand_title"
+            app:layout_constraintBottom_toTopOf="@id/ll_expand_title"
             app:srcCompat="@drawable/ic_launcher_background" />
 
     </android.support.constraint.ConstraintLayout>

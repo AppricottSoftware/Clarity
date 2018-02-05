@@ -16,6 +16,7 @@ import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.service.media.MediaBrowserService;
@@ -55,6 +56,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 
 import org.parceler.Parcels;
 
@@ -83,7 +85,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private NotificationManager notificationManager;
     private MediaSessionCompat mediaSession;
     private PlaybackStateCompat.Builder stateBuilder;
-    private MediaPlayer mediaPlayer;
+//    private MediaPlayer mediaPlayer;
     private SimpleExoPlayer exoMediaPlayer;
     private PlayerCallback playerCallback;
     private PlayerService mediaService;
@@ -92,6 +94,8 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private Context context;
     private WifiManager.WifiLock wifiLock;
     private PowerManager.WakeLock wakeLock;
+    private Handler playbackStateHandler;
+    private Runnable playbackStateRunnable;
 
     @Override
     public void onCreate() {
@@ -136,6 +140,24 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         // Set session token to communicate with activities
         setSessionToken(mediaSession.getSessionToken());
+
+        // Initialize the handler to sync with the seekbar
+        playbackStateHandler = new Handler();
+        playbackStateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
+                        .setActions(getAvailableActions())
+                        .setBufferedPosition(exoMediaPlayer.getDuration())
+                        .setState(PlaybackStateCompat.STATE_PLAYING, exoMediaPlayer.getCurrentPosition(), 1.0f, exoMediaPlayer.getDuration());
+                mediaSession.setPlaybackState(stateBuilder.build());
+                playbackStateHandler.postDelayed(this, 1000);
+            }
+        };
+
+        // Attach the media player to the media session
+//        MediaSessionConnector mediaSessionConnector= new MediaSessionConnector(mediaSession);
+//        mediaSessionConnector.setPlayer(exoMediaPlayer, null, null);
     }
 
     @Nullable
@@ -225,16 +247,18 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                Log.e(TAG, "Play when ready: " + playWhenReady + " " + playbackState);
                 // Push the state to the media session when the audio starts or stops playing
                 if(playWhenReady && playbackState == PlaybackStateCompat.STATE_PLAYING) {
-                    playbackState = PlaybackStateCompat.STATE_PLAYING;
+                    playbackStateHandler.post(playbackStateRunnable);
                 } else {
-                    playbackState = PlaybackState.STATE_PAUSED;
+                    playbackStateHandler.removeCallbacks(playbackStateRunnable);
+                    PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
+                            .setActions(getAvailableActions())
+                            .setBufferedPosition(exoMediaPlayer.getDuration())
+                            .setState(PlaybackStateCompat.STATE_PAUSED, exoMediaPlayer.getCurrentPosition(), 1.0f, exoMediaPlayer.getDuration());
+                    mediaSession.setPlaybackState(stateBuilder.build());
                 }
-                PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
-                        .setActions(getAvailableActions());
-                stateBuilder.setState(playbackState, exoMediaPlayer.getCurrentPosition(), 1.0f, exoMediaPlayer.getDuration());
-                mediaSession.setPlaybackState(stateBuilder.build());
                 // Set the notification
                 setNotification(playbackState);
             }
@@ -391,6 +415,13 @@ public class PlayerService extends MediaBrowserServiceCompat {
 //                mPlayback.play(currentMusic);
 //            }
 //        }
+
+
+        @Override
+        public void onSeekTo(long pos) {
+            Log.e(TAG, "Seeking to " + pos);
+            exoMediaPlayer.seekTo(pos);
+        }
 
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras) {
