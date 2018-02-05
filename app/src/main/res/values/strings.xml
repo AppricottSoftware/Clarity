@@ -29,4 +29,7 @@
     <string name="google_login_type">3</string>
     <string name="google_request_code">5</string>
 
+    <string name="no_auth">Username or password is incorrect</string>
+
+
 </resources>
