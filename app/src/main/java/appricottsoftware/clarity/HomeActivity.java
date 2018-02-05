@@ -24,7 +24,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
@@ -38,6 +43,7 @@ import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
+import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -51,6 +57,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     private static final String TAG = "HomeActivity";
 
     private ActionBarDrawerToggle drawerToggle;
+    private String loginType;   // "1" is e-mail password, "2" is facebook, "3" is google
 
     private static HomeFragment homeFragment;
     private static LikeFragment likeFragment;
@@ -71,6 +78,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         context = this;
+
+        // Get Login Type
+        loginType = getIntent().getStringExtra("loginType");
 
         // Replace toolbar
         setSupportActionBar(toolbar);
@@ -201,8 +211,23 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 fragment = settingFragment;
                 break;
             case R.id.nav_logout:
-                logout();
-                break;
+                switch(loginType) {
+                    case "1":
+                        break;
+                    case "2":
+                        // Logout Facebook
+                        LoginManager.getInstance().logOut();
+                        logout();                       // This function returns to LoginActivity
+                        break;
+                    case "3":
+                        // Logout Google
+                        googleSignOut();
+                        break;
+                    default:
+                        Toast.makeText(getApplicationContext(),"Default", Toast.LENGTH_SHORT).show();
+                        logout();
+                        break;
+                }
             default:
                 break;
         }
@@ -388,5 +413,34 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         bundle.putParcelable(getString(R.string.home_activity_podcast_bundle), Parcels.wrap(podcast));
         mediaController.getTransportControls()
                 .playFromSearch(podcast.getTitle_original(), bundle);
+    }
+
+    private void googleSignOut() {
+        ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
+        if (mGoogleSignInClient != null){
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            revokeAccess();
+                        }
+                    });
+        }
+    }
+
+    private void revokeAccess() {
+        ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
+        if (mGoogleSignInClient != null) {
+            mGoogleSignInClient.revokeAccess()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            logout();
+                        }
+                    });
+        }
+        clarityApp.clearGoogleSignInClient();
     }
 }
