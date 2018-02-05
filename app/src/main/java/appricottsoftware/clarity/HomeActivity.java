@@ -5,27 +5,28 @@ import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewParent;
+import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import appricottsoftware.clarity.adapters.TabPagerAdapter;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
+import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -37,6 +38,7 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.supl_home) SlidingUpPanelLayout suplPanel;
 
     private ActionBarDrawerToggle drawerToggle;
+    private String loginType;   // "1" is e-mail password, "2" is facebook, "3" is google
 
     private static HomeFragment homeFragment;
     private static LikeFragment likeFragment;
@@ -48,6 +50,9 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+
+        // Get Login Type
+        loginType = getIntent().getStringExtra("loginType");
 
         // Replace toolbar
         setSupportActionBar(toolbar);
@@ -175,8 +180,23 @@ public class HomeActivity extends AppCompatActivity {
                 fragment = settingFragment;
                 break;
             case R.id.nav_logout:
-                logout();
-                break;
+                switch(loginType) {
+                    case "1":
+                        break;
+                    case "2":
+                        // Logout Facebook
+                        LoginManager.getInstance().logOut();
+                        logout();                       // This function returns to LoginActivity
+                        break;
+                    case "3":
+                        // Logout Google
+                        googleSignOut();
+                        break;
+                    default:
+                        Toast.makeText(getApplicationContext(),"Default", Toast.LENGTH_SHORT).show();
+                        logout();
+                        break;
+                }
             default:
                 break;
         }
@@ -201,5 +221,34 @@ public class HomeActivity extends AppCompatActivity {
 
     private ActionBarDrawerToggle setUpDrawerToggle() {
         return new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
+    }
+
+    private void googleSignOut() {
+        ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
+        if (mGoogleSignInClient != null){
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            revokeAccess();
+                        }
+                    });
+        }
+    }
+
+    private void revokeAccess() {
+        ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
+        if (mGoogleSignInClient != null) {
+            mGoogleSignInClient.revokeAccess()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            logout();
+                        }
+                    });
+        }
+        clarityApp.clearGoogleSignInClient();
     }
 }

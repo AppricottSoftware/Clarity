@@ -9,8 +9,27 @@
     <string name="nav_drawer_open">Open navigation drawer</string>
     <string name="nav_drawer_close">Close navigation drawer</string>
 
-
     <string name="toolbar_login_activity">Login</string>
     <string name="toolbar_register_activity">Register</string>
     <string name="toolbar_home_activity">Home</string>
+    <string name="splash_content_desc">Logo Gif</string>
+
+    <string name="register_button">Register</string>
+    <string name="email_hint">email</string>
+    <string name="password_hint">password</string>
+    <string name="survey_prompt">Looks like you don\'t have any channels.\n
+                                 Let\'s setup a channel for you.\n\n
+                                 What are some of the topics you like to listen?\n\n
+                                 Thumbs up as many as you like.
+
+    </string>
+
+    <string name="registered_login_type">1</string>
+    <string name="facebook_login_type">2</string>
+    <string name="google_login_type">3</string>
+    <string name="google_request_code">5</string>
+
+    <string name="no_auth">Username or password is incorrect</string>
+
+
 </resources>
