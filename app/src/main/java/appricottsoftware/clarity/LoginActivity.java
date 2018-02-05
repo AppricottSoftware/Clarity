@@ -149,8 +149,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                             Toast.LENGTH_SHORT);
                         unauthToast.show();
                     } else {
-                        Intent homeActivityIntent = new Intent(parentActivity, HomeActivity.class);
-                        startActivity(homeActivityIntent);
+                        login("1");
+//                        Intent homeActivityIntent = new Intent(parentActivity, HomeActivity.class);
+//                        homeActivityIntent.putExtra("loginType", )
+//                        startActivity(homeActivityIntent);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
