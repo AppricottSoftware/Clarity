@@ -4,7 +4,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,34 +24,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.MediaController;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.extractor.ExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.google.android.exoplayer2.upstream.TransferListener;
-import com.google.android.exoplayer2.util.Util;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
-
-import java.util.ArrayList;
 
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
@@ -65,7 +40,6 @@ import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
@@ -128,6 +102,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         super.onStart();
         // Connect to the service
         mediaBrowser.connect();
+
         // Set the initial player to be open or closed
         updatePlayer();
     }
@@ -196,6 +171,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         likeFragment = new LikeFragment();
         settingFragment = new SettingFragment();
 
+        // Start on the home fragment
         nvDrawer.setCheckedItem(R.id.nav_home_fragment);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
@@ -240,8 +216,10 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
             // Highlight the choice
             item.setChecked(true);
+
             // Set toolbar title
             setTitle(item.getTitle());
+
             // Close nav drawer
             drawerLayout.closeDrawers();
         } catch(Exception e) {
@@ -274,6 +252,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     }
 
     private void setUpPlayer() {
+        // Inflate the player fragment
         playerFragment = new PlayerFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
@@ -310,10 +289,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         }
     }
 
-
-
-    // Try to connect to the media session
     private void connectToSession(MediaSessionCompat.Token token) {
+        // Try to connect to the media session
         try {
             // Create media controller
             mediaController = new MediaControllerCompat(this, token);
@@ -325,7 +302,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
             mediaController.registerCallback(controllerCallback);
 
             // Display initial state
-            playerFragment.onConnected(mediaController.getPlaybackState(), mediaController.getMetadata());
+            playerFragment.onPlaybackStateChanged(mediaController.getPlaybackState(), mediaController.getMetadata());
             onMediaControllerConnected();
 
             // Finish building UI
@@ -361,29 +338,28 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     }
 
     private MediaControllerCompat.Callback getControllerCallback() {
-        /* TODO */
         return new MediaControllerCompat.Callback() {
             @Override
             public void onMetadataChanged(MediaMetadataCompat metadata) {
-                Log.e(TAG, "OnMetadataChanged: " + metadata.toString());
+                Log.d(TAG, "OnMetadataChanged: " + metadata.toString());
                 playerFragment.onMetadataChanged(metadata);
             }
 
             @Override
             public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                Log.e(TAG, "OnPlaybackStateChanged: " + state.toString());
+                Log.d(TAG, "OnPlaybackStateChanged: " + state.toString());
                 playerFragment.onPlaybackStateChanged(state, mediaController.getMetadata());
             }
 
             @Override
             public void onAudioInfoChanged(MediaControllerCompat.PlaybackInfo info) {
-                Log.e(TAG, "onAudioInfoChanged: " + info.toString());
+                Log.d(TAG, "onAudioInfoChanged: " + info.toString());
                 super.onAudioInfoChanged(info);
             }
 
             @Override
             public void onSessionEvent(String event, Bundle extras) {
-                Log.e(TAG, "onSessionEvent" + event.toString());
+                Log.d(TAG, "onSessionEvent" + event.toString());
                 super.onSessionEvent(event, extras);
             }
         };
@@ -402,10 +378,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         // TODO: Figure out why bundle is not transmitting data
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_episode_bundle), Parcels.wrap(episode));
-        Log.e(TAG, bundle.toString());
         mediaController.getTransportControls()
                 .playFromMediaId(episode.toString(), bundle);
-//        playExo(episode);
     }
 
     @Override
@@ -415,96 +389,4 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         mediaController.getTransportControls()
                 .playFromSearch(podcast.getTitle_original(), bundle);
     }
-
-    // Get controller
-//            mediaController.getMetadata()
-    
-
-    //    // Player interface functions
-//    @Override
-//    public void loadPlaylist(ArrayList<Podcast> podcasts) {
-//        playerFragment.loadPlaylist(podcasts);
-//    }
-//
-//    @Override
-//    public void play(Episode episode) {
-////        playerFragment.play(episode);
-//    }
-//
-//    @Override
-//    public void pause() {
-//        playerFragment.pause();
-//    }
-//
-//    @Override
-//    public void skip() {
-//        playerFragment.skip();
-//    }
-
-
-    public void playExo(Episode ep) {
-        SimpleExoPlayer exoPlayer;
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(this), new DefaultTrackSelector(), new DefaultLoadControl());
-        exoPlayer.addListener(new Player.EventListener() {
-            @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-            }
-
-            @Override
-            public void onLoadingChanged(boolean isLoading) {
-
-            }
-
-            @Override
-            public void onPlayerError(ExoPlaybackException error) {
-
-            }
-
-            @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
-            }
-
-            @Override
-            public void onSeekProcessed() {
-
-            }
-
-            @Override
-            public void onPositionDiscontinuity(int reason) {
-
-            }
-
-            @Override
-            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
-            }
-
-            @Override
-            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
-            }
-
-            @Override
-            public void onTimelineChanged(Timeline timeline, Object manifest) {
-
-            }
-
-            @Override
-            public void onRepeatModeChanged(int repeatMode) {
-
-            }
-        });
-
-        String userAgent = Util.getUserAgent(this, getString(R.string.app_name));
-        DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, null, DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS, DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS, true /* allow cross protocol redirects for feedproxy*/);
-        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, null, httpDataSourceFactory);
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        MediaSource audioSource = new ExtractorMediaSource(Uri.parse(ep.getAudio()), dataSourceFactory, extractorsFactory, null, null);
-        exoPlayer.prepare(audioSource);
-        exoPlayer.setPlayWhenReady(true);
-
-    }
-
 }
