@@ -128,7 +128,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         String hashedPassword = null;
         try
         {
-            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] bytes = originalPassword.getBytes("UTF-8");
             digest.update(bytes, 0, bytes.length);
             bytes = digest.digest();
