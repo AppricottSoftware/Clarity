@@ -2,7 +2,6 @@ package appricottsoftware.clarity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -145,6 +144,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 super.onSuccess(statusCode, headers, response);
                 try {
                     if (response.getString("auth").equals("failure")) {
+                        Toast unauthToast = Toast.makeText(getApplicationContext(),
+                                            R.string.no_auth,
+                                            Toast.LENGTH_SHORT);
+                        unauthToast.show();
                     } else {
                         Intent homeActivityIntent = new Intent(parentActivity, HomeActivity.class);
                         startActivity(homeActivityIntent);
@@ -157,32 +160,26 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
-                userIsAuthenticated = true;
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                userIsAuthenticated = false;
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                userIsAuthenticated = false;
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-                userIsAuthenticated = false;
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 super.onSuccess(statusCode, headers, responseString);
-                userIsAuthenticated = true;
-                Log.e("TAG", "Success3");
             }
         });
     }
