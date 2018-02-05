@@ -182,6 +182,7 @@ public class HomeActivity extends AppCompatActivity {
             case R.id.nav_logout:
                 switch(loginType) {
                     case "1":
+                        logout();
                         break;
                     case "2":
                         // Logout Facebook

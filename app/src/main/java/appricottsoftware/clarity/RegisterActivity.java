@@ -67,6 +67,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     // Switch to home activity
                     Intent homeActivityIntent = new Intent(this, HomeActivity.class);
                     homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    homeActivityIntent.putExtra("loginType", getString(R.string.registered_login_type));
                     startActivity(homeActivityIntent);
                     finish();
                 }
