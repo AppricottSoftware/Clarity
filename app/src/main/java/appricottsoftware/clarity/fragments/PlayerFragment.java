@@ -57,11 +57,12 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @BindView(R.id.iv_expand_cover) ImageView ivExpandCover;
 
     private static final String TAG = "PlayerFragment";
-    private static String coverURL = "";
 
-    private MediaControllerCompat.Callback mediaControllerCallback;
-    private Activity fragmentActvity;
-    private MediaControllerCompat mediaController;
+    private MediaMetadataCompat currentMetadata;
+
+//    private MediaControllerCompat.Callback mediaControllerCallback;
+//    private Activity fragmentActvity;
+//    private MediaControllerCompat mediaController;
 
     @Nullable
     @Override
@@ -74,13 +75,15 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
-        fragmentActvity = getActivity();
-
+//        fragmentActvity = getActivity();
+//        mediaController = MediaControllerCompat.getMediaController(fragmentActvity);
         // Set marquee scrolling
         tvExpandTitle.setSelected(true);
         tvExpandDescription.setSelected(true);
         tvCollapseTitle.setSelected(true);
         tvCollapseDescription.setSelected(true);
+
+        currentMetadata = null;
 
         // Initialize onclick listeners
 //        ibCollapsePlayPause.setOnClickListener(this);
@@ -98,95 +101,86 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @Override
     public void onStart() {
         super.onStart();
-        mediaController = MediaControllerCompat.getMediaController(fragmentActvity);
-        onConnected();
-        try {
-        } catch(Exception e) {
-            Log.e(TAG, "onStart: " + e.getMessage());
-        }
+//        onConnected();
+//        try {
+//            // mediacontroller.connect
+//        } catch(Exception e) {
+//            Log.e(TAG, "onStart: " + e.getMessage());
+//        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if(mediaController != null) {
-            mediaController.unregisterCallback(mediaControllerCallback);
-        }
-    }
-
-    // TODO: merge with setcontrolonclick
-//    @Override
-//    public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.ib_collapse_play_pause:
-//            case R.id.ib_expand_play_pause:
-//                PlaybackStateCompat playbackState = mediaController.getPlaybackState();
-//                int state = playbackState == null ? PlaybackStateCompat.STATE_NONE : playbackState.getState();
-//                if(state == PlaybackStateCompat.STATE_STOPPED
-//                        || state == PlaybackStateCompat.STATE_PAUSED
-//                        || state == PlaybackStateCompat.STATE_NONE) {
-//                    Log.d(TAG, "onClick: play");
-//                    playAudio();
-//                } else if(state == PlaybackStateCompat.STATE_PLAYING
-//                        || state == PlaybackStateCompat.STATE_BUFFERING
-//                        || state == PlaybackStateCompat.STATE_CONNECTING) {
-//                    Log.d(TAG, "onClick: pause");
-//                    pauseAudio();
-//                }
-//
-//            default:
-//                Log.d(TAG, "onClick: listener not specified");
-//                break;
+//        if(mediaController != null) {
+//            mediaController.unregisterCallback(mediaControllerCallback);
 //        }
-//    }
-
-    public void onConnected() {
-        if(mediaController != null) {
-            onMetadataChanged(mediaController.getMetadata());
-            onPlaybackStateChanged(mediaController.getPlaybackState());
-            mediaController.registerCallback(mediaControllerCallback);
-        }
     }
 
-    public void onPlaybackStateChanged(PlaybackStateCompat state) {
+    // Hide/show view elements to make fragment full screen
+    public void openPanel() {
+        rlExpand.setVisibility(View.VISIBLE);
+        rlCollapse.setVisibility(View.GONE);
+    }
+
+    // Hide/show view elements to make fragment bottom strip
+    public void closePanel() {
+        rlExpand.setVisibility(View.GONE);
+        rlCollapse.setVisibility(View.VISIBLE);
+    }
+
+    public void onConnected(PlaybackStateCompat state, MediaMetadataCompat metadata) {
+        onPlaybackStateChanged(state, metadata);
+    }
+
+    public void onPlaybackStateChanged(PlaybackStateCompat state, MediaMetadataCompat metadata) {
         Log.e(TAG, "onPlaybackStateChanged: " + state.toString());
         switch(state.getState()) {
             case PlaybackStateCompat.STATE_PLAYING:
-                Log.d(TAG, "onPlaybackStateChanged: State is playing " + state.getState());
+                Log.e(TAG, "onPlaybackStateChanged: State is playing " + state.getState());
                 setPlayControls();
+                onMetadataChanged(metadata);
                 break;
             case PlaybackStateCompat.STATE_PAUSED:
-                Log.d(TAG, "onPlaybackStateChanged: State is paused " + state.getState());
+                Log.e(TAG, "onPlaybackStateChanged: State is paused " + state.getState());
                 setPauseControls();
                 break;
             case PlaybackStateCompat.STATE_STOPPED:
-                Log.d(TAG, "onPlaybackStateChanged: State is stopped " + state.getState());
+                Log.e(TAG, "onPlaybackStateChanged: State is stopped " + state.getState());
                 setPauseControls();
                 break;
             case PlaybackStateCompat.STATE_ERROR:
                 Log.e(TAG, "onPlaybackStateChanged: Error state " + state.getErrorMessage());
                 break;
             default:
-                Log.d(TAG, "onPlaybackStateChanged: Unhandled case " + state.getState());
+                Log.e(TAG, "onPlaybackStateChanged: Unhandled case " + state.getState());
                 break;
         }
     }
 
     // Load changed details into player fragment
     public void onMetadataChanged(MediaMetadataCompat metadata) {
-        if(metadata != null) {
+        if(metadata != null
+            && (currentMetadata == null
+                    || (!metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
+                        .equals(currentMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI))))) {
             tvCollapseTitle.setText(metadata.getDescription().getTitle());
             tvExpandTitle.setText(metadata.getDescription().getTitle());
             tvCollapseDescription.setText(metadata.getDescription().getDescription());
-            tvCollapseDescription.setText(metadata.getDescription().getDescription());
+            tvExpandDescription.setText(metadata.getDescription().getDescription());
             Glide.with(getContext()).load(metadata.getDescription().getIconUri()).into(ivCollapseCover);
             Glide.with(getContext()).load(metadata.getDescription().getIconUri()).into(ivExpandCover);
+
+            if(currentMetadata != null)
+                Log.e(TAG, "metadata changed " + metadata.toString() + " " + currentMetadata.toString());
+            currentMetadata = metadata;
         }
     }
 
     public void buildTransportControls(@NonNull final Activity activity) {
         setControlOnClick(activity, ibCollapsePlayPause);
         setControlOnClick(activity, ibExpandPlayPause);
+        // TODO: Seek, speed setting
     }
 
     private void setControlOnClick(@NonNull final Activity activity, ImageButton imageButton) {
@@ -195,20 +189,12 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
             public void onClick(View v) {
                 int pbState = MediaControllerCompat.getMediaController(activity).getPlaybackState().getState();
                 if(pbState == PlaybackStateCompat.STATE_PLAYING) {
-                    setPause(fragmentActvity);
+                    MediaControllerCompat.getMediaController(activity).getTransportControls().pause();
                 } else {
-                    setPlay(fragmentActvity);
+                    MediaControllerCompat.getMediaController(activity).getTransportControls().play();
                 }
             }
         });
-    }
-
-    private void setPlay(@NonNull final Activity activity) {
-        MediaControllerCompat.getMediaController(activity).getTransportControls().play();
-    }
-
-    private void setPause(@NonNull final Activity activity) {
-        MediaControllerCompat.getMediaController(activity).getTransportControls().pause();
     }
 
     private void setPlayControls() {
@@ -240,17 +226,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
 //        play(testEpisode);
 //    }
 
-    // Hide/show view elements to make fragment full screen
-    public void openPanel() {
-        rlExpand.setVisibility(View.VISIBLE);
-        rlCollapse.setVisibility(View.GONE);
-    }
 
-    // Hide/show view elements to make fragment bottom strip
-    public void closePanel() {
-        rlExpand.setVisibility(View.GONE);
-        rlCollapse.setVisibility(View.VISIBLE);
-    }
 
     public void loadPlaylist(ArrayList<Podcast> podcasts) {
 
@@ -273,9 +249,9 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
 //
 //    }
 
-    public void resume() {
+//    public void resume() {
 //        mediaPlayer.start();
-    }
+//    }
 
 //    public void pause() {
 //        mediaPlayer.pause();
@@ -299,5 +275,31 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
 //                PlayerFragment.this.onMetadataChanged(metadata);
 //            }
 //        };
+//    }
+
+    // TODO: merge with setcontrolonclick
+//    @Override
+//    public void onClick(View v) {
+//        switch (v.getId()) {
+//            case R.id.ib_collapse_play_pause:
+//            case R.id.ib_expand_play_pause:
+//                PlaybackStateCompat playbackState = mediaController.getPlaybackState();
+//                int state = playbackState == null ? PlaybackStateCompat.STATE_NONE : playbackState.getState();
+//                if(state == PlaybackStateCompat.STATE_STOPPED
+//                        || state == PlaybackStateCompat.STATE_PAUSED
+//                        || state == PlaybackStateCompat.STATE_NONE) {
+//                    Log.d(TAG, "onClick: play");
+//                    playAudio();
+//                } else if(state == PlaybackStateCompat.STATE_PLAYING
+//                        || state == PlaybackStateCompat.STATE_BUFFERING
+//                        || state == PlaybackStateCompat.STATE_CONNECTING) {
+//                    Log.d(TAG, "onClick: pause");
+//                    pauseAudio();
+//                }
+//
+//            default:
+//                Log.d(TAG, "onClick: listener not specified");
+//                break;
+//        }
 //    }
 }

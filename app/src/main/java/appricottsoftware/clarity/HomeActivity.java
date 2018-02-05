@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +27,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.MediaController;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.upstream.TransferListener;
+import com.google.android.exoplayer2.util.Util;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
@@ -65,6 +87,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     private MediaBrowserCompat mediaBrowser;
     private MediaBrowserCompat.ConnectionCallback connectionCallback;
     private MediaControllerCompat.Callback controllerCallback;
+    private MediaControllerCompat mediaController;
 
     private Context context;
 
@@ -90,6 +113,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
         // Start the PlayerService
         startBackgroundPlayerService();
+
+        // Create a media browser so we can track content from the service
         connectionCallback = getConnectionCallback();
         controllerCallback = getControllerCallback();
         mediaBrowser = new MediaBrowserCompat(context,
@@ -101,6 +126,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     @Override
     protected void onStart() {
         super.onStart();
+        // Connect to the service
         mediaBrowser.connect();
         // Set the initial player to be open or closed
         updatePlayer();
@@ -115,16 +141,19 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
     @Override
     protected void onStop() {
+        // Unregister the callback that's listening to the service
         if(MediaControllerCompat.getMediaController(this) != null) {
             MediaControllerCompat.getMediaController(this)
                     .unregisterCallback(controllerCallback);
         }
+        // Disconnect from the service
         mediaBrowser.disconnect();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
+        // Stop the service
         stopService(playerServiceIntent);
         super.onDestroy();
     }
@@ -147,67 +176,11 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
     @Override
     public void onBackPressed() {
+        // Close the nav drawer and keep the app on this page for onStart()
         if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawers();
         } else {
             moveTaskToBack(true);
-        }
-    }
-
-    private void setUpPlayer() {
-        playerFragment = new PlayerFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fl_home_activity_player, playerFragment)
-                .commit();
-
-        // Update panel layout when swiping up or down
-        suplPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) { }
-
-            @Override
-            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-                if(previousState == SlidingUpPanelLayout.PanelState.DRAGGING
-                        && newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
-                    // Opening panel, change fragment layout to full screen
-                    playerFragment.openPanel();
-                } else if(previousState == SlidingUpPanelLayout.PanelState.DRAGGING
-                        && newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
-                    // Closing panel, change fragment layout to bottom strip
-                    playerFragment.closePanel();
-                }
-            }
-        });
-    }
-
-//    // Player interface functions
-//    @Override
-//    public void loadPlaylist(ArrayList<Podcast> podcasts) {
-//        playerFragment.loadPlaylist(podcasts);
-//    }
-//
-//    @Override
-//    public void play(Episode episode) {
-////        playerFragment.play(episode);
-//    }
-//
-//    @Override
-//    public void pause() {
-//        playerFragment.pause();
-//    }
-//
-//    @Override
-//    public void skip() {
-//        playerFragment.skip();
-//    }
-
-    private void updatePlayer() {
-        // Get the current state of the panel and update the fragment
-        if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
-            playerFragment.closePanel();
-        } else if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-            playerFragment.openPanel();
         }
     }
 
@@ -218,6 +191,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     }
 
     private void setUpDrawer() {
+        // Set up the nav drawer
         homeFragment = new HomeFragment();
         likeFragment = new LikeFragment();
         settingFragment = new SettingFragment();
@@ -238,7 +212,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     }
 
     private void selectDrawer(MenuItem item) {
-        // Make fragment
+        // Respond to clicking on an item in the nav drawer
         Fragment fragment = null;
         switch(item.getItemId()) {
             case R.id.nav_home_fragment:
@@ -276,31 +250,93 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     }
 
     private ActionBarDrawerToggle setUpDrawerToggle() {
-        return new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.nav_drawer_open, R.string.nav_drawer_close);
+        return new ActionBarDrawerToggle(this, drawerLayout, toolbar,
+                R.string.nav_drawer_open, R.string.nav_drawer_close);
     }
+
+    private void startBackgroundPlayerService() {
+        // Create a runnable containing the service
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                playerServiceIntent = new Intent(context, PlayerService.class);
+                context.startService(playerServiceIntent);
+            }
+        };
+        // Launch it in a new thread so the UI thread isn't blocked
+        final Thread thread = new Thread() {
+            @Override
+            public void run() {
+                runnable.run();
+            }
+        };
+        thread.start();
+    }
+
+    private void setUpPlayer() {
+        playerFragment = new PlayerFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fl_home_activity_player, playerFragment)
+                .commit();
+
+        // Update panel layout when swiping up or down
+        suplPanel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) { }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState,
+                                            SlidingUpPanelLayout.PanelState newState) {
+                if(previousState == SlidingUpPanelLayout.PanelState.DRAGGING
+                        && newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                    // Opening panel, change fragment layout to full screen
+                    playerFragment.openPanel();
+                } else if(previousState == SlidingUpPanelLayout.PanelState.DRAGGING
+                        && newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                    // Closing panel, change fragment layout to bottom strip
+                    playerFragment.closePanel();
+                }
+            }
+        });
+    }
+
+    private void updatePlayer() {
+        // Get the current state of the panel and update the fragment
+        if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+            playerFragment.closePanel();
+        } else if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+            playerFragment.openPanel();
+        }
+    }
+
+
 
     // Try to connect to the media session
     private void connectToSession(MediaSessionCompat.Token token) {
         try {
             // Create media controller
-            MediaControllerCompat mediaController = new MediaControllerCompat(this, token);
+            mediaController = new MediaControllerCompat(this, token);
+
             // Save the controller
             MediaControllerCompat.setMediaController(this, mediaController);
+
             // Register a callback to stay in sync
             mediaController.registerCallback(controllerCallback);
+
             // Display initial state
-            MediaMetadataCompat metadata = mediaController.getMetadata();
-            PlaybackStateCompat pbState = mediaController.getPlaybackState();
-            if(playerFragment != null) {
-                playerFragment.onConnected();
-            }
+            playerFragment.onConnected(mediaController.getPlaybackState(), mediaController.getMetadata());
             onMediaControllerConnected();
+
             // Finish building UI
             playerFragment.buildTransportControls(this);
         } catch(RemoteException e) {
             e.printStackTrace();
         }
+    }
 
+    private void onMediaControllerConnected() {
+        //TODO: Browse fragment code
     }
 
     private MediaBrowserCompat.ConnectionCallback getConnectionCallback() {
@@ -329,45 +365,29 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         return new MediaControllerCompat.Callback() {
             @Override
             public void onMetadataChanged(MediaMetadataCompat metadata) {
-                Log.d(TAG, "OnMetadataChanged: " + metadata.toString());
+                Log.e(TAG, "OnMetadataChanged: " + metadata.toString());
                 playerFragment.onMetadataChanged(metadata);
             }
 
             @Override
             public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                Log.d(TAG, "OnPlaybackStateChanged: " + state.toString());
-                playerFragment.onPlaybackStateChanged(state);
+                Log.e(TAG, "OnPlaybackStateChanged: " + state.toString());
+                playerFragment.onPlaybackStateChanged(state, mediaController.getMetadata());
             }
-        };
-    }
 
-    private void startBackgroundPlayerService() {
-        final Runnable runnable = new Runnable() {
             @Override
-            public void run() {
-                playerServiceIntent = new Intent(context, PlayerService.class);
-                context.startService(playerServiceIntent);
+            public void onAudioInfoChanged(MediaControllerCompat.PlaybackInfo info) {
+                Log.e(TAG, "onAudioInfoChanged: " + info.toString());
+                super.onAudioInfoChanged(info);
             }
         };
-        final Thread thread = new Thread() {
-            @Override
-            public void run() {
-                runnable.run();
-            }
-        };
-        thread.start();
-    }
-
-    private void onMediaControllerConnected() {
-        //TODO: Browse fragment code
     }
 
     @Override
     public void playChannel(Channel channel) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_channel_bundle), Parcels.wrap(channel));
-        MediaControllerCompat.getMediaController(this)
-                .getTransportControls()
+        mediaController.getTransportControls()
                 .playFromSearch(channel.getTopic(), bundle);
     }
 
@@ -377,17 +397,108 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_episode_bundle), Parcels.wrap(episode));
         Log.e(TAG, bundle.toString());
-        MediaControllerCompat.getMediaController(this)
-                .getTransportControls()
+        mediaController.getTransportControls()
                 .playFromMediaId(episode.toString(), bundle);
+//        playExo(episode);
     }
 
     @Override
     public void playPodcast(Podcast podcast) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_podcast_bundle), Parcels.wrap(podcast));
-        MediaControllerCompat.getMediaController(this)
-                .getTransportControls()
+        mediaController.getTransportControls()
                 .playFromSearch(podcast.getTitle_original(), bundle);
     }
+
+    // Get controller
+//            mediaController.getMetadata()
+    
+
+    //    // Player interface functions
+//    @Override
+//    public void loadPlaylist(ArrayList<Podcast> podcasts) {
+//        playerFragment.loadPlaylist(podcasts);
+//    }
+//
+//    @Override
+//    public void play(Episode episode) {
+////        playerFragment.play(episode);
+//    }
+//
+//    @Override
+//    public void pause() {
+//        playerFragment.pause();
+//    }
+//
+//    @Override
+//    public void skip() {
+//        playerFragment.skip();
+//    }
+
+
+    public void playExo(Episode ep) {
+        SimpleExoPlayer exoPlayer;
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(this), new DefaultTrackSelector(), new DefaultLoadControl());
+        exoPlayer.addListener(new Player.EventListener() {
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+            }
+
+            @Override
+            public void onLoadingChanged(boolean isLoading) {
+
+            }
+
+            @Override
+            public void onPlayerError(ExoPlaybackException error) {
+
+            }
+
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+            }
+
+            @Override
+            public void onSeekProcessed() {
+
+            }
+
+            @Override
+            public void onPositionDiscontinuity(int reason) {
+
+            }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+
+            }
+
+            @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+
+            }
+
+            @Override
+            public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+            }
+
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+
+            }
+        });
+
+        String userAgent = Util.getUserAgent(this, getString(R.string.app_name));
+        DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent, null, DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS, DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS, true /* allow cross protocol redirects for feedproxy*/);
+        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(this, null, httpDataSourceFactory);
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+        MediaSource audioSource = new ExtractorMediaSource(Uri.parse(ep.getAudio()), dataSourceFactory, extractorsFactory, null, null);
+        exoPlayer.prepare(audioSource);
+        exoPlayer.setPlayWhenReady(true);
+
+    }
+
 }

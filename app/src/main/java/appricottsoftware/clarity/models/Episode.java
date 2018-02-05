@@ -1,10 +1,14 @@
 package appricottsoftware.clarity.models;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadata;
 import android.support.v4.media.MediaMetadataCompat;
 
 import org.parceler.Parcel;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import appricottsoftware.clarity.sync.ClarityApp;
@@ -214,14 +218,24 @@ public class Episode {
     }
 
     public MediaMetadataCompat toMediaMetadataCompat() {
+        Bitmap bitmap = null;
+        // TODO: Write service to grab bitmap
+//        try {
+//            URL url = new URL(image);
+//            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+//        } catch(IOException e) {
+//            e.printStackTrace();
+//        }
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
         builder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title_original)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title_original)
+                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, publisher_original)
                 .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, description_original)
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, podcast_title_original)
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, image)
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, audio)
-                .putString(MediaMetadataCompat.METADATA_KEY_AUTHOR, publisher_original);
+                .putString(MediaMetadataCompat.METADATA_KEY_AUTHOR, publisher_original)
+                .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
         return builder.build();
     }
 
@@ -230,7 +244,9 @@ public class Episode {
         episode.setPub_date_ms(Long.parseLong("1511796600000"));
         episode.setDescription_original("What is net neutrality and why should you care about it? What happens to science and innovation, and even sites like this one, without an open internet?\n\nRead the transcript at http://www.quickanddirtytips.com/education/science/net-neutrality-repeal-and-science\nCheck out all the Quick and Dirty Tips shows:\nwww.quickanddirtytips.com/podcasts\n\nFOLLOW EVERYDAY EINSTEIN\nFacebook: https://www.facebook.com/qdteinstein \nTwitter: https://twitter.com/qdteinstein");
         episode.setRss("http://www.quickanddirtytips.com/xml/einstein.xml");
-        episode.setAudio("http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/einstein/traffic.libsyn.com/einstein/ede_263-ui3.mp3");
+        episode.setAudio("http://traffic.libsyn.com/brookingsintersections/170215_Intersections_Turner-LeeSwarztrauber_final.mp3?dest-id=365002");
+//        episode.setAudio("http://feedproxy.google.com/~r/ThisIsMyNextPodcast/~5/uh_wiF1Sfxo/e5a0c1b9-23eb-408b-8d48-df3bf288b8a2.mp3");
+//        episode.setAudio("http://www.podtrac.com/pts/redirect.mp3/media.blubrry.com/einstein/traffic.libsyn.com/einstein/ede_263-ui3.mp3");
         episode.setDescription_highlighted("...What is <span class=\"ln-search-highlight\">net</span> <span class=\"ln-search-highlight\">neutrality</span> and why should you care about it? What happens to science and innovation, and even sites like this one, without an open internet?\n\nRead the transcript at http");
         episode.setItunes_id(510036484);
         episode.setTitle_highlighted("263 - The End of <span class=\"ln-search-highlight\">Net</span> <span class=\"ln-search-highlight\">Neutrality</span>: What It Means For Science (and You)");

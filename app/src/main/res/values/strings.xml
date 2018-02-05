@@ -14,7 +14,9 @@
     <string name="toolbar_home_activity">Home</string>
 
     <string name="player_service_pause">Pause</string>
+    <string name="player_service_play">Play</string>
     <string name="player_service_wifi_lock">APPRICOTT_WIFI_LOCK</string>
+    <string name="player_service_wake_lock">APPRICOTT_WAKE_LOCK</string>
 
     <string name="home_activity_channel_bundle">CHANNEL</string>
     <string name="home_activity_episode_bundle">EPISODE</string>

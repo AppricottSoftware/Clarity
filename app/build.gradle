@@ -34,6 +34,8 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'org.parceler:parceler-api:1.1.9'
+    implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.6.0'
     annotationProcessor 'org.parceler:parceler:1.1.9'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

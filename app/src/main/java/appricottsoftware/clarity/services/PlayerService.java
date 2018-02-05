@@ -2,13 +2,18 @@ package appricottsoftware.clarity.services;
 
 import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.drm.DrmStore;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaMetadata;
 import android.media.MediaPlayer;
+import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -30,9 +35,31 @@ import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.ExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+
 import org.parceler.Parcels;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,15 +80,18 @@ public class PlayerService extends MediaBrowserServiceCompat {
 //    TODO: private BecomingNoisyReceiver myNoisyAudioStreamReceiver;
     private PlaybackReceiver playbackReceiver;
     private Notification notification;
+    private NotificationManager notificationManager;
     private MediaSessionCompat mediaSession;
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaPlayer mediaPlayer;
+    private SimpleExoPlayer exoMediaPlayer;
     private PlayerCallback playerCallback;
     private PlayerService mediaService;
     private IntentFilter intentFilter;
     private NotificationReceiver notificationReceiver;
     private Context context;
     private WifiManager.WifiLock wifiLock;
+    private PowerManager.WakeLock wakeLock;
 
     @Override
     public void onCreate() {
@@ -69,21 +99,24 @@ public class PlayerService extends MediaBrowserServiceCompat {
         mediaService = this;
         context = getApplicationContext();
         intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-        mediaService = this;
 
-        // Initialize media player
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         // Acquire a lock so CPU stays on even when screen is locked
-        wifiLock = ((WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE))
+        wakeLock = ((PowerManager) context.getSystemService(Context.POWER_SERVICE))
+                .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getString(R.string.player_service_wake_lock));
+        wakeLock.acquire();
+
+        // Acquire a wifi lock so wifi doesn't disconnect
+        wifiLock = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, getString(R.string.player_service_wifi_lock));
-        // Get the wifi lock
         wifiLock.acquire();
 
-        // TODO: create receiver
-        playbackReceiver = new PlaybackReceiver();
-        // myNoisyAudioStreamReceiver = new BecomingNoisyReceiver();
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Initialize media player
+        initializeExoMediaPlayer();
+
+        // Create broadcast receiver
+        playbackReceiver = new PlaybackReceiver(this);
 
         // Create media session
         mediaSession = new MediaSessionCompat(context, TAG);
@@ -97,7 +130,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 .setActions(getAvailableActions());
         mediaSession.setPlaybackState(stateBuilder.build());
 
-        // TODO: Handle callbacks from media controller
+        // Handle callbacks from media controller
         playerCallback = new PlayerCallback(this);
         mediaSession.setCallback(playerCallback);
 
@@ -108,15 +141,12 @@ public class PlayerService extends MediaBrowserServiceCompat {
     @Nullable
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
-
-        // TODO: Control level of access for package
+        // TODO: Control level of access for packages
         return new BrowserRoot(MEDIA_ROOT_ID, null);
-
     }
 
     @Override
     public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
-
         // Calling package is not whitelisted (invalid)
         if(TextUtils.equals(EMPTY_MEDIA_ROOT_ID, parentId)) {
             result.sendResult(null);
@@ -145,14 +175,13 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
     @Override
     public void onDestroy() {
-        if(mediaPlayer != null) {
-            mediaPlayer.release();
-        }
         try {
             unregisterReceiver(playbackReceiver);
         } catch(Exception e) {
             e.printStackTrace();
         }
+        exoMediaPlayer.release();
+        wakeLock.release();
         wifiLock.release();
         stopForeground(true);
         super.onDestroy();
@@ -163,7 +192,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
                 | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
                 | PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
-        if(mediaPlayer.isPlaying()) {
+        if(exoMediaPlayer.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
             Log.d(TAG, "getAvailableActions: mediaPlayer isPlaying()");
             actions |= PlaybackStateCompat.ACTION_PAUSE;
         } else {
@@ -171,6 +200,122 @@ public class PlayerService extends MediaBrowserServiceCompat {
             actions |= PlaybackStateCompat.ACTION_PLAY;
         }
         return actions;
+    }
+
+    private void initializeExoMediaPlayer() {
+        exoMediaPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(this), new DefaultTrackSelector(), new DefaultLoadControl());
+        exoMediaPlayer.addListener(new Player.EventListener() {
+            @Override
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) { }
+
+            @Override
+            public void onLoadingChanged(boolean isLoading) { }
+
+            @Override
+            public void onPlayerError(ExoPlaybackException error) { }
+
+            @Override
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) { }
+
+            @Override
+            public void onSeekProcessed() { }
+
+            @Override
+            public void onPositionDiscontinuity(int reason) { }
+
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                // Push the state to the media session when the audio starts or stops playing
+                if(playWhenReady && playbackState == PlaybackStateCompat.STATE_PLAYING) {
+                    playbackState = PlaybackStateCompat.STATE_PLAYING;
+                } else {
+                    playbackState = PlaybackState.STATE_PAUSED;
+                }
+                PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
+                        .setActions(getAvailableActions());
+                stateBuilder.setState(playbackState, exoMediaPlayer.getCurrentPosition(), 1.0f, exoMediaPlayer.getDuration());
+                mediaSession.setPlaybackState(stateBuilder.build());
+                // Set the notification
+                setNotification(playbackState);
+            }
+
+            @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) { }
+
+            @Override
+            public void onTimelineChanged(Timeline timeline, Object manifest) { }
+
+            @Override
+            public void onRepeatModeChanged(int repeatMode) { }
+        });
+
+    }
+
+    private void setNotification(int playbackState) {
+        try {
+            MediaControllerCompat controller = mediaSession.getController();
+            MediaMetadataCompat metadata = controller.getMetadata();
+            MediaDescriptionCompat description = metadata.getDescription();
+
+            // TODO: make the notification update
+            int rDrawable = R.drawable.ic_player_pause;
+            String actionState = getString(R.string.player_service_pause);
+            int playState = PlaybackStateCompat.STATE_PAUSED;
+            if(playbackState != PlaybackStateCompat.STATE_PLAYING) {
+                rDrawable = R.drawable.ic_player_play;
+                actionState = getString(R.string.player_service_play);
+                playState = PlaybackStateCompat.STATE_PLAYING;
+            }
+
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
+            builder // Metadata on notification bar
+                    .setContentTitle(description.getTitle())
+                    .setContentText(description.getDescription())
+                    .setSubText(description.getSubtitle())
+                    .setLargeIcon(description.getIconBitmap())
+
+                    // Launch activity by clicking notification
+                    .setContentIntent(controller.getSessionActivity())
+
+                    // Swipe notification away to stop service
+                    .setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context,
+                            PlaybackStateCompat.ACTION_STOP))
+
+                    // Show notification on lock screen
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+                    // App icon + color
+                    .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                    .setColor(ContextCompat.getColor(context,
+                            android.R.color.white))
+
+                    // Pause button stops playback
+                    .addAction(new NotificationCompat.Action(rDrawable,
+                            actionState,
+                            MediaButtonReceiver.buildMediaButtonPendingIntent(context,
+                                    playState)))
+
+                    // Use MediaStyle features
+                    .setStyle(new MediaStyle()
+                            .setMediaSession(mediaSession.getSessionToken())
+                            .setShowActionsInCompactView(0));
+
+            // Show notification and put service in foreground
+//            if(notification == null) {
+                notification = builder.build();
+
+                startForeground(NOTIFICATION_ID, notification);
+//            }
+//            else {
+
+//            }
+
+
+            Log.e(TAG, "Success notification");
+        } catch(Exception e) {
+            Log.e(TAG, e.toString());
+            e.printStackTrace();
+        }
     }
 
     //TODO: Decouple from PlayerService
@@ -190,72 +335,51 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
             if(result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 // Start the service
-//                startService()
-//                mediaService.start();
+                startService(new Intent(context, PlayerService.class));
 
-                startService(new Intent(getApplicationContext(), PlayerService.class));
                 // Set the session active
                 mediaSession.setActive(true);
 
-;
-                // TODO: Register BECOME_NOISY
+                // Register the broadcast receiver
                 registerReceiver(playbackReceiver, intentFilter);
-//                setNotification();
             }
         }
 
         @Override
         public void onPlay() {
-            try {
-                Log.d(TAG, "onPlay");
-                // Start the player
-                mediaPlayer.start();
-                PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
-                        .setActions(getAvailableActions());
-                stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, mediaPlayer.getCurrentPosition(), 1.0f, mediaPlayer.getDuration());
-                mediaSession.setPlaybackState(stateBuilder.build());
-            } catch(Exception e) {
+            Log.d(TAG, "onPlay");
 
-            }
+            // Start the player
+            exoMediaPlayer.setPlayWhenReady(true);
         }
 
         @Override
         public void onPause() {
             Log.d(TAG, "onPause");
-            mediaPlayer.pause();
-            PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
-                    .setActions(getAvailableActions());
-            stateBuilder.setState(PlaybackStateCompat.STATE_PAUSED, mediaPlayer.getCurrentPosition(), 1.0f, mediaPlayer.getDuration());
-            mediaSession.setPlaybackState(stateBuilder.build());
-            // TODO: unregister broadcast receiver
-            try {
-                unregisterReceiver(playbackReceiver);
-            } catch(Exception e) {
-//                e.printStackTrace();
-            }
 
-            // Stop notification, take the service out of the foreground
-            stopForeground(false);
+            // Pause the player
+            exoMediaPlayer.setPlayWhenReady(false);
         }
 
         @Override
         public void onStop() {
-            AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
             // Remove audio focus
+            AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
             audioManager.abandonAudioFocus(afChangeListener);
-            // TODO: Unregister receiver
+
+            // Unregister broadcast receiver
             try {
                 unregisterReceiver(playbackReceiver);
             } catch(Exception e) {
-                //TODO: clean up receivers
-//                e.printStackTrace();
+                Log.e(TAG, e.toString());
             }
-            // TODO: Stop the service
-//            service.stop(self;
+
+            // Stop the player
+            exoMediaPlayer.stop();
+
             // Set the session inactive
             mediaSession.setActive(false);
-            // stop the player
-            mediaPlayer.stop();
+
             // Stop notification, take the service out of the foreground
             stopForeground(false);
         }
@@ -274,74 +398,37 @@ public class PlayerService extends MediaBrowserServiceCompat {
             Episode episode = null;
             try {
                 episode = ClarityApp.getGson().fromJson(mediaId, Episode.class);
+
+                // Play the audio by creating a media source from the audio URL
+                String userAgent = Util.getUserAgent(context, getString(R.string.app_name));
+                DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent,
+                        null,
+                        DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+                        DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+                        true /* allow cross protocol redirects for feedproxy*/);
+                DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(context,
+                        null,
+                        httpDataSourceFactory);
+                ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+                MediaSource audioSource = new ExtractorMediaSource(Uri.parse(episode.getAudio()), dataSourceFactory, extractorsFactory, null, null);
+                exoMediaPlayer.prepare(audioSource);
+                exoMediaPlayer.setPlayWhenReady(true);
+
+                // Update the metadata for this session
+                mediaSession.setMetadata(episode.toMediaMetadataCompat());
+
+                Log.e("PlayerFragment", "Notification successful");
             } catch(Exception e) {
                 e.printStackTrace();
                 return;
-            }
-            if(episode != null) {
-                //TODO: Stop if already playing
-                try {
-                    mediaPlayer.setDataSource(episode.getAudio());
-                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mp) {
-                            mediaPlayer.start();
-                            PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
-                                    .setActions(getAvailableActions());
-                            stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, mediaPlayer.getCurrentPosition(), 1.0f, mediaPlayer.getDuration());
-                            mediaSession.setPlaybackState(stateBuilder.build());
-//                            setNotification();
-                        }
-                    });
-                    mediaPlayer.prepareAsync();
-                    mediaSession.setMetadata(episode.toMediaMetadataCompat());
-
-                    Log.e("PlayerFragment", "Playing audio");
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
             }
         }
 
         @Override
         public void onPlayFromSearch(String query, Bundle extras) {
 //            setNotification();
+
             super.onPlayFromSearch(query, extras);
-        }
-
-
-        private void setNotification() {
-            try {
-                MediaControllerCompat controller = mediaSession.getController();
-                MediaMetadataCompat metadata = controller.getMetadata();
-                MediaDescriptionCompat description = metadata.getDescription();
-
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
-                builder.setContentTitle(description.getTitle()) // Metadata on notification bar
-                        .setContentText(description.getSubtitle())
-                        .setSubText(description.getDescription())
-                        .setLargeIcon(description.getIconBitmap())
-                        .setContentIntent(controller.getSessionActivity()) // Launch activity by clicking notification
-                        .setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context,
-                                PlaybackStateCompat.ACTION_STOP)) // Swipe notification away to stop service
-                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC) // Show notification on lock screen
-                        .setSmallIcon(R.drawable.ic_launcher_foreground) // App icon + color
-                        .setColor(ContextCompat.getColor(context,
-                                R.color.colorPrimary))
-                        .addAction(new NotificationCompat.Action(R.drawable.ic_player_pause, // Pause button
-                                getString(R.string.player_service_pause),
-                                MediaButtonReceiver.buildMediaButtonPendingIntent(context,
-                                        PlaybackStateCompat.ACTION_PLAY_PAUSE)))
-                        .setStyle(new MediaStyle() // Use MediaStyle features
-                                .setMediaSession(mediaSession.getSessionToken())
-                                .setShowActionsInCompactView(0));
-
-                // Show notification and put service in foreground
-                notification = builder.build();
-                startForeground(NOTIFICATION_ID, notification);
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }
