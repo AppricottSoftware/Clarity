@@ -1,5 +1,6 @@
 package appricottsoftware.clarity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import appricottsoftware.clarity.sync.ClarityApp;
@@ -56,6 +58,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private AccessTokenTracker fbAccessTokenTracker;
     private GoogleSignInAccount googleAccount;
     private GoogleSignInClient googleSignInClient;
+    private boolean userIsAuthenticated = false;
 
 
     @Override
@@ -119,14 +122,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btn_login:
                 String strPassword = new RegisterActivity().hashPassword(etPassword.getText().toString());
                 String strEmail = etEmail.getText().toString();
-
-                if (isAuthenticated(strEmail, strPassword)) {
-                    Intent homeActivityIntent = new Intent(this, HomeActivity.class);
-                    startActivity(homeActivityIntent);
-                }
-                // TODO Create an error page or ui for incorrect email or password credentials
-
-                finish();
+                authenticate(strEmail, strPassword);
                 break;
             case R.id.btn_register:
                 register();
@@ -140,11 +136,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     // HTTPS GET function to authenticate user. Currently not working.
-    public boolean isAuthenticated(String email, String password) {
+    public void authenticate(String email, String password) {
+        final Activity parentActivity = this;
         ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                try {
+                    if (response.getString("auth").equals("failure")) {
+                        Toast unauthToast = Toast.makeText(getApplicationContext(),
+                                            R.string.no_auth,
+                                            Toast.LENGTH_SHORT);
+                        unauthToast.show();
+                    } else {
+                        Intent homeActivityIntent = new Intent(parentActivity, HomeActivity.class);
+                        startActivity(homeActivityIntent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -172,7 +182,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 super.onSuccess(statusCode, headers, responseString);
             }
         });
-        return false;
     }
 
     private void facebookLogin() {
