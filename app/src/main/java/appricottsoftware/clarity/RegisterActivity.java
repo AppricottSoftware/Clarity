@@ -26,9 +26,6 @@ import cz.msebera.android.httpclient.Header;
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.bt_register) Button btRegister;
-    @BindView(R.id.editText_firstname) EditText firstname;
-    @BindView(R.id.editText_lastname) EditText lastname;
-    @BindView(R.id.editText_username) EditText username;
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
 
@@ -49,15 +46,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch(v.getId()) {
             case R.id.bt_register:
 
-                String firstnameString = firstname.getText().toString();
-                String lastnameString = lastname.getText().toString();
-                String usernameString = username.getText().toString();
                 String emailString = email.getText().toString();
                 String hashedPassword = hashPassword(password.getText().toString());
 
                 // Sanity Check to make sure all instances are populated with actual strings
-                if(firstnameString.length() == 0|| lastnameString.length() == 0 || usernameString.length() == 0 ||
-                        emailString.length() == 0 || password.getText().toString().length() == 0) {
+                if(emailString.length() == 0 || password.getText().toString().length() == 0) {
                     return;
                 }
 
@@ -72,15 +65,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                     // After successful save of user info on back end
                     // Switch to home activity
-
-
                     Intent homeActivityIntent = new Intent(this, HomeActivity.class);
                     homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(homeActivityIntent);
                     finish();
                 }
 
-                ClarityApp.getRestClient().registerRequest(usernameString, emailString, hashedPassword, firstnameString, lastnameString, this, new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient().registerRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         Log.e(TAG, "onSuccess1 : " + response.toString() );
@@ -128,7 +119,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         String hashedPassword = null;
         try
         {
-            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] bytes = originalPassword.getBytes("UTF-8");
             digest.update(bytes, 0, bytes.length);
             bytes = digest.digest();

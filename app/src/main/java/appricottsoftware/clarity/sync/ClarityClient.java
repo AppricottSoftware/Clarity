@@ -53,18 +53,14 @@ public class ClarityClient {
     }
 
 
-    public void registerRequest(String username, String email, String password, String firstname,
-                                String lastname, Context context, JsonHttpResponseHandler handler) {
+    public void registerRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
 
         JSONObject jsonParams = new JSONObject();
         try {
-            jsonParams.put("username", username);
             jsonParams.put("email", email);
             jsonParams.put("password", password);
-            jsonParams.put("firstname", firstname);
-            jsonParams.put("lastname", lastname);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
             client.post(context, context.getString(R.string.register_request_url), entity, "application/json", handler);
