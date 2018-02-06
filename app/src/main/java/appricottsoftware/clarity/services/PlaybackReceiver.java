@@ -24,14 +24,14 @@ public class PlaybackReceiver extends BroadcastReceiver {
             // TODO: Pause the playback
         } else if(PlaybackStateCompat.ACTION_PAUSE == Long.parseLong(intent.getAction())) {
             // TODO: show play on notification
-            Log.e(TAG, "Play");
+            Log.d(TAG, "Play");
         } else if(PlaybackStateCompat.ACTION_PLAY == Long.parseLong(intent.getAction())) {
             // TODO: show pause on notification
-            Log.e(TAG, "Pause");
+            Log.d(TAG, "Pause");
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Action: " + intent.getAction() + "\n");
         sb.append("URI: " + intent.toUri(Intent.URI_INTENT_SCHEME).toString() + "\n");
-        Log.e(TAG, sb.toString());
+        Log.d(TAG, sb.toString());
     }
 }

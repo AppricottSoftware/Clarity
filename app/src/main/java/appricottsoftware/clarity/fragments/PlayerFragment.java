@@ -62,12 +62,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     private static final String TAG = "PlayerFragment";
 
     private MediaMetadataCompat currentMetadata;
-    private PlaybackStateCompat currentPlaybackState;
     private boolean currentPlayState;
-
-//    private MediaControllerCompat.Callback mediaControllerCallback;
-//    private Activity fragmentActvity;
-//    private MediaControllerCompat mediaController;
 
     @Nullable
     @Override
@@ -80,96 +75,70 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
-//        fragmentActvity = getActivity();
-//        mediaController = MediaControllerCompat.getMediaController(fragmentActvity);
+
         // Set marquee scrolling
         tvExpandTitle.setSelected(true);
         tvExpandDescription.setSelected(true);
         tvCollapseTitle.setSelected(true);
         tvCollapseDescription.setSelected(true);
-
-        // Initialize onclick listeners
-//        ibCollapsePlayPause.setOnClickListener(this);
-//        ibCollapseSkip.setOnClickListener(this);
-//
-//        ibExpandPlayPause.setOnClickListener(this);
-//        ibExpandLike.setOnClickListener(this);
-//        ibExpandDislike.setOnClickListener(this);
-//        tvExpandSpeed.setOnClickListener(this);
-
-        // Set media controller callback
-//        mediaControllerCallback = getMediaControllerCallback();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-//        onConnected();
-//        try {
-//            // mediacontroller.connect
-//        } catch(Exception e) {
-//            Log.e(TAG, "onStart: " + e.getMessage());
-//        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-//        if(mediaController != null) {
-//            mediaController.unregisterCallback(mediaControllerCallback);
-//        }
     }
 
-    // Hide/show view elements to make fragment full screen
     public void openPanel() {
+        // Hide/show view elements to make fragment full screen
         rlExpand.setVisibility(View.VISIBLE);
         rlCollapse.setVisibility(View.GONE);
     }
 
-    // Hide/show view elements to make fragment bottom strip
+
     public void closePanel() {
+        // Hide/show view elements to make fragment bottom strip
         rlExpand.setVisibility(View.GONE);
         rlCollapse.setVisibility(View.VISIBLE);
     }
 
-    public void onConnected(PlaybackStateCompat state, MediaMetadataCompat metadata) {
-        onPlaybackStateChanged(state, metadata);
-    }
-
     public void onPlaybackStateChanged(PlaybackStateCompat state, MediaMetadataCompat metadata) {
-        Log.e(TAG, "onPlaybackStateChanged: " + state.toString());
-        switch(state.getState()) {
+        switch (state.getState()) {
             case PlaybackStateCompat.STATE_PLAYING:
-                Log.e(TAG, "onPlaybackStateChanged: State is playing " + state.getState());
+                Log.d(TAG, "onPlaybackStateChanged: State is playing " + state.getState());
                 setPlayPauseControls(true);
                 setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 onMetadataChanged(metadata);
                 break;
             case PlaybackStateCompat.STATE_PAUSED:
-                Log.e(TAG, "onPlaybackStateChanged: State is paused " + state.getState());
+                Log.d(TAG, "onPlaybackStateChanged: State is paused " + state.getState());
                 setPlayPauseControls(false);
                 setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 break;
             case PlaybackStateCompat.STATE_STOPPED:
-                Log.e(TAG, "onPlaybackStateChanged: State is stopped " + state.getState());
+                Log.d(TAG, "onPlaybackStateChanged: State is stopped " + state.getState());
                 setPlayPauseControls(false);
                 setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 break;
             case PlaybackStateCompat.STATE_ERROR:
-                Log.e(TAG, "onPlaybackStateChanged: Error state " + state.getErrorMessage());
+                Log.d(TAG, "onPlaybackStateChanged: Error state " + state.getErrorMessage());
                 break;
             default:
-                Log.e(TAG, "onPlaybackStateChanged: Unhandled case " + state.getState());
+                Log.d(TAG, "onPlaybackStateChanged: Unhandled case " + state.getState());
                 break;
         }
     }
 
-    // Load changed details into player fragment
     public void onMetadataChanged(MediaMetadataCompat metadata) {
-        if(metadata != null
-            && (currentMetadata == null
-                    || (!metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
-                        .equals(currentMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI))))) {
+        // Load changed details into player fragment if the metadata has changed
+        if (metadata != null
+                && (currentMetadata == null
+                || (!metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
+                .equals(currentMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI))))) {
             tvCollapseTitle.setText(metadata.getDescription().getTitle());
             tvExpandTitle.setText(metadata.getDescription().getTitle());
             tvCollapseDescription.setText(metadata.getDescription().getDescription());
@@ -177,8 +146,8 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
             Glide.with(getContext()).load(metadata.getDescription().getIconUri()).into(ivCollapseCover);
             Glide.with(getContext()).load(metadata.getDescription().getIconUri()).into(ivExpandCover);
 
-            if(currentMetadata != null)
-                Log.e(TAG, "metadata changed " + metadata.toString() + " " + currentMetadata.toString());
+            if (currentMetadata != null)
+                Log.d(TAG, "OnMetadataChanged: " + metadata.toString() + " " + currentMetadata.toString());
             currentMetadata = metadata;
         }
     }
@@ -187,7 +156,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         setControlOnClick(activity, ibCollapsePlayPause);
         setControlOnClick(activity, ibExpandPlayPause);
         setSeekBarDrag(activity, sbExpandSeek);
-        // TODO: playback speed
+        // TODO: playback speed controls
 
     }
 
@@ -195,11 +164,15 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int pbState = MediaControllerCompat.getMediaController(activity).getPlaybackState().getState();
-                if(pbState == PlaybackStateCompat.STATE_PLAYING) {
-                    MediaControllerCompat.getMediaController(activity).getTransportControls().pause();
-                } else {
-                    MediaControllerCompat.getMediaController(activity).getTransportControls().play();
+                switch (MediaControllerCompat.getMediaController(activity).getPlaybackState().getState()) {
+                    case PlaybackStateCompat.STATE_PLAYING:
+                        // If audio is playing, call the service to pause
+                        MediaControllerCompat.getMediaController(activity).getTransportControls().pause();
+                        break;
+                    default:
+                        // If audio is not playing, call the service to play audio
+                        MediaControllerCompat.getMediaController(activity).getTransportControls().play();
+                        break;
                 }
             }
         });
@@ -209,145 +182,54 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser) {
-                    Log.e(TAG, "Seeking to: " + progress);
+                if (fromUser) {
+                    Log.d(TAG, "setSeekBarDrag: onProgressChanged: " + progress);
+                    // If the user drags the seekbar, call the service to seek to a position (in milliseconds)
                     MediaControllerCompat.getMediaController(activity).getTransportControls().seekTo(progress * 1000);
                 }
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
     }
 
-
-
     private void setPlayPauseControls(boolean play) {
-        if(currentPlayState != play) {
+        if (currentPlayState != play) {
             // If paused, set the play/pause button to play
             int rDrawable = R.drawable.ic_player_play;
             // If playing, set the play/pause button to pause
-            if(play) {
+            if (play) {
                 rDrawable = R.drawable.ic_player_pause;
             }
+
             // Set both the expanded and collapsed view elements
             ibCollapsePlayPause.setImageResource(rDrawable);
             ibExpandPlayPause.setImageResource(rDrawable);
 
+            // Update the current play state
             currentPlayState = play;
         }
     }
 
     private void setSeekBarControls(int progress, int totalTime) {
-        if(progress <= totalTime) {
+        if (progress <= totalTime) {
+            // Total time is given in milliseconds - convert to seconds
             sbExpandSeek.setMax(totalTime / 1000);
             sbExpandSeek.setProgress(progress / 1000);
+
             // Set the elapsed time
             String timeElapsed = DurationFormatUtils.formatDuration(progress, "HH:mm:ss", true);
             tvExpandTimeElapsed.setText(timeElapsed);
+
             // Set the remaining time
             String timeRemaining = DurationFormatUtils.formatDuration(totalTime - progress, "HH:mm:ss", true);
             tvExpandTimeRemaining.setText(timeRemaining);
         }
     }
-
-    //TODO: Remove these functions
-//    private void playAudio() {
-//        if(mediaController != null) {
-//            mediaController.getTransportControls().play();
-//        }
-//    }
-//
-//    private void pauseAudio() {
-//        if(mediaController != null) {
-//            mediaController.getTransportControls().pause();
-//        }
-//    }
-
-//    private void testPlay() {
-//        // Test bench
-//        Episode testEpisode = new Episode();
-//        testEpisode.setAudio("http://traffic.libsyn.com/nsf/nsf253-itunes.mp3?dest-id=63713");
-//        play(testEpisode);
-//    }
-
-
-
-    public void loadPlaylist(ArrayList<Podcast> podcasts) {
-
-    }
-
-//    public void play(Episode episode) {
-//        try {
-//            mediaPlayer.setDataSource(episode.getAudio());
-//            mediaPlayer.prepareAsync();
-//            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//                @Override
-//                public void onPrepared(MediaPlayer mp) {
-//                    mediaPlayer.start();
-//                }
-//            });
-//            Log.e("PlayerFragment", "Playing audio");
-//        } catch(Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-
-//    public void resume() {
-//        mediaPlayer.start();
-//    }
-
-//    public void pause() {
-//        mediaPlayer.pause();
-
-
-//    public void skip() {
-//
-//    }
-
-//    private MediaControllerCompat.Callback getMediaControllerCallback() {
-//        return new MediaControllerCompat.Callback() {
-//            @Override
-//            public void onPlaybackStateChanged(PlaybackStateCompat state) {
-//                Log.d(TAG, "MediaControllerCompat.Callback: onPlaybackStateChanged to " + state.getState());
-//                PlayerFragment.this.onPlaybackStateChanged(state);
-//            }
-//
-//            @Override
-//            public void onMetadataChanged(MediaMetadataCompat metadata) {
-//                Log.d(TAG, "MediaControllerCompat.Callback: onMetadataChanged to " + metadata.getDescription().getMediaId() + " " + metadata.getDescription().getTitle());
-//                PlayerFragment.this.onMetadataChanged(metadata);
-//            }
-//        };
-//    }
-
-    // TODO: merge with setcontrolonclick
-//    @Override
-//    public void onClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.ib_collapse_play_pause:
-//            case R.id.ib_expand_play_pause:
-//                PlaybackStateCompat playbackState = mediaController.getPlaybackState();
-//                int state = playbackState == null ? PlaybackStateCompat.STATE_NONE : playbackState.getState();
-//                if(state == PlaybackStateCompat.STATE_STOPPED
-//                        || state == PlaybackStateCompat.STATE_PAUSED
-//                        || state == PlaybackStateCompat.STATE_NONE) {
-//                    Log.d(TAG, "onClick: play");
-//                    playAudio();
-//                } else if(state == PlaybackStateCompat.STATE_PLAYING
-//                        || state == PlaybackStateCompat.STATE_BUFFERING
-//                        || state == PlaybackStateCompat.STATE_CONNECTING) {
-//                    Log.d(TAG, "onClick: pause");
-//                    pauseAudio();
-//                }
-//
-//            default:
-//                Log.d(TAG, "onClick: listener not specified");
-//                break;
-//        }
-//    }
 }
