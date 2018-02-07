@@ -164,6 +164,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         // Close the nav drawer and keep the app on this page for onStart()
         if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawers();
+        } else if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                suplPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                playerFragment.closePanel();
         } else {
             moveTaskToBack(true);
         }
