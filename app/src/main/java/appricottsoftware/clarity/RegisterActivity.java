@@ -35,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
 
-    boolean seeSurvey = false;
+    boolean seeSurvey = true;
     private static final String TAG = "RegisterActivity";
 
     @Override

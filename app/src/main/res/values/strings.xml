@@ -18,10 +18,8 @@
     <string name="register_button">Register</string>
     <string name="email_hint">email</string>
     <string name="password_hint">password</string>
-    <string name="survey_prompt">Looks like you don\'t have any channels.\n
-                                 Let\'s setup a channel for you.\n\n
-                                 What are some of the topics you like to listen?\n\n
-                                 Thumbs up as many as you like.</string>
+    <string name="survey_prompt">Let\'s setup your first channel.\n\n
+                                 Select the topics you like.\n\n</string>
 
     <string name="category_1">TV &amp; Film</string>
     <string name="category_2">Sports &amp; Recreation</string>
