@@ -2,6 +2,7 @@ package appricottsoftware.clarity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import appricottsoftware.clarity.models.Session;
 import appricottsoftware.clarity.sync.ClarityApp;
 
 import java.util.Arrays;
@@ -58,7 +60,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private AccessTokenTracker fbAccessTokenTracker;
     private GoogleSignInAccount googleAccount;
     private GoogleSignInClient googleSignInClient;
-    private boolean userIsAuthenticated = false;
+    private boolean userIsAuthenticated;
 
 
     @Override
@@ -74,8 +76,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         facebookLogin();
         googleLogin();
-
-        // TODO keep persistent login for users who register with e-mail password. Waiting on database.
     }
 
     @Override
@@ -92,12 +92,30 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             login(getString(R.string.facebook_login_type));
             fbAccessTokenTracker.startTracking();
         }
+
+        if (ClarityApp.getSession(this).getUserID() != -1) {
+            login(getString(R.string.registered_login_type));
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         fbAccessTokenTracker.stopTracking();
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+
+        // We need an Editor object to make preference changes.
+        // All objects are from android.context.Context
+        SharedPreferences settings = getSharedPreferences("MyPrefsFile", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("userIsAuthenticated", userIsAuthenticated);
+
+        // Commit the edits!
+        editor.apply();
     }
 
     @Override
@@ -149,10 +167,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                             Toast.LENGTH_SHORT);
                         unauthToast.show();
                     } else {
+                        // TODO eventually need to get info from JSON object to save user ID
+                        ClarityApp.getSession(getApplicationContext()).setUserID(1);
                         login("1");
-//                        Intent homeActivityIntent = new Intent(parentActivity, HomeActivity.class);
-//                        homeActivityIntent.putExtra("loginType", )
-//                        startActivity(homeActivityIntent);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

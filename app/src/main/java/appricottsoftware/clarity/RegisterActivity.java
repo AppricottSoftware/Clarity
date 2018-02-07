@@ -1,6 +1,7 @@
 package appricottsoftware.clarity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +19,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
+import appricottsoftware.clarity.models.Session;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,6 +64,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     startActivity(surveyActivityIntent);
                     finish();
                 } else {
+                    // Update persistent storage that a user has been authenticated with a user ID.
+                    ClarityApp.getSession(this).setUserID(1);
 
                     // After successful save of user info on back end
                     // Switch to home activity

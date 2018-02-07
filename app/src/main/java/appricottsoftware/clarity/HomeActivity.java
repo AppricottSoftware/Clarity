@@ -1,6 +1,7 @@
 package appricottsoftware.clarity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +27,7 @@ import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
+import appricottsoftware.clarity.models.Session;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,6 +38,10 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @BindView(R.id.nv_drawer) NavigationView nvDrawer;
     @BindView(R.id.supl_home) SlidingUpPanelLayout suplPanel;
+
+    private static final String registeredLoginType = "1";
+    private static final String facebookLoginType = "2";
+    private static final String googleLoginType = "3";
 
     private ActionBarDrawerToggle drawerToggle;
     private String loginType;   // "1" is e-mail password, "2" is facebook, "3" is google
@@ -181,15 +187,17 @@ public class HomeActivity extends AppCompatActivity {
                 break;
             case R.id.nav_logout:
                 switch(loginType) {
-                    case "1":
+                    case registeredLoginType:
+                        // Clear persistent user information
+                        ClarityApp.getSession(this).setUserID(-1);
                         logout();
                         break;
-                    case "2":
+                    case facebookLoginType:
                         // Logout Facebook
                         LoginManager.getInstance().logOut();
                         logout();                       // This function returns to LoginActivity
                         break;
-                    case "3":
+                    case googleLoginType:
                         // Logout Google
                         googleSignOut();
                         break;
