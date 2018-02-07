@@ -224,7 +224,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                         googleSignOut();
                         break;
                     default:
-                        Toast.makeText(getApplicationContext(),"Default", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context,"Default", Toast.LENGTH_SHORT).show();
                         logout();
                         break;
                 }
