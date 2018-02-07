@@ -39,7 +39,7 @@ public class SearchResultsListAdapter extends RecyclerView.Adapter<SearchResults
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Podcast podcast = podcasts.get(position);
-        holder.podcastName.setText(podcast.getPodcast_title_original());
+//        holder.podcastName.setText(podcast.getPodcast_title_original());
         holder.podcastDescription.setText(podcast.getDescription_original());
         Log.e("Adapter", podcast.getImage());
         Glide.with(context).load(podcast.getImage()).into(holder.podcastImage);
