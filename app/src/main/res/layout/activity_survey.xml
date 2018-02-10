@@ -23,8 +23,8 @@
 
     <ToggleButton
         android:id="@+id/toggleButton_cat1"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
@@ -37,8 +37,8 @@
 
     <ToggleButton
         android:id="@+id/toggleButton_cat2"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
@@ -51,8 +51,8 @@
 
     <ToggleButton
         android:id="@+id/toggleButton_cat3"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
@@ -65,8 +65,8 @@
 
     <ToggleButton
         android:id="@+id/toggleButton_cat4"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
@@ -79,8 +79,8 @@
 
     <ToggleButton
         android:id="@+id/toggleButton_cat5"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
@@ -93,8 +93,8 @@
 
     <ToggleButton
         android:id="@+id/toggleButton_cat6"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
