@@ -1,5 +1,6 @@
 package appricottsoftware.clarity.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import java.util.List;
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.RecyclerAdapter;
 import appricottsoftware.clarity.RecyclerListItem;
+import appricottsoftware.clarity.SurveyActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -28,10 +30,12 @@ public class ChannelFragment extends Fragment {
     @BindView(R.id.button_createChannel)
     Button createChannelButton;
     @BindView(R.id.button_ShuffleChannel)
-    Button suffleChannelsButton;
+    Button shuffleChannelsButton;
 
     private RecyclerView.Adapter rAdapter;
     private List<RecyclerListItem> rListItems;
+
+    boolean seeSurvey = true;
 
     /*
     random number 10 - 20
@@ -43,6 +47,15 @@ public class ChannelFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_channel, container, false);
         ButterKnife.bind(this, view);
+
+        if (seeSurvey == true) {
+
+            //view = inflater.inflate(R.layout.activity_survey, container);
+            Intent surveyActivityIntent = new Intent(getActivity(), SurveyActivity.class);
+            surveyActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(surveyActivityIntent);
+        }
+
 
         channelRecycler.setHasFixedSize(true);
         channelRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -78,5 +91,11 @@ public class ChannelFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
+
+
     }
+
+
+
+
 }
