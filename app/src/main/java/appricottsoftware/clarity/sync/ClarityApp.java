@@ -3,25 +3,25 @@ package appricottsoftware.clarity.sync;
 import android.app.Application;
 import android.content.Context;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.gson.Gson;
 
 // Keep a state for the entire app for API calls
 public class ClarityApp extends Application {
 
-    private static Context context;
     private static ClarityClient clarityClient;
+    private static GoogleSignInClient googleSignInClient;
     private static Gson gson;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        ClarityApp.context = this;
     }
 
     // Get the single instance of the API client
     public static ClarityClient getRestClient() {
         if(clarityClient == null) {
-            clarityClient = new ClarityClient(context);
+            clarityClient = new ClarityClient();
         }
         return clarityClient;
     }
@@ -32,5 +32,17 @@ public class ClarityApp extends Application {
             gson = new Gson();
         }
         return gson;
+    }
+
+    public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {
+        this.googleSignInClient = googleSignInClient;
+    }
+
+    public GoogleSignInClient getGoogleSignInClient() {
+        return this.googleSignInClient;
+    }
+
+    public void clearGoogleSignInClient() {
+        googleSignInClient = null;
     }
 }

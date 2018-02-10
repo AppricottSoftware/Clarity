@@ -12,6 +12,8 @@ import butterknife.ButterKnife;
 
 public class BrowseFragment extends Fragment {
 
+    private static final String TAG = "BrowseFragment";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {

@@ -45,4 +45,32 @@ public class Channel {
 
     String name;
     List<Integer> genres;
+
+//    Orig Master Mode:
+//    import org.parceler.Parcel;
+//
+//    @Parcel
+//    public class Channel {
+//
+//        String topic;
+//
+//        public Channel() { /* Empty constructor required by GSON and Parcel */}
+//
+//        public Channel(String topic) {
+//            this.topic = topic;
+//        }
+//
+//        public String getTopic() {
+//            return topic;
+//        }
+//
+//        public void setTopic(String topic) {
+//            this.topic = topic;
+//        }
+//
+//        public appricottsoftware.clarity.models.Channel getExampleChannel() {
+//            return new appricottsoftware.clarity.models.Channel("Cryptocurrency");
+//        }
+//    }
+
 }
