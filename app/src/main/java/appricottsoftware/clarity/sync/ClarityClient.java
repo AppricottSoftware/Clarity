@@ -2,7 +2,6 @@ package appricottsoftware.clarity.sync;
 
 import android.content.Context;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -14,9 +13,7 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ClarityClient {
 
-
-
-    public ClarityClient(Context context) {}
+    public ClarityClient() {}
 
     // Insert API calls here //
     // Calls the /search endpoint (fulltextsearch)
@@ -38,7 +35,25 @@ public class ClarityClient {
         client.get("search", params, handler);
     }
 
-    public void RegisterRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
+    public void authenticateUser(String email, String password, Context context, JsonHttpResponseHandler handler) {
+        // Create the rest client and add header(s)
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("email", email);
+            jsonParams.put("password", password);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.login_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void registerRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
 
@@ -53,6 +68,5 @@ public class ClarityClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

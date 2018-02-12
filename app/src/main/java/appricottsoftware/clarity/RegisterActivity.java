@@ -14,14 +14,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
 import appricottsoftware.clarity.sync.ClarityApp;
-import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
@@ -50,11 +47,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             case R.id.bt_register:
 
                 String emailString = email.getText().toString();
-                String hashedPassword = Hash_Password(password.getText().toString());
+                String hashedPassword = hashPassword(password.getText().toString());
+
+                // Sanity Check to make sure all instances are populated with actual strings
+                if(emailString.length() == 0 || password.getText().toString().length() == 0) {
+                    return;
+                }
 
                 // create instance of clarityClient
                 // pass information to database to store
-
                 if (seeSurvey == true){
                     Intent surveyActivityIntent = new Intent(this, SurveyActivity.class);
                     surveyActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -64,15 +65,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                     // After successful save of user info on back end
                     // Switch to home activity
-
-
                     Intent homeActivityIntent = new Intent(this, HomeActivity.class);
                     homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    homeActivityIntent.putExtra("loginType", getString(R.string.registered_login_type));
                     startActivity(homeActivityIntent);
                     finish();
                 }
 
-                ClarityApp.getRestClient().RegisterRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient().registerRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         Log.e(TAG, "onSuccess1 : " + response.toString() );
@@ -116,11 +116,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    public String Hash_Password(String originalPassword) {
+    public String hashPassword(String originalPassword) {
         String hashedPassword = null;
         try
         {
-            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] bytes = originalPassword.getBytes("UTF-8");
             digest.update(bytes, 0, bytes.length);
             bytes = digest.digest();

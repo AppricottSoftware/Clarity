@@ -1,5 +1,6 @@
 package appricottsoftware.clarity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,13 +27,13 @@ import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import appricottsoftware.clarity.sync.ClarityApp;
 
 import java.util.Arrays;
 
-import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
@@ -57,6 +58,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private AccessTokenTracker fbAccessTokenTracker;
     private GoogleSignInAccount googleAccount;
     private GoogleSignInClient googleSignInClient;
+    private boolean userIsAuthenticated = false;
 
 
     @Override
@@ -72,6 +74,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         facebookLogin();
         googleLogin();
+
+        // TODO keep persistent login for users who register with e-mail password. Waiting on database.
     }
 
     @Override
@@ -80,7 +84,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         googleAccount = GoogleSignIn.getLastSignedInAccount(this);
         if (googleAccount != null) {
-            login("3");
+            login(getString(R.string.google_login_type));
+        }
+
+        Profile fbProfile = Profile.getCurrentProfile();
+        if (fbProfile != null) {
+            login(getString(R.string.facebook_login_type));
+            fbAccessTokenTracker.startTracking();
         }
     }
 
@@ -92,13 +102,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Faceboo login dependency.
+        // Facebook login dependency.
         fbCallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
 
         // Google login dependency.
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == 3) {
+        if (requestCode == Integer.parseInt(getString(R.string.google_request_code))) {
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -110,15 +120,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_login:
-                String strPassword = new RegisterActivity().Hash_Password(etPassword.getText().toString());
+                String strPassword = new RegisterActivity().hashPassword(etPassword.getText().toString());
                 String strEmail = etEmail.getText().toString();
-
-                if (isAuthenticated(strEmail, strPassword)) {
-                    Intent homeActivityIntent = new Intent(this, HomeActivity.class);
-                    startActivity(homeActivityIntent);
-                }
-
-                finish();
+                authenticate(strEmail, strPassword);
                 break;
             case R.id.btn_register:
                 register();
@@ -132,8 +136,54 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     // HTTPS GET function to authenticate user. Currently not working.
-    public boolean isAuthenticated(String email, String password) {
-        return true;
+    public void authenticate(String email, String password) {
+        final Activity parentActivity = this;
+        ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try {
+                    if (response.getString("auth").equals("failure")) {
+                        Toast unauthToast = Toast.makeText(getApplicationContext(),
+                                            R.string.no_auth,
+                                            Toast.LENGTH_SHORT);
+                        unauthToast.show();
+                    } else {
+                        login("1");
+//                        Intent homeActivityIntent = new Intent(parentActivity, HomeActivity.class);
+//                        homeActivityIntent.putExtra("loginType", )
+//                        startActivity(homeActivityIntent);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                super.onSuccess(statusCode, headers, responseString);
+            }
+        });
     }
 
     private void facebookLogin() {
@@ -156,7 +206,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 @Override
                 public void onSuccess(LoginResult loginResult) {
                     // App code
-                    Log.e("Facebook Login", "onSuccess login Facebook");
                     GraphRequest request = GraphRequest.newMeRequest(
                             AccessToken.getCurrentAccessToken(),
                             new GraphRequest.GraphJSONObjectCallback() {
@@ -165,21 +214,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     FacebookSdk.setIsDebugEnabled(true);
                                     FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 
-                                    Log.e("Facebook Login", "AccessToken.getCurrentAccessToken() " + AccessToken.getCurrentAccessToken().toString());
-                                    Profile profile = Profile.getCurrentProfile();
-                                    Log.e("Facebook Login", "Current profile: " + profile);
-                                    if (profile != null) {
-                                        Log.e("Facebook Login", String.format("id = %s; name = %s; lastName = %s; uri = %s",
-                                                profile.getId(), profile.getFirstName(),
-                                                profile.getLastName(), profile.getProfilePictureUri(50, 60)));
-//                                        name = String.format("%s %s",profile.getFirstName(),profile.getLastName());
-//                                        fbid = profile.getId();
-                                    }
+                                    // Can use Profile to extract user info here
                                 }
                             });
 
                     request.executeAsync();
-                    login("2");
+                    login(getString(R.string.facebook_login_type));
                 }
 
                 @Override
@@ -196,11 +236,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             });
         }
-        else {
-            Log.d("Facebook Login", "Logged with " + fbProfile.getName());
-            login("2");
-        }
-        fbAccessTokenTracker.startTracking();
     }
 
     private void googleLogin() {
@@ -215,7 +250,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void googleSignIn() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, 3);
+        startActivityForResult(signInIntent, Integer.parseInt(getString(R.string.google_request_code)));
     }
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
@@ -223,12 +258,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
             // Signed in successfully, show authenticated UI.
-            login("3");
+            login(getString(R.string.google_login_type));
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("Google Login", "signInResult:failed code=" + e.getStatusCode());
-            //updateUI(null);
         }
     }
 

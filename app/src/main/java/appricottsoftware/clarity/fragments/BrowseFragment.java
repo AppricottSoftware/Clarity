@@ -19,6 +19,8 @@ import butterknife.ButterKnife;
 
 public class BrowseFragment extends Fragment {
 
+    private static final String TAG = "BrowseFragment";
+
     private Integer[] images = {
             R.drawable.sample_0, R.drawable.sample_1,
             R.drawable.sample_2, R.drawable.sample_3,
