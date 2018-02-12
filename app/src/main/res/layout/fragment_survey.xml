@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="appricottsoftware.clarity.SurveyActivity">
+
+    <TextView
+        android:id="@+id/textView_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:paddingLeft="@dimen/survey_prompt_LR_padding"
+        android:paddingRight="@dimen/survey_prompt_LR_padding"
+        android:text="@string/survey_prompt"
+        android:textAlignment="center"
+        android:textSize="@dimen/survey_prompt_text_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat1"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat5"
+        app:layout_constraintVertical_bias="0.311" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat2"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat6"
+        app:layout_constraintVertical_bias="0.515" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat3"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat1"
+        app:layout_constraintVertical_bias="0.311" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat4"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat3"
+        app:layout_constraintVertical_bias="0.311" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat5"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
+        app:layout_constraintTop_toBottomOf="@+id/textView_prompt"
+        app:layout_constraintVertical_bias="0.064" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat6"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
+        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat4"
+        app:layout_constraintVertical_bias="0.311" />
+
+    <TextView
+        android:id="@+id/textView_cat1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_1"
+        android:textSize="@dimen/survey_cat_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/textView_cat2"
+        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_prompt"
+        app:layout_constraintVertical_bias="0.295" />
+
+    <TextView
+        android:id="@+id/textView_cat2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_2"
+        android:textSize="@dimen/survey_cat_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/textView_cat3"
+        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_cat1"
+        app:layout_constraintVertical_bias="0.488" />
+
+    <TextView
+        android:id="@+id/textView_cat3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_3"
+        android:textSize="@dimen/survey_cat_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/textView_cat4"
+        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_cat2"
+        app:layout_constraintVertical_bias="0.488" />
+
+    <TextView
+        android:id="@+id/textView_cat4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_4"
+        android:textSize="@dimen/survey_cat_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/textView_cat5"
+        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_cat3"
+        app:layout_constraintVertical_bias="0.488" />
+
+    <TextView
+        android:id="@+id/textView_cat5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_5"
+        android:textSize="@dimen/survey_cat_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/textView_cat6"
+        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_cat4"
+        app:layout_constraintVertical_bias="0.488" />
+
+    <TextView
+        android:id="@+id/textView_cat6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_6"
+        android:textSize="@dimen/survey_cat_text_size"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_cat5"
+        app:layout_constraintVertical_bias="0.488" />
+
+
+</android.support.constraint.ConstraintLayout>
