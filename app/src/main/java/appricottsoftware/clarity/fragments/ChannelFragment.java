@@ -73,7 +73,7 @@ public class ChannelFragment extends Fragment {
     private RecyclerView.Adapter rAdapter;
     private List<RecyclerListItem> rListItems;
 
-    boolean seeSurvey = true;
+    boolean seeSurvey = false;
 
     /*
     random number 10 - 20
@@ -148,8 +148,6 @@ public class ChannelFragment extends Fragment {
 
 
     }
-
-
 
 
 
