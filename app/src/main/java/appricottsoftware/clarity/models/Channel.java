@@ -1,73 +1,60 @@
 package appricottsoftware.clarity.models;
 
-import java.util.List;
-import org.parceler.Parcel;
+import java.util.ArrayList;
 
-//public class Channel {
-//
-//    int cid;
-//    int uid;
-//
-//    public int getCid() {
-//        return cid;
-//    }
-//
-//    public void setCid(int cid) {
-//        this.cid = cid;
-//    }
-//
-//    public int getUid() {
-//        return uid;
-//    }
-//
-//    public void setUid(int uid) {
-//        this.uid = uid;
-//    }
-//
-//    public String getName() {
-//        return name;
-//    }
-//
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-//
-//    public List<Integer> getGenres() {
-//        return genres;
-//    }
-//
-//    public void setGenres(List<Integer> genres) {
-//        this.genres = genres;
-//    }
-//
-//    String name;
-//    List<Integer> genres;
-//}
+import appricottsoftware.clarity.sync.ClarityApp;
 
-
-
-@Parcel
 public class Channel {
 
-    String topic;
+    int cid;
+    int uid;
+    String name;
+    String image;
+    ArrayList<Metadata> metadata;
 
-    public Channel() { /* Empty constructor required by GSON and Parcel */}
+    public Channel() { /* Empty constructor required by GSON and Parcel */ }
 
-    public Channel(String topic) {
-        this.topic = topic;
+    public int getCid() {
+        return cid;
     }
 
-    public String getTopic() {
-        return topic;
+    public void setCid(int cid) {
+        this.cid = cid;
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public int getUid() {
+        return uid;
     }
 
-    public appricottsoftware.clarity.models.Channel getExampleChannel() {
-        return new appricottsoftware.clarity.models.Channel("Cryptocurrency");
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public ArrayList<Metadata> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(ArrayList<Metadata> metadata) {
+        this.metadata = metadata;
+    }
+
+    public String toString() {
+        return ClarityApp.getGson().toJson(this);
     }
 }
-
-
