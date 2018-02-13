@@ -139,6 +139,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == Integer.parseInt(getString(R.string.google_request_code))) {
 
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+
             // Preparing to get google login token
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
@@ -151,10 +156,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         try {
                             String scope = "oauth2:"+ Scopes.EMAIL+" "+ Scopes.PROFILE;
                             token = GoogleAuthUtil.getToken(getApplicationContext(), account.getAccount(), scope, new Bundle());
-                            Log.e(TAG, "accessToken:\t"+token); //accessToken:ya29.Gl...
 
                             // Logging in here now that we have access to the token
-                            login(getString(R.string.google_login_type));
+                            registerSocialMediaUser(email, token, getString(R.string.google_login_type));
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (GoogleAuthException e) {
@@ -164,11 +168,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 };
                 AsyncTask.execute(runnable);
             }
-
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
         }
     }
 
@@ -195,53 +194,61 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         ClarityApp.getRestClient().registerRequest(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.e(TAG, "onSuccess1 : " + response.toString() );
+                Log.e(TAG, "onSuccess1 : " + statusCode + "\n" + response.toString() );
                 super.onSuccess(statusCode, headers, response);
 
-                if (loginType == getString(R.string.registered_login_type)) {
-                    login(getString(R.string.registered_login_type));
+                try {
+                    if (response.getInt("userId") == -1) {
+                        Log.e(TAG, "User already in database, logging them in anyway");
+                        if (loginType == getString(R.string.facebook_login_type)) {
+                            login(getString(R.string.facebook_login_type));
+                        }
+                        else if (loginType == getString(R.string.google_login_type)) {
+                            login(getString(R.string.google_login_type));
+                        }
+                    }
+                    else {
+                        // Call authenticate once we get real user id's from backend
+                    }
                 }
-                else if (loginType == getString(R.string.facebook_login_type)) {
-                    login(getString(R.string.facebook_login_type));
-                }
-                else if (loginType == getString(R.string.google_login_type)) {
-                    login(getString(R.string.google_login_type));
+                catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                Log.e(TAG, "onSuccess2 : " + response.toString());
+                Log.e(TAG, "onSuccess2 : " + statusCode + "\n" +  response.toString());
                 super.onSuccess(statusCode, headers, response);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, "onFailue1 : " + errorResponse.toString());
+                Log.e(TAG, "onFailure1 : " + statusCode + "\n" +  errorResponse.toString());
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                Log.e(TAG, "onFailue2 : " + errorResponse.toString());
+                Log.e(TAG, "onFailure2 : " + statusCode + "\n" + errorResponse.toString());
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "onFailue3 : " + responseString.toString());
+                Log.e(TAG, "onFailure3 : " + statusCode + "\n" + responseString.toString());
                 super.onFailure(statusCode, headers, responseString, throwable);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Log.e(TAG, "onSuccess3 : " + responseString.toString());
+                Log.e(TAG, "onSuccess3 : "+ statusCode + "\n" + responseString.toString());
                 super.onSuccess(statusCode, headers, responseString);
             }
         });
     }
 
-    // HTTPS GET function to authenticate user. Currently not working.
+    // HTTPS GET function to authenticate user
     public void authenticate(String email, String password) {
         final Activity parentActivity = this;
         ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
@@ -328,10 +335,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     // Extract user info for our backend
                                     try {
                                         email = object.getString("email");
-                                        Log.e(TAG, "Email: " + email + "\tPassword: " + loginResult.getAccessToken().toString());
                                         String str = loginResult.getAccessToken().toString();
                                         str = str.substring(19, str.length() - 37);
-                                        Log.e(TAG, "String length: " + str.length() + " " + str);
                                         registerSocialMediaUser(email, str,
                                                 getString(R.string.facebook_login_type));
                                     }
@@ -385,11 +390,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
                 email = account.getEmail();
-                Log.e(TAG, "been here done that\t\temail: " + email + "\tPassword: " + token);
             }
-
-            // Signed in successfully, show authenticated UI.
-//            login(getString(R.string.google_login_type));
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
