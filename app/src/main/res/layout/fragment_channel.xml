@@ -10,4 +10,10 @@
         android:layout_height="wrap_content"
         android:text="Channel Fragment"/>
 
+    <Button
+        android:id="@+id/test_music"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test"/>
+
 </android.support.constraint.ConstraintLayout>
