@@ -3,6 +3,7 @@ package appricottsoftware.clarity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -246,9 +247,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
                 try {
-                    if (response.getString("auth").equals("failure")) {
+                    if (response.getString("userId").equals("-1")) {
                         Toast unauthToast = Toast.makeText(getApplicationContext(),
                                             R.string.no_auth,
                                             Toast.LENGTH_SHORT);
@@ -256,37 +256,44 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     } else {
                         // TODO eventually need to get info from JSON object to save user ID
                         ClarityApp.getSession(getApplicationContext()).setUserID(1);
+                        Log.e(TAG, "onSuccess1: " + response.toString());
 
                         login("1");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
             }
 
             @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                Log.e(TAG, "onSuccess2: " + response.toString());
+                super.onSuccess(statusCode, headers, response);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Log.e(TAG, "onSuccess3: " + responseString.toString());
+                super.onSuccess(statusCode, headers, responseString);
+            }
+
+            @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG, "onFailure1: " + errorResponse.toString());
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                Log.e(TAG, "onFailure2: " + errorResponse.toString());
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.e(TAG, "onFailure3: " + responseString.toString());
                 super.onFailure(statusCode, headers, responseString, throwable);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                super.onSuccess(statusCode, headers, responseString);
             }
         });
     }
