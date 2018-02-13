@@ -3,6 +3,7 @@ package appricottsoftware.clarity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,10 +19,15 @@ import com.facebook.GraphResponse;
 import com.facebook.LoggingBehavior;
 import com.facebook.Profile;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
@@ -34,6 +40,7 @@ import org.json.JSONObject;
 import appricottsoftware.clarity.models.Session;
 import appricottsoftware.clarity.sync.ClarityApp;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import butterknife.BindView;
@@ -55,11 +62,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @BindView(R.id.et_email) EditText etEmail;
     @BindView(R.id.et_password) EditText etPassword;
 
-    private static final String EMAIL = "email";
+    private static final String TAG = "LoginActivity";
+
     private CallbackManager fbCallbackManager;
     private AccessTokenTracker fbAccessTokenTracker;
     private GoogleSignInAccount googleAccount;
     private GoogleSignInClient googleSignInClient;
+    private String email;
+    private String token;
     private boolean userIsAuthenticated;
 
 
@@ -108,14 +118,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onStop(){
         super.onStop();
 
-        // We need an Editor object to make preference changes.
-        // All objects are from android.context.Context
-        SharedPreferences settings = getSharedPreferences("MyPrefsFile", 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("userIsAuthenticated", userIsAuthenticated);
+        // Ignore this code at the bottom for now. It'll be replaced soon.
+//        SharedPreferences settings = getSharedPreferences("MyPrefsFile", 0);
+//        SharedPreferences.Editor editor = settings.edit();
+//        editor.putBoolean("userIsAuthenticated", userIsAuthenticated);
+//        editor.apply();
 
-        // Commit the edits!
-        editor.apply();
+        // TODO save user id from backend use it to save the session.
+//        ClarityApp.getSession(getApplicationContext()).setUserID(1);
     }
 
     @Override
@@ -127,6 +137,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Google login dependency.
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == Integer.parseInt(getString(R.string.google_request_code))) {
+
+            // Preparing to get google login token
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                final GoogleSignInAccount account = result.getSignInAccount();
+
+                // These lines of code are necessary getting Google login token
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String scope = "oauth2:"+ Scopes.EMAIL+" "+ Scopes.PROFILE;
+                            token = GoogleAuthUtil.getToken(getApplicationContext(), account.getAccount(), scope, new Bundle());
+                            Log.e(TAG, "accessToken:\t"+token); //accessToken:ya29.Gl...
+
+                            // Logging in here now that we have access to the token
+                            login(getString(R.string.google_login_type));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (GoogleAuthException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                AsyncTask.execute(runnable);
+            }
+
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -153,6 +190,56 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    public void registerSocialMediaUser(String email, String password, final String loginType) {
+        ClarityApp.getRestClient().registerRequest(email, password, this, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.e(TAG, "onSuccess1 : " + response.toString() );
+                super.onSuccess(statusCode, headers, response);
+
+                if (loginType == getString(R.string.registered_login_type)) {
+                    login(getString(R.string.registered_login_type));
+                }
+                else if (loginType == getString(R.string.facebook_login_type)) {
+                    login(getString(R.string.facebook_login_type));
+                }
+                else if (loginType == getString(R.string.google_login_type)) {
+                    login(getString(R.string.google_login_type));
+                }
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                Log.e(TAG, "onSuccess2 : " + response.toString());
+                super.onSuccess(statusCode, headers, response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG, "onFailue1 : " + errorResponse.toString());
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                Log.e(TAG, "onFailue2 : " + errorResponse.toString());
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.e(TAG, "onFailue3 : " + responseString.toString());
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Log.e(TAG, "onSuccess3 : " + responseString.toString());
+                super.onSuccess(statusCode, headers, responseString);
+            }
+        });
+    }
+
     // HTTPS GET function to authenticate user. Currently not working.
     public void authenticate(String email, String password) {
         final Activity parentActivity = this;
@@ -169,6 +256,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     } else {
                         // TODO eventually need to get info from JSON object to save user ID
                         ClarityApp.getSession(getApplicationContext()).setUserID(1);
+
                         login("1");
                     }
                 } catch (JSONException e) {
@@ -204,7 +292,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void facebookLogin() {
-        Profile fbProfile = Profile.getCurrentProfile();
+        final Profile fbProfile = Profile.getCurrentProfile();
         fbAccessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
@@ -217,26 +305,41 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         if (fbProfile == null) {
             fbCallbackManager = CallbackManager.Factory.create();
-            btnFacebook = findViewById(R.id.btn_loginFacebook);
-            btnFacebook.setReadPermissions(Arrays.asList(EMAIL));
+            btnFacebook.setReadPermissions(Arrays.asList("public_profile", "email"));
             btnFacebook.registerCallback(fbCallbackManager, new FacebookCallback<LoginResult>() {
                 @Override
-                public void onSuccess(LoginResult loginResult) {
+                public void onSuccess(final LoginResult loginResult) {
                     // App code
                     GraphRequest request = GraphRequest.newMeRequest(
-                            AccessToken.getCurrentAccessToken(),
+                            loginResult.getAccessToken(),
                             new GraphRequest.GraphJSONObjectCallback() {
                                 @Override
                                 public void onCompleted(JSONObject object, GraphResponse response) {
                                     FacebookSdk.setIsDebugEnabled(true);
                                     FacebookSdk.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 
-                                    // Can use Profile to extract user info here
+                                    // Extract user info for our backend
+                                    try {
+                                        email = object.getString("email");
+                                        Log.e(TAG, "Email: " + email + "\tPassword: " + loginResult.getAccessToken().toString());
+                                        String str = loginResult.getAccessToken().toString();
+                                        str = str.substring(19, str.length() - 37);
+                                        Log.e(TAG, "String length: " + str.length() + " " + str);
+                                        registerSocialMediaUser(email, str,
+                                                getString(R.string.facebook_login_type));
+                                    }
+                                    catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             });
 
+                    Bundle parameters = new Bundle();
+                    parameters.putString("fields", "email");
+                    request.setParameters(parameters);
                     request.executeAsync();
-                    login(getString(R.string.facebook_login_type));
+
+                    //login(getString(R.string.facebook_login_type));
                 }
 
                 @Override
@@ -273,9 +376,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            if (account != null) {
+                email = account.getEmail();
+                Log.e(TAG, "been here done that\t\temail: " + email + "\tPassword: " + token);
+            }
 
             // Signed in successfully, show authenticated UI.
-            login(getString(R.string.google_login_type));
+//            login(getString(R.string.google_login_type));
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -284,7 +391,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     // Generic login function that takes the user to HomeActivity
-    // "1" is e-mail password, "2" is facebook, "3" is google
     private void login(String loginType) {
         Intent homeActivityIntent = new Intent(LoginActivity.this, HomeActivity.class);
         homeActivityIntent.putExtra("loginType", loginType);
@@ -292,6 +398,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         finish();
     }
 
+    // Takes user to RegisterActivity
     private void register() {
         Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
         startActivity(registerActivityIntent);
