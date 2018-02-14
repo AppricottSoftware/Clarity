@@ -171,7 +171,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch(v.getId()) {
             case R.id.btn_login:
-                String strPassword = new RegisterActivity().hashPassword(etPassword.getText().toString());
+                String strPassword = hashPassword(etPassword.getText().toString());
                 String strEmail = etEmail.getText().toString();
                 authenticate(strEmail, strPassword, getString(R.string.registered_login_type));
                 break;
@@ -350,10 +350,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                                     // Extract user info for our backend
                                     try {
-                                        Log.e(TAG, "Facebook() email: " + userEmail + "\ttoken: " + token);
                                         userEmail = object.getString("email");
                                         token = loginResult.getAccessToken().toString();
                                         token = token.substring(19, token.length() - 37);
+
+                                        Log.e(TAG, "Facebook() email: " + userEmail + "\ttoken: " + token);
                                         registerSocialMediaUser(userEmail, token,
                                                 getString(R.string.facebook_login_type));
                                     }
@@ -426,5 +427,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Intent registerActivityIntent = new Intent(this, RegisterActivity.class);
         startActivity(registerActivityIntent);
         finish();
+    }
+
+    private String hashPassword(String password) {
+        String hash = new RegisterActivity().hashPassword(password);
+        return hash;
     }
 }
