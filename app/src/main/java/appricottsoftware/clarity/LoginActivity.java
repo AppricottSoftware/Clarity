@@ -118,11 +118,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         fbAccessTokenTracker.stopTracking();
     }
 
-//    @Override
-//    protected void onStop(){
-//        super.onStop();
-//    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Facebook login dependency.
@@ -137,33 +132,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
-
-            // Preparing to get google login token
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                final GoogleSignInAccount account = result.getSignInAccount();
-
-                // These lines of code are necessary getting Google login token
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            String scope = "oauth2:"+ Scopes.EMAIL+" "+ Scopes.PROFILE;
-                            token = GoogleAuthUtil.getToken(getApplicationContext(), account.getAccount(), scope, new Bundle());
-
-                            Log.e(TAG, "Google() email: " + userEmail + "\ttoken: " + token);
-
-                            // Logging in here now that we have access to the token
-                            registerSocialMediaUser(userEmail, token, getString(R.string.google_login_type));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (GoogleAuthException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                AsyncTask.execute(runnable);
-            }
         }
     }
 
@@ -190,7 +158,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         ClarityApp.getRestClient().registerRequest(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.e(TAG, "register onSuccess1 : " + statusCode + "\n" + response.toString() );
+//                Log.e(TAG, "register onSuccess1 : " + statusCode + "\n" + response.toString() );
                 super.onSuccess(statusCode, headers, response);
 
                 try {
@@ -256,18 +224,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.e(TAG, "authenticate onSuccess1: " + response.toString());
+//                Log.e(TAG, "authenticate onSuccess1: " + response.toString());
                 try {
-                    String strUserId = response.getString("userId");
-                    Log.e(TAG, "User ID: " + userId);
-                    if (strUserId == "-1") {
-                        Log.e(TAG, "Username or password is incorrect");
+                    String uid = response.getString("userId");
+                    if (uid == "-1") {
                         Toast unauthToast = Toast.makeText(getApplicationContext(),
                                             R.string.no_auth,
                                             Toast.LENGTH_SHORT);
                         unauthToast.show();
                     } else {
-                        String uid = response.getString("userId");
                         ClarityApp.getSession(getApplicationContext()).setUserID(Integer.parseInt((uid)));
 
                         if (loginType == getString(R.string.facebook_login_type)) {
@@ -351,10 +316,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     // Extract user info for our backend
                                     try {
                                         userEmail = object.getString("email");
-                                        token = loginResult.getAccessToken().toString();
-                                        token = token.substring(19, token.length() - 37);
-
-                                        Log.e(TAG, "Facebook() email: " + userEmail + "\ttoken: " + token);
+                                        token = hashPassword(userEmail);
+//                                        token = loginResult.getAccessToken().toString();
+//                                        token = token.substring(19, token.length() - 37);
+//
+//                                        Log.e(TAG, "Facebook() email: " + userEmail + "\ttoken: " + token);
                                         registerSocialMediaUser(userEmail, token,
                                                 getString(R.string.facebook_login_type));
                                     }
@@ -406,6 +372,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
                 userEmail = account.getEmail();
+                token = hashPassword(userEmail);
+//                Log.e(TAG, "Google() email: " + userEmail + "\ttoken: " + token);
+                registerSocialMediaUser(userEmail, token, getString(R.string.google_login_type));
             }
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.

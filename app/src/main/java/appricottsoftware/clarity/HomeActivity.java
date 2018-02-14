@@ -111,8 +111,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 new ComponentName(context, PlayerService.class),
                 connectionCallback,
                 null);
-
-        Log.e(TAG, "Login Type: " + loginType + "\tuserId: " + ClarityApp.getSession(this).getUserID());
     }
 
     @Override
