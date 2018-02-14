@@ -282,7 +282,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     }
                 } catch (JSONException e) {
-                    Log.e(TAG, "Exception due to JSON returned as {\"auth\" : \"-1\"} key value pair");
+                    Log.e(TAG, "Exception due to JSON returned as {\"auth\" : \"-1\"} key value pair. Expecting {\"userId\" : uid}");
                     e.printStackTrace();
                 }
                 super.onSuccess(statusCode, headers, response);
