@@ -111,6 +111,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 new ComponentName(context, PlayerService.class),
                 connectionCallback,
                 null);
+
+        Log.e(TAG, "Login Type: " + loginType + "\tuserId: " + ClarityApp.getSession(this).getUserID());
     }
 
     @Override
@@ -179,6 +181,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     }
 
     private void logout() {
+        ClarityApp.getSession(getApplicationContext()).setUserID(-1);
         Intent loginActivityIntent = new Intent(this, LoginActivity.class);
         startActivity(loginActivityIntent);
         finish();
@@ -222,8 +225,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
             case R.id.nav_logout:
                 switch(loginType) {
                     case registeredLoginType:
-                        // Clear persistent user information
-                        ClarityApp.getSession(this).setUserID(-1);
                         logout();
                         break;
                     case facebookLoginType:

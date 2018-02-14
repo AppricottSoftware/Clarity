@@ -69,9 +69,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private AccessTokenTracker fbAccessTokenTracker;
     private GoogleSignInAccount googleAccount;
     private GoogleSignInClient googleSignInClient;
-    private String email;
+    private String userEmail;
     private String token;
     private boolean userIsAuthenticated;
+    private int userId;
 
 
     @Override
@@ -87,6 +88,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         facebookLogin();
         googleLogin();
+
+        userId = ClarityApp.getSession(this).getUserID();
     }
 
     @Override
@@ -115,19 +118,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         fbAccessTokenTracker.stopTracking();
     }
 
-    @Override
-    protected void onStop(){
-        super.onStop();
-
-        // Ignore this code at the bottom for now. It'll be replaced soon.
-//        SharedPreferences settings = getSharedPreferences("MyPrefsFile", 0);
-//        SharedPreferences.Editor editor = settings.edit();
-//        editor.putBoolean("userIsAuthenticated", userIsAuthenticated);
-//        editor.apply();
-
-        // TODO save user id from backend use it to save the session.
-//        ClarityApp.getSession(getApplicationContext()).setUserID(1);
-    }
+//    @Override
+//    protected void onStop(){
+//        super.onStop();
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -157,8 +151,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             String scope = "oauth2:"+ Scopes.EMAIL+" "+ Scopes.PROFILE;
                             token = GoogleAuthUtil.getToken(getApplicationContext(), account.getAccount(), scope, new Bundle());
 
+                            Log.e(TAG, "Google() email: " + userEmail + "\ttoken: " + token);
+
                             // Logging in here now that we have access to the token
-                            registerSocialMediaUser(email, token, getString(R.string.google_login_type));
+                            registerSocialMediaUser(userEmail, token, getString(R.string.google_login_type));
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (GoogleAuthException e) {
@@ -177,7 +173,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.btn_login:
                 String strPassword = new RegisterActivity().hashPassword(etPassword.getText().toString());
                 String strEmail = etEmail.getText().toString();
-                authenticate(strEmail, strPassword);
+                authenticate(strEmail, strPassword, getString(R.string.registered_login_type));
                 break;
             case R.id.btn_register:
                 register();
@@ -194,21 +190,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         ClarityApp.getRestClient().registerRequest(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.e(TAG, "onSuccess1 : " + statusCode + "\n" + response.toString() );
+                Log.e(TAG, "register onSuccess1 : " + statusCode + "\n" + response.toString() );
                 super.onSuccess(statusCode, headers, response);
 
                 try {
+                    // User already in database
                     if (response.getInt("userId") == -1) {
-                        Log.e(TAG, "User already in database, logging them in anyway");
+                        authenticate(userEmail, token, loginType);
+                    }
+
+                    // First time social media user
+                    else {
+                        userId = response.getInt("userId");
+                        ClarityApp.getSession(getApplicationContext()).setUserID(userId);
+
                         if (loginType == getString(R.string.facebook_login_type)) {
                             login(getString(R.string.facebook_login_type));
                         }
                         else if (loginType == getString(R.string.google_login_type)) {
                             login(getString(R.string.google_login_type));
                         }
-                    }
-                    else {
-                        // Call authenticate once we get real user id's from backend
+
                     }
                 }
                 catch (JSONException e) {
@@ -249,25 +251,38 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     // HTTPS GET function to authenticate user
-    public void authenticate(String email, String password) {
+    public void authenticate(String email, String password, final String loginType) {
         final Activity parentActivity = this;
         ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.e(TAG, "authenticate onSuccess1: " + response.toString());
                 try {
-                    if (response.getString("userId").equals("-1")) {
+                    String strUserId = response.getString("userId");
+                    Log.e(TAG, "User ID: " + userId);
+                    if (strUserId == "-1") {
+                        Log.e(TAG, "Username or password is incorrect");
                         Toast unauthToast = Toast.makeText(getApplicationContext(),
                                             R.string.no_auth,
                                             Toast.LENGTH_SHORT);
                         unauthToast.show();
                     } else {
-                        // TODO eventually need to get info from JSON object to save user ID
-                        ClarityApp.getSession(getApplicationContext()).setUserID(1);
-                        Log.e(TAG, "onSuccess1: " + response.toString());
+                        String uid = response.getString("userId");
+                        ClarityApp.getSession(getApplicationContext()).setUserID(Integer.parseInt((uid)));
 
-                        login("1");
+                        if (loginType == getString(R.string.facebook_login_type)) {
+                            login(getString(R.string.facebook_login_type));
+                        }
+                        else if (loginType == getString(R.string.google_login_type)) {
+                            login(getString(R.string.google_login_type));
+                        }
+                        else if (loginType == getString(R.string.registered_login_type)) {
+                            login(getString(R.string.registered_login_type));
+                        }
+
                     }
                 } catch (JSONException e) {
+                    Log.e(TAG, "Exception due to JSON returned as {\"auth\" : \"-1\"} key value pair");
                     e.printStackTrace();
                 }
                 super.onSuccess(statusCode, headers, response);
@@ -319,6 +334,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         if (fbProfile == null) {
             fbCallbackManager = CallbackManager.Factory.create();
+            btnFacebook.findViewById(R.id.btn_loginFacebook);
             btnFacebook.setReadPermissions(Arrays.asList("public_profile", "email"));
             btnFacebook.registerCallback(fbCallbackManager, new FacebookCallback<LoginResult>() {
                 @Override
@@ -334,10 +350,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                                     // Extract user info for our backend
                                     try {
-                                        email = object.getString("email");
-                                        String str = loginResult.getAccessToken().toString();
-                                        str = str.substring(19, str.length() - 37);
-                                        registerSocialMediaUser(email, str,
+                                        Log.e(TAG, "Facebook() email: " + userEmail + "\ttoken: " + token);
+                                        userEmail = object.getString("email");
+                                        token = loginResult.getAccessToken().toString();
+                                        token = token.substring(19, token.length() - 37);
+                                        registerSocialMediaUser(userEmail, token,
                                                 getString(R.string.facebook_login_type));
                                     }
                                     catch (JSONException e) {
@@ -350,8 +367,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     parameters.putString("fields", "email");
                     request.setParameters(parameters);
                     request.executeAsync();
-
-                    //login(getString(R.string.facebook_login_type));
                 }
 
                 @Override
@@ -389,7 +404,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
-                email = account.getEmail();
+                userEmail = account.getEmail();
             }
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
