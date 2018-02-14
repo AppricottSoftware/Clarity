@@ -406,7 +406,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_channel_bundle), Parcels.wrap(channel));
         mediaController.getTransportControls()
-                .playFromSearch(channel.getTopic(), bundle);
+                .playFromSearch(channel.toString(), bundle);
     }
 
     @Override
