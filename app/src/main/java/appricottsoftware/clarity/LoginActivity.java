@@ -71,7 +71,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleSignInClient googleSignInClient;
     private String userEmail;
     private String token;
-    private boolean userIsAuthenticated;
     private int userId;
 
 
@@ -187,44 +186,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                Log.e(TAG, "onSuccess2 : " + statusCode + "\n" +  response.toString());
-                super.onSuccess(statusCode, headers, response);
-            }
-
-            @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.e(TAG, "onFailure1 : " + statusCode + "\n" +  errorResponse.toString());
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                Log.e(TAG, "onFailure2 : " + statusCode + "\n" + errorResponse.toString());
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "onFailure3 : " + statusCode + "\n" + responseString.toString());
-                super.onFailure(statusCode, headers, responseString, throwable);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Log.e(TAG, "onSuccess3 : "+ statusCode + "\n" + responseString.toString());
-                super.onSuccess(statusCode, headers, responseString);
             }
         });
     }
 
     // HTTPS GET function to authenticate user
     public void authenticate(String email, String password, final String loginType) {
-        final Activity parentActivity = this;
         ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-//                Log.e(TAG, "authenticate onSuccess1: " + response.toString());
                 try {
                     String uid = response.getString("userId");
                     if (uid == "-1") {
@@ -247,22 +220,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     }
                 } catch (JSONException e) {
-                    Log.e(TAG, "Exception due to JSON returned as {\"auth\" : \"-1\"} key value pair. Expecting {\"userId\" : uid}");
                     e.printStackTrace();
                 }
                 super.onSuccess(statusCode, headers, response);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                Log.e(TAG, "onSuccess2: " + response.toString());
-                super.onSuccess(statusCode, headers, response);
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Log.e(TAG, "onSuccess3: " + responseString.toString());
-                super.onSuccess(statusCode, headers, responseString);
             }
 
             @Override
@@ -270,23 +230,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Log.e(TAG, "onFailure1: " + errorResponse.toString());
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                Log.e(TAG, "onFailure2: " + errorResponse.toString());
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "onFailure3: " + responseString.toString());
-                super.onFailure(statusCode, headers, responseString, throwable);
-            }
         });
     }
 
     private void facebookLogin() {
         final Profile fbProfile = Profile.getCurrentProfile();
+
+        // Necessary code to stay logged in
         fbAccessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
@@ -319,8 +269,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                         token = hashPassword(userEmail);
 //                                        token = loginResult.getAccessToken().toString();
 //                                        token = token.substring(19, token.length() - 37);
-//
-//                                        Log.e(TAG, "Facebook() email: " + userEmail + "\ttoken: " + token);
                                         registerSocialMediaUser(userEmail, token,
                                                 getString(R.string.facebook_login_type));
                                     }
