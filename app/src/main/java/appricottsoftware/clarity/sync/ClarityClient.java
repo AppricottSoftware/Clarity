@@ -65,6 +65,8 @@ public class ClarityClient {
 
             JSONObject jsonParams = new JSONObject();
             try {
+                client.setMaxRetriesAndTimeout(1, 1000);
+
                 jsonParams.put("email", email);
                 jsonParams.put("password", password);
 
@@ -104,6 +106,8 @@ public class ClarityClient {
 
             JSONObject jsonParams = new JSONObject();
             try {
+                client.setMaxRetriesAndTimeout(1, 1000);
+                
                 jsonParams.put("email", email);
                 jsonParams.put("password", password);
 

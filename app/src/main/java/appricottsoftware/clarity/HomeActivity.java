@@ -112,7 +112,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 connectionCallback,
                 null);
 
-//        Log.e(TAG, "Login Type: " + loginType + "\tuserId: " + ClarityApp.getSession(this).getUserID());
+        Log.e(TAG, "Login Type: " + loginType + "\tuserId: " + ClarityApp.getSession(this).getUserID());
     }
 
     @Override
@@ -428,7 +428,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 .playFromSearch(podcast.getTitle_original(), bundle);
     }
 
-    private void googleSignOut() {
+    public void googleSignOut() {
         ClarityApp clarityApp = new ClarityApp();
         GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
         if (mGoogleSignInClient != null){

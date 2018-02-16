@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.Tag;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.LoggingBehavior;
 import com.facebook.Profile;
+import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -31,6 +33,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -96,17 +99,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onStart();
 
         googleAccount = GoogleSignIn.getLastSignedInAccount(this);
-        if (googleAccount != null) {
+        Profile fbProfile = Profile.getCurrentProfile();
+        if (googleAccount != null && userId != -1) {
             login(getString(R.string.google_login_type));
         }
 
-        Profile fbProfile = Profile.getCurrentProfile();
-        if (fbProfile != null) {
+        else if (fbProfile != null && userId != -1) {
             login(getString(R.string.facebook_login_type));
             fbAccessTokenTracker.startTracking();
         }
 
-        if (ClarityApp.getSession(this).getUserID() != -1) {
+        else if (userId != -1) {
             login(getString(R.string.registered_login_type));
         }
     }
@@ -153,14 +156,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    public void registerSocialMediaUser(String email, String password, final String loginType) {
+    public void registerSocialMediaUser(final String email, String password, final String loginType) {
         ClarityApp.getRestClient().registerRequest(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-//                Log.e(TAG, "register onSuccess1 : " + statusCode + "\n" + response.toString() );
                 super.onSuccess(statusCode, headers, response);
 
                 try {
+                    Log.e(TAG, "register onSuccess : " + statusCode + "\n" + response.toString() );
+
                     // User already in database
                     if (response.getInt("userId") == -1) {
                         authenticate(userEmail, token, loginType);
@@ -187,8 +191,43 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, "onFailure1 : " + statusCode + "\n" +  errorResponse.toString());
                 super.onFailure(statusCode, headers, throwable, errorResponse);
+
+                try {
+                    Log.i(TAG, "Register onFailure -> Status Code: " + statusCode + "\tLogin Type:" + loginType);
+                    switch(statusCode) {
+                        // Server inactive. Log users out of their social media accounts.
+                        case(0):
+                            Toast.makeText(getApplicationContext(),
+                                    "Server is down. Please try later.",
+                                    Toast.LENGTH_LONG).show();
+
+                            if (loginType == getString(R.string.facebook_login_type)) {
+                                LoginManager.getInstance().logOut();
+                            }
+                            else if (loginType == getString(R.string.google_login_type)) {
+                                Log.e(TAG, "Google Logout()");
+                                googleSignOut();
+                            }
+                            break;
+
+                        // Bad login credentials
+                        case (400):
+                            break;
+
+                        // User already in database. Call authenticate endpoint.
+                        case (401):
+                            authenticate(userEmail, token, loginType);
+                            break;
+
+                        default:
+                            Log.i(TAG, "Register onFailure. Default Switch. Status Code: " + statusCode);
+                            break;
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -199,6 +238,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
+                    Log.i(TAG, "Authenticate OnSuccess -> Status Code: " + statusCode + "\tLoginType: " + loginType  + "\t" +  response.toString());
+
                     String uid = response.getString("userId");
                     if (uid == "-1") {
                         Toast unauthToast = Toast.makeText(getApplicationContext(),
@@ -227,8 +268,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, "onFailure1: " + errorResponse.toString());
                 super.onFailure(statusCode, headers, throwable, errorResponse);
+
+                switch (statusCode) {
+                    case (0):
+                        Toast.makeText(getApplicationContext(),
+                                "Server is down. Please try later.",
+                                Toast.LENGTH_LONG).show();
+                        break;
+
+                    default:
+                        Log.i(TAG, "Authenticate onFailure Default Case");
+                        break;
+                }
             }
         });
     }
@@ -267,8 +319,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     try {
                                         userEmail = object.getString("email");
                                         token = hashPassword(userEmail);
-//                                        token = loginResult.getAccessToken().toString();
-//                                        token = token.substring(19, token.length() - 37);
                                         registerSocialMediaUser(userEmail, token,
                                                 getString(R.string.facebook_login_type));
                                     }
@@ -321,13 +371,42 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             if (account != null) {
                 userEmail = account.getEmail();
                 token = hashPassword(userEmail);
-//                Log.e(TAG, "Google() email: " + userEmail + "\ttoken: " + token);
                 registerSocialMediaUser(userEmail, token, getString(R.string.google_login_type));
             }
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("Google Login", "signInResult:failed code=" + e.getStatusCode());
+        }
+    }
+
+    // Google sign out function
+    private void googleSignOut() {
+        ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
+        if (mGoogleSignInClient != null){
+            mGoogleSignInClient.signOut()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            revokeAccess();
+                        }
+                    });
+        }
+    }
+
+    // Google revoke access to fully delete account info
+    private void revokeAccess() {
+        final ClarityApp clarityApp = new ClarityApp();
+        GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
+        if (mGoogleSignInClient != null) {
+            mGoogleSignInClient.revokeAccess()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            clarityApp.clearGoogleSignInClient();
+                        }
+                    });
         }
     }
 
