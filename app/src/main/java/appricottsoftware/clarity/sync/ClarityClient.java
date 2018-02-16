@@ -2,12 +2,14 @@ package appricottsoftware.clarity.sync;
 
 import android.content.Context;
 import android.os.Looper;
+import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import appricottsoftware.clarity.R;
@@ -111,6 +113,35 @@ public class ClarityClient {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+
+    public void metadataUpVoteRequest(Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("cid", 1);
+            JSONArray metadata = new JSONArray();
+
+            JSONObject element1 = new JSONObject();
+            element1.put("mid", 1);
+            JSONObject element2 = new JSONObject();
+            element2.put("mid", 2);
+
+            metadata.put(element1);
+            metadata.put(element2);
+
+            jsonParams.put("metadata", metadata);
+
+            jsonParams.put("metadata", metadata);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            Log.e("TESTING", jsonParams.toString() + " TO: " + R.string.put_dislike_request_url);
+            client.post(context, context.getString(R.string.put_dislike_request_url), entity, "application/json", handler);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
