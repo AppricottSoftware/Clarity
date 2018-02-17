@@ -130,6 +130,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        Intent loginActivityIntent = new Intent(this, LoginActivity.class);
+        startActivity(loginActivityIntent);
+        finish();
+    }
+
     public String hashPassword(String originalPassword) {
         String hashedPassword = null;
         try
