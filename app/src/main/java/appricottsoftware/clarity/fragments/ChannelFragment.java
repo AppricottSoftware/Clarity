@@ -18,18 +18,28 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.RecyclerAdapter;
 import appricottsoftware.clarity.RecyclerListItem;
+import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cz.msebera.android.httpclient.Header;
+
+import static appricottsoftware.clarity.sync.ClarityApp.getGson;
 
 public class ChannelFragment extends Fragment {
 
@@ -52,7 +62,11 @@ public class ChannelFragment extends Fragment {
     private RecyclerView.Adapter rAdapter;
     private List<RecyclerListItem> rListItems;
 
-    boolean seeSurvey = true;
+    int offset = 0;
+    String query = "starwars";
+
+    // To set - query to see if channels exist for user.
+    boolean seeSurvey = false;
 
 
     private static final String TAG = "ChannelFragment";
@@ -111,16 +125,7 @@ public class ChannelFragment extends Fragment {
             rListItems.add(item3);
             rListItems.add(itemU);
             rListItems.add(item3);
-            rListItems.add(item3);
-            rListItems.add(item3);
-            rListItems.add(item1);
-            rListItems.add(item2);
-            rListItems.add(item3);
-            rListItems.add(item3);
-            rListItems.add(item3);
-            rListItems.add(item3);
-            rListItems.add(item3);
-            rListItems.add(item3);
+
 
             rAdapter = new RecyclerAdapter(rListItems, getContext());
             channelRecycler.setAdapter(rAdapter);
@@ -140,6 +145,10 @@ public class ChannelFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(getActivity(), "create channel clicked", Toast.LENGTH_SHORT).show();
+
+                    // making API call
+
+                    searchAPI(query);
 
 
                     //ClarityApp.getRestClient().NEED METHOD
@@ -204,6 +213,63 @@ public class ChannelFragment extends Fragment {
 
     }
 
+    private void searchAPI(String query) {
+        ClarityApp.getRestClient().getFullTextSearch(offset, query, 0, "episode", getActivity(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try {
+                    offset = response.getInt("next_offset");
+                    //Log.e(TAG, response.toString());
+                    createChannel(response);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                throwable.printStackTrace();
+                //should gracefully fail
+            }
+        });
+    }
+
+    private void createChannel(JSONObject response) {
+
+        Channel aChannel = new Channel();
+        ArrayList<Episode> episodes = new ArrayList<Episode>();
+
+        try {
+            JSONArray resp = response.getJSONArray("results");
+
+            for (int i = 0; i < 1 && i < resp.length(); i++) {
+                Episode e = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Episode.class);
+                episodes.add(e);
+            }
+
+            aChannel.setImage(episodes.get(0).getImage());
+            aChannel.setName(episodes.get(0).getTitle_original());
+
+            populateRecycler(aChannel);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void populateRecycler(Channel aChannel) {
+
+        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), "");
+
+        rListItems.add(APIresult);
+
+        rAdapter = new RecyclerAdapter(rListItems, getContext());
+        channelRecycler.setAdapter(rAdapter);
+    }
 
 
 //    @OnClick(R.id.test_music)
@@ -214,7 +280,6 @@ public class ChannelFragment extends Fragment {
 
 
 }
-
 
 
 
