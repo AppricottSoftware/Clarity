@@ -6,8 +6,9 @@
     <dimen name="nav_drawer_header_height">160dp</dimen>
 
     <dimen name="survey_prompt_text_size">18sp</dimen>
-    <dimen name="survey_cat_text_size">14sp</dimen>
+    <dimen name="survey_cat_text_size">18sp</dimen>
     <dimen name="survey_prompt_LR_padding">48dp</dimen>
+
     <dimen name="player_fragment_collapse_height">72dp</dimen>
     <dimen name="player_fragment_shadow_height">5dp</dimen>
     <dimen name="player_fragment_button">48dp</dimen>

@@ -29,7 +29,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
 
-    boolean seeSurvey = true;
     private static final String TAG = "RegisterActivity";
 
     @Override
@@ -54,24 +53,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     return;
                 }
 
-                // create instance of clarityClient
-                // pass information to database to store
-                if (seeSurvey == true){
-                    Intent surveyActivityIntent = new Intent(this, SurveyActivity.class);
-                    surveyActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(surveyActivityIntent);
-                    finish();
-                } else {
 
-                    // After successful save of user info on back end
-                    // Switch to home activity
+                // After successful save of user info on back end
+                // Switch to home activity
 
-                    Intent homeActivityIntent = new Intent(this, HomeActivity.class);
-                    homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    homeActivityIntent.putExtra("loginType", getString(R.string.registered_login_type));
-                    startActivity(homeActivityIntent);
-                    finish();
-                }
+                Intent homeActivityIntent = new Intent(this, HomeActivity.class);
+                homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                homeActivityIntent.putExtra("loginType", getString(R.string.registered_login_type));
+                startActivity(homeActivityIntent);
+                finish();
+
 
                 ClarityApp.getRestClient().registerRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
                     @Override

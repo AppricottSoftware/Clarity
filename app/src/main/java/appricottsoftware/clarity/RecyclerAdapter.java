@@ -8,12 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
-/**
- * Created by Mathew on 1/30/2018.
- */
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.CustomViewHolder> {
 
@@ -72,8 +70,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
             selected_position = getLayoutPosition();
             notifyItemChanged(selected_position);
 
+            String toastText = recyclerList_ItemList.get(selected_position).getTitle();
+            Toast.makeText(view.getContext(), toastText, Toast.LENGTH_SHORT).show();
+
 
             // CHANGE CHANNEL ON CLICK
+            //ClarityApp.getRestClient().NEED METHOD
 
         }
     }

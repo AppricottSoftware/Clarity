@@ -3,23 +3,75 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="appricottsoftware.clarity.SurveyActivity">
+    android:layout_height="match_parent" >
 
     <TextView
         android:id="@+id/textView_prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="16dp"
         android:paddingLeft="@dimen/survey_prompt_LR_padding"
         android:paddingRight="@dimen/survey_prompt_LR_padding"
         android:text="@string/survey_prompt"
         android:textAlignment="center"
         android:textSize="@dimen/survey_prompt_text_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/textView_cat1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_1"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="64dp"
+        tools:layout_editor_absoluteY="220dp" />
+
+    <TextView
+        android:id="@+id/textView_cat2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_2"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="24dp"
+        tools:layout_editor_absoluteY="268dp" />
+
+    <TextView
+        android:id="@+id/textView_cat3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_3"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="50dp"
+        tools:layout_editor_absoluteY="304dp" />
+
+    <TextView
+        android:id="@+id/textView_cat4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_4"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="64dp"
+        tools:layout_editor_absoluteY="369dp" />
+
+    <TextView
+        android:id="@+id/textView_cat5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_5"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="41dp"
+        tools:layout_editor_absoluteY="406dp" />
+
+
+    <TextView
+        android:id="@+id/textView_cat6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_6"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="24dp"
+        tools:layout_editor_absoluteY="461dp" />
 
     <ToggleButton
         android:id="@+id/toggleButton_cat1"
@@ -28,12 +80,8 @@
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
-        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
-        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat5"
-        app:layout_constraintVertical_bias="0.311" />
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="220dp" />
 
     <ToggleButton
         android:id="@+id/toggleButton_cat2"
@@ -42,12 +90,8 @@
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
-        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat6"
-        app:layout_constraintVertical_bias="0.515" />
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="268dp" />
 
     <ToggleButton
         android:id="@+id/toggleButton_cat3"
@@ -56,12 +100,8 @@
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
-        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
-        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat1"
-        app:layout_constraintVertical_bias="0.311" />
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="311dp" />
 
     <ToggleButton
         android:id="@+id/toggleButton_cat4"
@@ -70,12 +110,8 @@
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
-        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat6"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
-        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat3"
-        app:layout_constraintVertical_bias="0.311" />
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="369dp" />
 
     <ToggleButton
         android:id="@+id/toggleButton_cat5"
@@ -84,12 +120,8 @@
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
-        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
-        app:layout_constraintTop_toBottomOf="@+id/textView_prompt"
-        app:layout_constraintVertical_bias="0.064" />
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="425dp" />
 
     <ToggleButton
         android:id="@+id/toggleButton_cat6"
@@ -98,90 +130,8 @@
         android:background="@drawable/ic_nav_drawer_like_white"
         android:textOff=""
         android:textOn=""
-        app:layout_constraintBottom_toTopOf="@+id/toggleButton_cat2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView_cat1"
-        app:layout_constraintTop_toBottomOf="@+id/toggleButton_cat4"
-        app:layout_constraintVertical_bias="0.311" />
-
-    <TextView
-        android:id="@+id/textView_cat1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/category_1"
-        android:textSize="@dimen/survey_cat_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/textView_cat2"
-        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_prompt"
-        app:layout_constraintVertical_bias="0.295" />
-
-    <TextView
-        android:id="@+id/textView_cat2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/category_2"
-        android:textSize="@dimen/survey_cat_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/textView_cat3"
-        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_cat1"
-        app:layout_constraintVertical_bias="0.488" />
-
-    <TextView
-        android:id="@+id/textView_cat3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/category_3"
-        android:textSize="@dimen/survey_cat_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/textView_cat4"
-        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_cat2"
-        app:layout_constraintVertical_bias="0.488" />
-
-    <TextView
-        android:id="@+id/textView_cat4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/category_4"
-        android:textSize="@dimen/survey_cat_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/textView_cat5"
-        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_cat3"
-        app:layout_constraintVertical_bias="0.488" />
-
-    <TextView
-        android:id="@+id/textView_cat5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/category_5"
-        android:textSize="@dimen/survey_cat_text_size"
-        app:layout_constraintBottom_toTopOf="@+id/textView_cat6"
-        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_cat4"
-        app:layout_constraintVertical_bias="0.488" />
-
-    <TextView
-        android:id="@+id/textView_cat6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/category_6"
-        android:textSize="@dimen/survey_cat_text_size"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/toggleButton_cat1"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_cat5"
-        app:layout_constraintVertical_bias="0.488" />
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="481dp" />
 
 
 </android.support.constraint.ConstraintLayout>

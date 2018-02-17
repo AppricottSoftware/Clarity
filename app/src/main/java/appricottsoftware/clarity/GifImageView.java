@@ -1,6 +1,5 @@
-package appricottsoftware.clarity; /**
- * Created by Mathew on 1/28/2018.
- */
+package appricottsoftware.clarity;
+
 
 import android.content.Context;
 import android.graphics.Canvas;
