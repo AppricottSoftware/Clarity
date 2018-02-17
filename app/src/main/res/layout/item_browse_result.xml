@@ -16,27 +16,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center_horizontal"
     android:paddingTop="8dp"
     android:paddingLeft="8dp"
     android:paddingRight="8dp">
 
         <ImageView
             android:id="@+id/ivBrowseImg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="centerCrop"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/ic_launcher_background"/>
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background" />
 
         <TextView
             android:id="@+id/ivBrowseEpisodeName"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="8dp"
             android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:singleLine="true"
+            android:scrollHorizontally="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
             android:text="Name"
+            android:textAlignment="viewStart"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@android:color/black"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textSize="12sp" />
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

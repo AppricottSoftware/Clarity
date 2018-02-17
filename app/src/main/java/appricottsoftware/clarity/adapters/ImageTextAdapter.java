@@ -1,6 +1,7 @@
 package appricottsoftware.clarity.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.fragments.BrowseFragment;
 import appricottsoftware.clarity.models.Podcast;
 
 /**
@@ -21,6 +25,8 @@ import appricottsoftware.clarity.models.Podcast;
 public class ImageTextAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<Podcast> podcasts;
+
+    private static final String TAG = "ImageTextAdapter";
 
     public ImageTextAdapter(Context c, ArrayList<Podcast> p) {
         context = c;
@@ -49,9 +55,8 @@ public class ImageTextAdapter extends BaseAdapter {
             holder = new ViewHolder();
             convertView = inflater.inflate(R.layout.item_browse_result, parent, false);
             holder.textView = convertView.findViewById(R.id.ivBrowseEpisodeName);
+            holder.textView.setSelected(true);
             holder.imageView = convertView.findViewById(R.id.ivBrowseImg);
-            holder.imageView.setLayoutParams(new LinearLayout.LayoutParams(450, 450));
-            holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             holder.imageView.setPadding(8, 8, 8, 8);
             convertView.setTag(holder);
         }
@@ -59,7 +64,8 @@ public class ImageTextAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.imageView.setImageResource(podcasts.get(position).getItunes_id());
+//        holder.imageView.setImageResource((int)podcasts.get(position).getItunes_id());
+        Glide.with(context).load(podcasts.get(position).getImage()).into(holder.imageView);
         holder.textView.setText(podcasts.get(position).getTitle_original());
 
         return convertView;
@@ -69,16 +75,4 @@ public class ImageTextAdapter extends BaseAdapter {
         ImageView imageView;
         TextView textView;
     }
-
-    // references to our images
-    private Integer[] mThumbIds = {
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7
-    };
 }
