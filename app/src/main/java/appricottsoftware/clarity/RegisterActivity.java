@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -53,7 +54,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String hashedPassword = hashPassword(password.getText().toString());
 
                 // Sanity Check to make sure all instances are populated with actual strings
-                if(emailString.length() == 0 || password.getText().toString().length() == 0) {
+                if(!isValidEmail(emailString)){
+                    Toast.makeText(v.getContext(), "Email Invalid", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(password.getText().toString().length() == 0 || password.getText().toString().length() < 6) {
+                    Toast.makeText(v.getContext(), "Password Invalid", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -91,34 +97,25 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }
 
                         @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                            Log.e(TAG, "onSuccess2 : " + response.toString());
-                            super.onSuccess(statusCode, headers, response);
-                        }
-
-                        @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            Log.e(TAG, "onFailue1 : " + errorResponse.toString());
+                            try {
+                                switch(statusCode) {
+                                    case(0):
+                                        Toast.makeText(getApplicationContext(),
+                                                "Server is down. Please try later.",
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                    default:
+                                        Log.i(TAG, "Register onFailure. Default Switch. Status Code: " + statusCode);
+                                        break;
+                                }
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             super.onFailure(statusCode, headers, throwable, errorResponse);
                         }
 
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                            Log.e(TAG, "onFailue2 : " + errorResponse.toString());
-                            super.onFailure(statusCode, headers, throwable, errorResponse);
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                            Log.e(TAG, "onFailue3 : " + responseString.toString());
-                            super.onFailure(statusCode, headers, responseString, throwable);
-                        }
-
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                            Log.e(TAG, "onSuccess3 : " + responseString.toString());
-                            super.onSuccess(statusCode, headers, responseString);
-                        }
                     });
                 }
 
@@ -129,6 +126,22 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent loginActivityIntent = new Intent(this, LoginActivity.class);
+        startActivity(loginActivityIntent);
+        finish();
+    }
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (target == null) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
+    }
+
 
     public String hashPassword(String originalPassword) {
         String hashedPassword = null;
