@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -53,7 +54,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 String hashedPassword = hashPassword(password.getText().toString());
 
                 // Sanity Check to make sure all instances are populated with actual strings
-                if(emailString.length() == 0 || password.getText().toString().length() == 0) {
+                if(!isValidEmail(emailString)){
+                    Toast.makeText(v.getContext(), "Email Invalid", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(password.getText().toString().length() == 0 || password.getText().toString().length() < 6) {
+                    Toast.makeText(v.getContext(), "Password Invalid", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -136,6 +142,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         startActivity(loginActivityIntent);
         finish();
     }
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (target == null) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
+    }
+
 
     public String hashPassword(String originalPassword) {
         String hashedPassword = null;
