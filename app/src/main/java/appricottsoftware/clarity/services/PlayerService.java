@@ -349,56 +349,54 @@ public class PlayerService extends MediaBrowserServiceCompat {
             playlist.remove();
             mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
             Log.i(TAG, "updatePlaylist: " + dynamicConcatenatingMediaSource.getSize() + " " + playlist.size());
-        } else {
-            // Get next page of result
-            clearQueue();
-            playChannel(currentQuery);
-
         }
     }
 
     private void playChannel(String query) {
-        if(query != currentQuery) {
+        if(!query.equals(currentQuery)) {
             currentQuery = query;
             total = 0;
             nextOffset = 0;
             clearQueue();
         }
-        try {
-            Channel channel = ClarityApp.getGson().fromJson(currentQuery, Channel.class);
-            ClarityApp.getRestClient(context).getFullTextSearch(channel.getGenreIds(), nextOffset, channel.getName(), 0, "episode", new JsonHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    playPlaylist(response);
-                }
+        // TODO: make prefetching constant = 5
+        if(dynamicConcatenatingMediaSource.getSize() < 5 && playlist.size() < 5) {
+            try {
+                Channel channel = ClarityApp.getGson().fromJson(currentQuery, Channel.class);
+                ClarityApp.getRestClient(context).getFullTextSearch(channel.getGenreIds(), nextOffset, channel.getName(), 0, "episode", new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        playPlaylist(response);
+                    }
 
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                    super.onSuccess(statusCode, headers, response);
-                }
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                    super.onFailure(statusCode, headers, throwable, errorResponse);
-                }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    super.onFailure(statusCode, headers, responseString, throwable);
-                }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
 
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                    super.onSuccess(statusCode, headers, responseString);
-                }
-            });
-        } catch(Exception e) {
-            e.printStackTrace();
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        super.onSuccess(statusCode, headers, responseString);
+                    }
+                });
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -439,13 +437,16 @@ public class PlayerService extends MediaBrowserServiceCompat {
             total = response.getInt("total");
             TypeToken<ArrayList<Episode>> token = new TypeToken<ArrayList<Episode>>() {};
             ArrayList<Episode> episodes = ClarityApp.getGson().fromJson(response.getString("results"), token.getType());
+            int prevPlaylistSize = dynamicConcatenatingMediaSource.getSize();
             for(Episode episode : episodes) {
                 if(episode != null && episode.isValid()) {
                     insertIntoQueue(episode);
                 }
             }
-            exoMediaPlayer.prepare(dynamicConcatenatingMediaSource);
-            exoMediaPlayer.setPlayWhenReady(true);
+            if(prevPlaylistSize < 1) {
+                exoMediaPlayer.prepare(dynamicConcatenatingMediaSource);
+                exoMediaPlayer.setPlayWhenReady(true);
+            }
             mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
             Log.e(TAG, episodes.toString());
         } catch(Exception e) {
