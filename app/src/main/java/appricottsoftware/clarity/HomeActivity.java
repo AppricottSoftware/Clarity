@@ -3,6 +3,7 @@ package appricottsoftware.clarity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -44,6 +45,7 @@ import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
+import appricottsoftware.clarity.models.Session;
 import appricottsoftware.clarity.sync.ClarityApp;
 import appricottsoftware.clarity.sync.ClarityApp;
 import appricottsoftware.clarity.sync.ClarityClient;
@@ -56,6 +58,10 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
     @BindView(R.id.nv_drawer) NavigationView nvDrawer;
     @BindView(R.id.supl_home) SlidingUpPanelLayout suplPanel;
+
+    private static final String registeredLoginType = "1";
+    private static final String facebookLoginType = "2";
+    private static final String googleLoginType = "3";
 
     private static final String TAG = "HomeActivity";
 
@@ -108,6 +114,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 new ComponentName(context, PlayerService.class),
                 connectionCallback,
                 null);
+
+        Log.e(TAG, "Login Type: " + loginType + "\tuserId: " + ClarityApp.getSession(this).getUserID());
     }
 
     @Override
@@ -176,6 +184,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     }
 
     private void logout() {
+        ClarityApp.getSession(getApplicationContext()).setUserID(-1);
         Intent loginActivityIntent = new Intent(this, LoginActivity.class);
         startActivity(loginActivityIntent);
         finish();
@@ -218,15 +227,15 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 break;
             case R.id.nav_logout:
                 switch(loginType) {
-                    case "1":
+                    case registeredLoginType:
                         logout();
                         break;
-                    case "2":
+                    case facebookLoginType:
                         // Logout Facebook
                         LoginManager.getInstance().logOut();
                         logout();                       // This function returns to LoginActivity
                         break;
-                    case "3":
+                    case googleLoginType:
                         // Logout Google
                         googleSignOut();
                         break;
@@ -402,7 +411,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_channel_bundle), Parcels.wrap(channel));
         mediaController.getTransportControls()
-                .playFromSearch(channel.getTopic(), bundle);
+                .playFromSearch(channel.toString(), bundle);
     }
 
     @Override
@@ -422,7 +431,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 .playFromSearch(podcast.getTitle_original(), bundle);
     }
 
-    private void googleSignOut() {
+    public void googleSignOut() {
         ClarityApp clarityApp = new ClarityApp();
         GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
         if (mGoogleSignInClient != null){
