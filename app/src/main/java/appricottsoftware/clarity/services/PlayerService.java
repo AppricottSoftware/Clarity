@@ -344,14 +344,61 @@ public class PlayerService extends MediaBrowserServiceCompat {
     }
 
     private void updatePlaylist() {
-        if(dynamicConcatenatingMediaSource.getSize() > 0 && playlist.size() > 0) {
+        if(dynamicConcatenatingMediaSource.getSize() > 1 && playlist.size() > 1) {
             dynamicConcatenatingMediaSource.removeMediaSource(0);
             playlist.remove();
+            mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
             Log.i(TAG, "updatePlaylist: " + dynamicConcatenatingMediaSource.getSize() + " " + playlist.size());
         } else {
+            // Get next page of result
             clearQueue();
-            // Get next page of results
+            playChannel(currentQuery);
 
+        }
+    }
+
+    private void playChannel(String query) {
+        if(query != currentQuery) {
+            currentQuery = query;
+            total = 0;
+            nextOffset = 0;
+            clearQueue();
+        }
+        try {
+            Channel channel = ClarityApp.getGson().fromJson(currentQuery, Channel.class);
+            ClarityApp.getRestClient(context).getFullTextSearch(channel.getGenreIds(), nextOffset, channel.getName(), 0, "episode", new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    playPlaylist(response);
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                    super.onSuccess(statusCode, headers, response);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                    super.onSuccess(statusCode, headers, responseString);
+                }
+            });
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -387,7 +434,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
     }
 
     private void playPlaylist(JSONObject response) {
-        clearQueue();
         try {
             nextOffset = response.getInt("next_offset");
             total = response.getInt("total");
@@ -400,6 +446,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             }
             exoMediaPlayer.prepare(dynamicConcatenatingMediaSource);
             exoMediaPlayer.setPlayWhenReady(true);
+            mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
             Log.e(TAG, episodes.toString());
         } catch(Exception e) {
             e.printStackTrace();
@@ -576,42 +623,8 @@ public class PlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onPlayFromSearch(String query, Bundle extras) {
             Log.i(TAG,"onPlayFromSearch: query: " + query + " extras: " + extras.toString());
-            try {
-                Channel channel = ClarityApp.getGson().fromJson(query, Channel.class);
-                ClarityApp.getRestClient(context).getFullTextSearch(channel.getGenreIds(), nextOffset, channel.getName(), 0, "episode", new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        playPlaylist(response);
-                    }
+            playChannel(query);
 
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                        super.onSuccess(statusCode, headers, response);
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                        super.onFailure(statusCode, headers, throwable, errorResponse);
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                        super.onFailure(statusCode, headers, throwable, errorResponse);
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                    }
-
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                        super.onSuccess(statusCode, headers, responseString);
-                    }
-                });
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
             // TODO: Play channel
         }
 
