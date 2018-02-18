@@ -158,17 +158,16 @@ public class ChannelFragment extends Fragment {
                     channelRecycler.setVisibility(View.INVISIBLE);
                     searchConstraintLayout.setVisibility(View.VISIBLE);
 
-                    ImageButton searchImageButton = v.findViewById(R.id.imageButton_serachIcon);
-                    searchImageButton.setOnClickListener(new View.OnClickListener() {
+                    searchIconImageButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            //String keywordText = searchEditText.getText.toString();
+                            String searchKeyword = searchEditText.getText().toString();
+
+                            searchAPI(searchKeyword);
+
+                            
                         }
                     });
-
-
-
-                    searchAPI(query);
 
                     int uid = 1;
                     String name = "testChannelTitle";
