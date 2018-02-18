@@ -6,10 +6,79 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <TextView
+            android:id="@+id/textView_createChannel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/create"
+            android:textAlignment="center"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/editText_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:ems="10"
+            android:hint="@string/search_keyword"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_createChannel" />
+
+        <TextView
+            android:id="@+id/textView_searchText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="224dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/search"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton_serachIcon" />
+
+        <ImageButton
+            android:id="@+id/imageButton_serachIcon"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:layout_marginTop="64dp"
+            android:background="@android:color/white"
+            android:contentDescription="@string/description"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@+id/textView_searchText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editText_search"
+            app:srcCompat="@drawable/search_icon" />
+
+    </android.support.constraint.ConstraintLayout>
+
     <android.support.v7.widget.CardView
         android:id="@+id/cardView_ChannelButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -57,6 +126,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="56dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -68,7 +138,8 @@
 
         android:id="@+id/ConstraintLayout_Survey"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/textView_prompt"
@@ -244,9 +315,9 @@
 
 
     <!--<Button-->
-        <!--android:id="@+id/test_music"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="test" />-->
+    <!--android:id="@+id/test_music"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="test" />-->
 
 </android.support.constraint.ConstraintLayout>

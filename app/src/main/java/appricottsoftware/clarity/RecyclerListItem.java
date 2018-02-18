@@ -2,26 +2,23 @@ package appricottsoftware.clarity;
 
 import android.media.Image;
 
-/**
- * Created by Mathew on 1/30/2018.
- */
 
 public class RecyclerListItem {
 
-    public RecyclerListItem(String title, String description) {
+    public RecyclerListItem(String title, int imageURL) {
         this.title = title;
-        this.description = description;
+        this.imageURL = imageURL;
     }
 
     private String title;
-    private String description;
-
+    private int imageURL;
 
     public String getTitle() {
         return title;
     }
 
-    public String getDescription() {
-        return description;
+    public int getImage() {
+        return imageURL;
     }
+
 }

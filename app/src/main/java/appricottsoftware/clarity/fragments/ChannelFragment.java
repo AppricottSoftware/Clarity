@@ -1,6 +1,7 @@
 package appricottsoftware.clarity.fragments;
 
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -49,6 +51,13 @@ public class ChannelFragment extends Fragment {
     CardView channelButtonCardView;
     @BindView(R.id.ConstraintLayout_Survey)
     ConstraintLayout surveyConstraintLayout;
+    @BindView(R.id.constraintLayout_search)
+    ConstraintLayout searchConstraintLayout;
+
+    @BindView(R.id.editText_search)
+    EditText searchEditText;
+    @BindView(R.id.imageButton_serachIcon)
+    ImageButton searchIconImageButton;
 
     @BindView(R.id.toggleButton_cat1)
     ToggleButton btCat1;
@@ -57,7 +66,6 @@ public class ChannelFragment extends Fragment {
     @BindView(R.id.toggleButton_cat4) ToggleButton btCat4;
     @BindView(R.id.toggleButton_cat5) ToggleButton btCat5;
     @BindView(R.id.toggleButton_cat6) ToggleButton btCat6;
-
 
     private RecyclerView.Adapter rAdapter;
     private List<RecyclerListItem> rListItems;
@@ -96,9 +104,9 @@ public class ChannelFragment extends Fragment {
 
         if (seeSurvey) {
 
-
             channelButtonCardView.setVisibility(View.INVISIBLE);
             channelRecycler.setVisibility(View.INVISIBLE);
+            searchConstraintLayout.setVisibility(View.INVISIBLE);
             surveyConstraintLayout.setVisibility(View.VISIBLE);
 
         }
@@ -107,6 +115,7 @@ public class ChannelFragment extends Fragment {
             channelButtonCardView.setVisibility(View.VISIBLE);
             channelRecycler.setVisibility(View.VISIBLE);
             surveyConstraintLayout.setVisibility(View.INVISIBLE);
+            searchConstraintLayout.setVisibility(View.INVISIBLE);
 
             ButterKnife.bind(this, view);
 
@@ -115,17 +124,14 @@ public class ChannelFragment extends Fragment {
 
             rListItems = new ArrayList<>();
 
-            RecyclerListItem item1 = new RecyclerListItem("title1", "desciption1");
-            RecyclerListItem item2 = new RecyclerListItem("title2", "desciption2");
-            RecyclerListItem item3 = new RecyclerListItem("title3", "desciption3");
-            RecyclerListItem itemU = new RecyclerListItem("title unique", "desciption unique");
+            RecyclerListItem item1 = new RecyclerListItem("Fake Channel 1", 1);
+            RecyclerListItem item2 = new RecyclerListItem("Fake Channel 2", 1);
+            RecyclerListItem item3 = new RecyclerListItem("Fake Channel 3", 1);
+            RecyclerListItem item4 = new RecyclerListItem("Fake Channel 4", 1);
             rListItems.add(item1);
             rListItems.add(item2);
             rListItems.add(item3);
-            rListItems.add(item3);
-            rListItems.add(itemU);
-            rListItems.add(item3);
-
+            rListItems.add(item4);
 
             rAdapter = new RecyclerAdapter(rListItems, getContext());
             channelRecycler.setAdapter(rAdapter);
@@ -140,13 +146,28 @@ public class ChannelFragment extends Fragment {
         // Initialize view lookups, listeners
 
         Button createChannelsButton = view.findViewById(R.id.button_createChannel);
+
+
         if (!seeSurvey) {
             createChannelsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Toast.makeText(getActivity(), "create channel clicked", Toast.LENGTH_SHORT).show();
 
-                    // making API call
+                    channelButtonCardView.setVisibility(View.INVISIBLE);
+                    channelRecycler.setVisibility(View.INVISIBLE);
+                    searchConstraintLayout.setVisibility(View.VISIBLE);
+
+                    ImageButton searchImageButton = v.findViewById(R.id.imageButton_serachIcon);
+                    searchImageButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            //String keywordText = searchEditText.getText.toString();
+                        }
+                    });
+
+
+
                     searchAPI(query);
 
                     int uid = 1;
@@ -299,7 +320,7 @@ public class ChannelFragment extends Fragment {
 
     private void populateRecycler(Channel aChannel) {
 
-        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), "");
+        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), 1);
 
         rListItems.add(APIresult);
 

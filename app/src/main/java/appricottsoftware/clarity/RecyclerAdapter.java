@@ -37,7 +37,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
         RecyclerListItem recyclerListItem = recyclerList_ItemList.get(position);
 
         holder.textViewTitle.setText(recyclerListItem.getTitle());
-        holder.textViewDescription.setText(recyclerListItem.getDescription());
         //holder.ImageViewAlbum.setImageResource(recyclerListItem.getAlbum());
 
         holder.itemView.setBackgroundColor(selected_position == position ? Color.LTGRAY : Color.TRANSPARENT);
@@ -52,14 +51,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
         //public ImageView ImageViewAlbum;
         public TextView textViewTitle;
-        public TextView textViewDescription;
 
         public CustomViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
 
             textViewTitle = itemView.findViewById(R.id.textView_title);
-            textViewDescription = itemView.findViewById(R.id.textView_desc);
             //ImageViewAlbum = itemView.findViewById(R.id.imageView_album);
 
         }

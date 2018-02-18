@@ -46,6 +46,8 @@
 
     <string name="create">Create Channel</string>
     <string name="shuffle">Shuffle</string>
+    <string name="search">Search</string>
+    <string name="search_keyword">Search Keyword</string>
     <string name="no_auth">Username or password is incorrect</string>
 
     <!-- TODO: Remove or change this placeholder text -->
