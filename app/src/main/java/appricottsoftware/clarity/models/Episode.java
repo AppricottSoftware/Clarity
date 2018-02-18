@@ -213,6 +213,23 @@ public class Episode {
         this.id = id;
     }
 
+    public boolean isValid() {
+        return !(description_original == null
+                || rss == null
+                || audio == null
+                || description_highlighted == null
+                || title_highlighted == null
+                || publisher_original == null
+                || audio_length == null
+                || podcast_title_highlighted == null
+                || image == null
+                || title_original == null
+                || podcast_title_original == null
+                || publisher_highlighted == null
+                || podcast_id == null
+                || id == null);
+    }
+
     public String toString() {
         return ClarityApp.getGson().toJson(this);
     }

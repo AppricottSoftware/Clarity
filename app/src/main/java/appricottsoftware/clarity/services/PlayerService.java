@@ -27,6 +27,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -48,13 +49,24 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.common.api.Response;
+import com.google.gson.reflect.TypeToken;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.sync.ClarityApp;
+import cz.msebera.android.httpclient.Header;
 
 public class PlayerService extends MediaBrowserServiceCompat {
 
@@ -81,11 +93,22 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private Runnable playbackStateRunnable;
     private DynamicConcatenatingMediaSource dynamicConcatenatingMediaSource;
 
+    private Queue<Episode> playlist; // Playlist to keep track of where we are in the playback
+    private int nextOffset; // Next page of Podcast API results
+    private int total;
+    private HashMap<Episode, MediaSource> elements;
+    private String currentQuery;
+
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
         intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+
+        nextOffset = 0;
+        total = 0;
+        playlist = new LinkedList<>();
+        currentQuery = "";
 
         // Acquire a lock so CPU stays on even when screen is locked
         wakeLock = ((PowerManager) context.getSystemService(Context.POWER_SERVICE))
@@ -214,7 +237,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private void initializeExoMediaPlayer() {
         exoMediaPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(this), new DefaultTrackSelector(), new DefaultLoadControl());
         exoMediaPlayer.addListener(new Player.EventListener() {
-
             @Override
             public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
                 Log.i(TAG, "onTracksChanged: trackGroups:" + trackGroups.toString() + " trackSelections: " + trackSelections.toString());
@@ -245,6 +267,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 String r = "";
                 switch(reason) {
                     case Player.DISCONTINUITY_REASON_PERIOD_TRANSITION:
+                        updatePlaylist();
                         r = "0: DISCONTINUITY_REASON_PERIOD_TRANSITION"; break;
                     case Player.DISCONTINUITY_REASON_SEEK:
                         r = "1: DISCONTINUITY_REASON_SEEK"; break;
@@ -256,7 +279,10 @@ public class PlayerService extends MediaBrowserServiceCompat {
                         r = " NO REASON DETECTED";
                 }
                 Log.i(TAG, "onPositionDiscontinuity: " + r);
+
+
                 // TODO: Signal next element in playlist started
+//                updatePlaylist();
                 /*
                     Called when a position discontinuity occurs without a change to the timeline. A position discontinuity occurs when the current window or period index changes (as a result of playback transitioning from one period in the timeline to the next), or when the playback position jumps within the period currently being played (as a result of a seek being performed, or when the source introduces a discontinuity internally).
                     When a position discontinuity occurs as a result of a change to the timeline this method is not called. onTimelineChanged(Timeline, Object) is called in this case.
@@ -315,6 +341,69 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 Log.i(TAG, "onRepeatModeChanged: " + r);
             }
         });
+    }
+
+    private void updatePlaylist() {
+        if(dynamicConcatenatingMediaSource.getSize() > 0 && playlist.size() > 0) {
+            dynamicConcatenatingMediaSource.removeMediaSource(0);
+            playlist.remove();
+            Log.i(TAG, "updatePlaylist: " + dynamicConcatenatingMediaSource.getSize() + " " + playlist.size());
+        } else {
+            clearQueue();
+            // Get next page of results
+
+        }
+    }
+
+    private MediaSource toAudioSource(Episode episode) {
+        // Convert episode into a media source for the player to play
+        String userAgent = Util.getUserAgent(context, getString(R.string.app_name));
+        DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent,
+                null,
+                DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+                DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+                true /* allow cross protocol redirects for feedproxy*/);
+        DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(context,
+                null,
+                httpDataSourceFactory);
+        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
+        return new ExtractorMediaSource(Uri.parse(episode.getAudio()), dataSourceFactory, extractorsFactory, null, null);
+    }
+
+    private void clearQueue() {
+        exoMediaPlayer.stop();
+        // Empty the play queue
+        while(dynamicConcatenatingMediaSource.getSize() > 0) {
+            dynamicConcatenatingMediaSource.removeMediaSource(0);
+        }
+
+        // Empty the playlist
+        playlist.clear();
+    }
+
+    private void insertIntoQueue(Episode episode) {
+        playlist.add(episode);
+        dynamicConcatenatingMediaSource.addMediaSource(toAudioSource(episode));
+    }
+
+    private void playPlaylist(JSONObject response) {
+        clearQueue();
+        try {
+            nextOffset = response.getInt("next_offset");
+            total = response.getInt("total");
+            TypeToken<ArrayList<Episode>> token = new TypeToken<ArrayList<Episode>>() {};
+            ArrayList<Episode> episodes = ClarityApp.getGson().fromJson(response.getString("results"), token.getType());
+            for(Episode episode : episodes) {
+                if(episode != null && episode.isValid()) {
+                    insertIntoQueue(episode);
+                }
+            }
+            exoMediaPlayer.prepare(dynamicConcatenatingMediaSource);
+            exoMediaPlayer.setPlayWhenReady(true);
+            Log.e(TAG, episodes.toString());
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setNotification(int playbackState) {
@@ -449,29 +538,30 @@ public class PlayerService extends MediaBrowserServiceCompat {
         }
 
         @Override
+        public void onSkipToNext() {
+            Log.e(TAG, "Skipping to next track");
+            // TODO: find the right function for skipping
+            updatePlaylist();
+//            if(exoMediaPlayer.getNextWindowIndex() > 0) {
+//                updatePlaylist();
+//                exoMediaPlayer.seekTo(exoMediaPlayer.getNextWindowIndex());
+//            } else {
+//                Toast.makeText(context, "No tracks remaining", Toast.LENGTH_SHORT);
+//            }
+        }
+
+        @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras) {
             Log.d(TAG, "onPlayFromMediaId: " + mediaId + " " + extras.toString());
             try {
                 Episode episode = ClarityApp.getGson().fromJson(mediaId, Episode.class);
 
                 // Play the audio by creating a media source from the audio URL
-                String userAgent = Util.getUserAgent(context, getString(R.string.app_name));
-                DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(userAgent,
-                        null,
-                        DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
-                        DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
-                        true /* allow cross protocol redirects for feedproxy*/);
-                DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(context,
-                        null,
-                        httpDataSourceFactory);
-                ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-                MediaSource audioSource = new ExtractorMediaSource(Uri.parse(episode.getAudio()), dataSourceFactory, extractorsFactory, null, null);
-                dynamicConcatenatingMediaSource.addMediaSource(audioSource);
+                insertIntoQueue(episode);
                 if(dynamicConcatenatingMediaSource.getSize() == 1) {
                     exoMediaPlayer.prepare(dynamicConcatenatingMediaSource, false, false);
                 }
                 Log.i(TAG, "onPlayFromMediaId: mediaSource.getSize(): " + dynamicConcatenatingMediaSource.getSize());
-//                exoMediaPlayer.prepare(audioSource);
 
                 // Start playing the audio
                 exoMediaPlayer.setPlayWhenReady(true);
@@ -485,9 +575,51 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         @Override
         public void onPlayFromSearch(String query, Bundle extras) {
-            super.onPlayFromSearch(query, extras);
+            Log.i(TAG,"onPlayFromSearch: query: " + query + " extras: " + extras.toString());
+            try {
+                Channel channel = ClarityApp.getGson().fromJson(query, Channel.class);
+                ClarityApp.getRestClient(context).getFullTextSearch(channel.getGenreIds(), nextOffset, channel.getName(), 0, "episode", new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        playPlaylist(response);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        super.onSuccess(statusCode, headers, responseString);
+                    }
+                });
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
             // TODO: Play channel
         }
+
+//        @Override
+//        TODO: Figure out if this works for changing speed
+//        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+//            return super.onMediaButtonEvent(mediaButtonEvent);
+//        }
     }
 
     public String getStateChanged(int playbackState) {

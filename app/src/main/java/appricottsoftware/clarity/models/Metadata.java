@@ -1,5 +1,8 @@
 package appricottsoftware.clarity.models;
 
+import org.parceler.Parcel;
+
+@Parcel
 public class Metadata {
 
     String category;
@@ -7,6 +10,12 @@ public class Metadata {
     int score;
 
     public Metadata() { /* Empty constructor required by GSON and Parcel */ }
+
+    public Metadata(String category, int mid, int score) {
+        this.category = category;
+        this.mid = mid;
+        this.score = score;
+    }
 
     public String getCategory() {
         return category;

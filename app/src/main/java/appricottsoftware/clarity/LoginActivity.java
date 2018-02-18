@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // HTTPS GET function to authenticate user. Currently not working.
     public void authenticate(String email, String password) {
         final Activity parentActivity = this;
-        ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient(this).authenticateUser(email, password, this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);

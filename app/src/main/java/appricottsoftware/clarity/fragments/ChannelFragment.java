@@ -43,6 +43,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import butterknife.ButterKnife;
@@ -85,5 +86,10 @@ public class ChannelFragment extends Fragment {
         playerInterface.playEpisode(testEpisode);
     }
 
+    @OnClick(R.id.test_channel)
+    public void onClickTestChannel() {
+        Channel testChannel = Channel.getSampleChannel();
+        playerInterface.playChannel(testChannel);
+    }
 
 }

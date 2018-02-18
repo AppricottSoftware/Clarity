@@ -156,6 +156,8 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         setControlOnClick(activity, ibCollapsePlayPause);
         setControlOnClick(activity, ibExpandPlayPause);
         setSeekBarDrag(activity, sbExpandSeek);
+        setSkipOnClick(activity, ibCollapseSkip);
+        setSkipOnClick(activity, ibExpandSkip);
         // TODO: playback speed controls
 
     }
@@ -195,6 +197,17 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    private void setSkipOnClick(@NonNull final Activity activity, ImageButton skip) {
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "setSkipOnClick: clicked");
+                // If the user clicks the skip button, call the service to skip to the next track
+                MediaControllerCompat.getMediaController(activity).getTransportControls().skipToNext();
             }
         });
     }
