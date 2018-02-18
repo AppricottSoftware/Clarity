@@ -97,34 +97,25 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }
 
                         @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                            Log.e(TAG, "onSuccess2 : " + response.toString());
-                            super.onSuccess(statusCode, headers, response);
-                        }
-
-                        @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            Log.e(TAG, "onFailue1 : " + errorResponse.toString());
+                            try {
+                                switch(statusCode) {
+                                    case(0):
+                                        Toast.makeText(getApplicationContext(),
+                                                "Server is down. Please try later.",
+                                                Toast.LENGTH_LONG).show();
+                                        break;
+                                    default:
+                                        Log.i(TAG, "Register onFailure. Default Switch. Status Code: " + statusCode);
+                                        break;
+                                }
+                            }
+                            catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             super.onFailure(statusCode, headers, throwable, errorResponse);
                         }
 
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                            Log.e(TAG, "onFailue2 : " + errorResponse.toString());
-                            super.onFailure(statusCode, headers, throwable, errorResponse);
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                            Log.e(TAG, "onFailue3 : " + responseString.toString());
-                            super.onFailure(statusCode, headers, responseString, throwable);
-                        }
-
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                            Log.e(TAG, "onSuccess3 : " + responseString.toString());
-                            super.onSuccess(statusCode, headers, responseString);
-                        }
                     });
                 }
 
