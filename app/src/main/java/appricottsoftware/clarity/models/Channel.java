@@ -107,4 +107,17 @@ public class Channel {
         channel.setMetadata(meta);
         return channel;
     }
+
+    public static Channel getSampleChannel2() {
+        Channel channel = new Channel();
+        channel.setCid(124);
+        channel.setUid(1);
+        channel.setName("Android");
+        channel.setImage("https://cdn-images-1.medium.com/max/1200/1*_Q5d0q-_GumdWTFwXxVcuQ.jpeg");
+        ArrayList<Metadata> meta = new ArrayList<>();
+        meta.add(new Metadata("Professional", 78, 12));
+        meta.add(new Metadata("Business", 93, 10));
+        channel.setMetadata(meta);
+        return channel;
+    }
 }

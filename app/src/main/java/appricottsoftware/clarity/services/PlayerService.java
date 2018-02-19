@@ -427,9 +427,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
         exoMediaPlayer.stop();
 
         // Empty the play queue
-        while(dynamicConcatenatingMediaSource.getSize() > 0) {
-            dynamicConcatenatingMediaSource.removeMediaSource(0);
-        }
+        dynamicConcatenatingMediaSource = new DynamicConcatenatingMediaSource();
 
         // Empty the playlist
         playlist.clear();
@@ -437,7 +435,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
     private void insertIntoQueue(Episode episode) {
         // Add episode to the playlist and media source
-        Log.e(TAG, "insertIntoQueue: " + episode.toString());
         playlist.add(episode);
         dynamicConcatenatingMediaSource.addMediaSource(toAudioSource(episode));
     }

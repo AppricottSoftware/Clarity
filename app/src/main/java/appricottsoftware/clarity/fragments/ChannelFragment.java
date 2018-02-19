@@ -55,6 +55,8 @@ public class ChannelFragment extends Fragment {
 
     private PlayerInterface playerInterface;
 
+    boolean first;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -64,6 +66,8 @@ public class ChannelFragment extends Fragment {
             Log.e(TAG, context.toString() + " must implement PlayerInterface");
             throw new ClassCastException(context.toString() + " must implement PlayerInterface");
         }
+
+        first = false;
     }
 
     @Nullable
@@ -87,8 +91,15 @@ public class ChannelFragment extends Fragment {
 
     @OnClick(R.id.test_channel)
     public void onClickTestChannel() {
-        Channel testChannel = Channel.getSampleChannel();
-        playerInterface.playChannel(testChannel);
+        if(first) {
+            Channel testChannel = Channel.getSampleChannel();
+            playerInterface.playChannel(testChannel);
+            first = false;
+        } else {
+            Channel testChannel = Channel.getSampleChannel2();
+            playerInterface.playChannel(testChannel);
+            first = true;
+        }
     }
 
 }
