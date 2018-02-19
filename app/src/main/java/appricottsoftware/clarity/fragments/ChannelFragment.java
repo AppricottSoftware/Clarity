@@ -329,10 +329,12 @@ public class ChannelFragment extends Fragment {
 
         rListItems = new ArrayList<>();
 
-        RecyclerListItem item1 = new RecyclerListItem("Fake Channel 1", 1);
-        RecyclerListItem item2 = new RecyclerListItem("Fake Channel 2", 1);
-        RecyclerListItem item3 = new RecyclerListItem("Fake Channel 3", 1);
-        RecyclerListItem item4 = new RecyclerListItem("Fake Channel 4", 1);
+        // TODO: Test getChannel endpoint to populate channels for realz
+        String iURL = "https://d3sv2eduhewoas.cloudfront.net/channel/image/5f39803be9b14489a47cb6d187dfd2fe.jpeg";
+        RecyclerListItem item1 = new RecyclerListItem("Fake Channel 1", iURL);
+        RecyclerListItem item2 = new RecyclerListItem("Fake Channel 2", iURL);
+        RecyclerListItem item3 = new RecyclerListItem("Fake Channel 3", iURL);
+        RecyclerListItem item4 = new RecyclerListItem("Fake Channel 4", iURL);
         rListItems.add(item1);
         rListItems.add(item2);
         rListItems.add(item3);
@@ -354,7 +356,7 @@ public class ChannelFragment extends Fragment {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     offset = response.getInt("next_offset");
-                    //Log.e(TAG, "MY JSON SEARCH RESPONSE: " + response.toString());
+                    Log.e(TAG, "MY JSON SEARCH RESPONSE: " + response.toString());
 
                     ////createChannel(response);
 
@@ -390,6 +392,7 @@ public class ChannelFragment extends Fragment {
                 aChannel.setImage(episodes.get(i).getImage());
                 aChannel.setName(episodes.get(i).getTitle_original());
                 addChannelToSearchRecycler(aChannel);
+                Log.i(TAG, "IMAGEURLS: " + episodes.get(i).getImage());
             }
 
 
@@ -427,23 +430,21 @@ public class ChannelFragment extends Fragment {
     }
 
     private void addChannelToSearchRecycler(Channel aChannel) {
-        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), 1);
+        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), aChannel.getImage());
 
         rListItemsSearch.add(APIresult);
 
         rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext(), false);
         channelRecycler.setAdapter(rAdapterSearch);
-
     }
 
     private void addChannelToRecycler(Channel aChannel) {
-        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), 1);
-
-        rListItems.add(APIresult);
-
-        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
-        channelRecycler.setAdapter(rAdapter);
-
+//        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), 1);
+//
+//        rListItems.add(APIresult);
+//
+//        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
+//        channelRecycler.setAdapter(rAdapter);
     }
 
 

@@ -5,19 +5,19 @@ import android.media.Image;
 
 public class RecyclerListItem {
 
-    public RecyclerListItem(String title, int imageURL) {
+    public RecyclerListItem(String title, String imageURL) {
         this.title = title;
         this.imageURL = imageURL;
     }
 
     private String title;
-    private int imageURL;
+    private String imageURL;
 
     public String getTitle() {
         return title;
     }
 
-    public int getImage() {
+    public String getImage() {
         return imageURL;
     }
 

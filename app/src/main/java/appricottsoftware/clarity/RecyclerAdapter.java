@@ -2,14 +2,22 @@ package appricottsoftware.clarity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 
@@ -32,6 +40,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
         View theView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.single_recycle_view_item, parent, false);
         return new CustomViewHolder(theView);
+
     }
 
     @Override
@@ -39,7 +48,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
         RecyclerListItem recyclerListItem = recyclerList_ItemList.get(position);
 
         holder.textViewTitle.setText(recyclerListItem.getTitle());
-        //holder.ImageViewAlbum.setImageResource(recyclerListItem.getAlbum());
+        Glide.with(theContext).load(recyclerListItem.getImage()).into(holder.ImageViewAlbum);
 
         holder.itemView.setBackgroundColor(selected_position == position ? Color.LTGRAY : Color.TRANSPARENT);
     }
@@ -51,7 +60,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        //public ImageView ImageViewAlbum;
+        public ImageView ImageViewAlbum;
         public TextView textViewTitle;
 
         public CustomViewHolder(View itemView) {
@@ -59,7 +68,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
             itemView.setOnClickListener(this);
 
             textViewTitle = itemView.findViewById(R.id.textView_title);
-            //ImageViewAlbum = itemView.findViewById(R.id.imageView_album);
+            ImageViewAlbum = itemView.findViewById(R.id.imageView_album);
 
         }
 
@@ -74,9 +83,13 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
             if (isChannelView){
                 Toast.makeText(view.getContext(),"You are in CHANNEL View", Toast.LENGTH_SHORT).show();
+
+                //TODO pass channel to Player fragment
             }
             else{
                 Toast.makeText(view.getContext(),"You are in SEARCH View", Toast.LENGTH_SHORT).show();
+
+
             }
 
 
