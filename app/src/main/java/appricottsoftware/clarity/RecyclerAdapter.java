@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import appricottsoftware.clarity.models.Channel;
+import appricottsoftware.clarity.models.Episode;
+import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.sync.ClarityApp;
 import cz.msebera.android.httpclient.Header;
 
@@ -36,6 +39,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
     private boolean isChannelView;
 
     int selected_position = 0;
+
+    private PlayerInterface playerInterface;
 
     public RecyclerAdapter(List<RecyclerListItem> recyclerList_ItemList, Context theContext, boolean isChannelView) {
         this.recyclerList_ItemList = recyclerList_ItemList;
@@ -87,9 +92,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
             notifyItemChanged(selected_position);
 
             if (isChannelView){
-                Toast.makeText(view.getContext(),"You are in CHANNEL View", Toast.LENGTH_SHORT).show();
 
-                //TODO pass channel to Player fragment
+                if(view.getContext() instanceof PlayerInterface) {
+                    playerInterface = (PlayerInterface) view.getContext();
+                } else {
+                    Log.e(TAG, view.getContext().toString() + " must implement PlayerInterface");
+                    throw new ClassCastException(view.getContext().toString() + " must implement PlayerInterface");
+                }
+
+                //Channel epToPlay = recyclerList_ItemList.get(selected_position).getClass();
+
+                Episode testEpisode = Episode.getSampleEpisode();
+                playerInterface.playEpisode(testEpisode);
             }
             else{
                 Toast.makeText(view.getContext(),"CHANNEL ADDED TO DATABASE AND CHANNEL LIST", Toast.LENGTH_SHORT).show();

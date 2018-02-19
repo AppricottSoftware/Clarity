@@ -84,10 +84,8 @@ public class ChannelFragment extends Fragment {
 
     int offset = 0;
 
-
     // To set - query to see if channels exist for user.
     boolean seeSurvey = false;
-
 
     private static final String TAG = "ChannelFragment";
 
@@ -114,6 +112,7 @@ public class ChannelFragment extends Fragment {
 
         //View view;
 
+        // TODO: decide on usefulness and form of survey
 //        if (seeSurvey) {
 //
 //            channelButtonCardView.setVisibility(View.INVISIBLE);
@@ -169,7 +168,6 @@ public class ChannelFragment extends Fragment {
             createChannelsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //Toast.makeText(getActivity(), "create channel clicked", Toast.LENGTH_SHORT).show();
 
                     gotoCreateChannel();
 
@@ -190,54 +188,10 @@ public class ChannelFragment extends Fragment {
 
                             searchAPI(searchKeyword);
 
-//                            searchResults = new ArrayList<>();
-//
-//                            RecyclerListItem searchItem1 = new RecyclerListItem("Fake Search Result 1", 1);
-//                            RecyclerListItem searchItem2 = new RecyclerListItem("Fake Search Result 2", 1);
-//
-//                            searchResults.add(searchItem1);
-//                            searchResults.add(searchItem2);
-//
-//                            rAdapterSearch = new RecyclerAdapter(searchResults, getContext());
-//                            channelRecycler.setAdapter(rAdapterSearch);
-
                             goToSearchResults();
 
                         }
                     });
-
-                        //ADD CHANNEL TO DATABASE
-//                    int uid = 1;
-//                    String name = "testChannelTitle";
-//
-//                    ClarityApp.getRestClient().createChannel(uid, name, getActivity(), new JsonHttpResponseHandler() {
-//                        @Override
-//                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-//                            Log.e(TAG, "onSuccess1 : " + response.toString() );
-//                            super.onSuccess(statusCode, headers, response);
-//                        }
-//
-//                        @Override
-//                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//                            try {
-//                                switch(statusCode) {
-//                                    case(0):
-//                                        Toast.makeText(getContext(),
-//                                                "Server is down. Please try later.",
-//                                                Toast.LENGTH_LONG).show();
-//                                        break;
-//                                    default:
-//                                        Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
-//                                        break;
-//                                }
-//                            }
-//                            catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                            super.onFailure(statusCode, headers, throwable, errorResponse);
-//                        }
-//
-//                    });
 
                 }
             });
@@ -356,9 +310,6 @@ public class ChannelFragment extends Fragment {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     offset = response.getInt("next_offset");
-                    //Log.e(TAG, "MY JSON SEARCH RESPONSE: " + response.toString());
-
-                    ////createChannel(response);
 
                     createSearchResult(response);
 
@@ -371,7 +322,7 @@ public class ChannelFragment extends Fragment {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 throwable.printStackTrace();
-                //should gracefully fail
+                // TODO: how to fail?
             }
         });
     }
@@ -379,7 +330,7 @@ public class ChannelFragment extends Fragment {
     private void createSearchResult(JSONObject response) {
 
         Channel aChannel = new Channel();
-        ArrayList<Episode> episodes = new ArrayList<Episode>();
+        ArrayList<Episode> episodes = new ArrayList<>();
 
         try {
             JSONArray resp = response.getJSONArray("results");
@@ -401,32 +352,29 @@ public class ChannelFragment extends Fragment {
 
     }
 
-
-    private void createChannel(JSONObject response) {
-
-        Channel aChannel = new Channel();
-        ArrayList<Episode> episodes = new ArrayList<Episode>();
-
-        try {
-            JSONArray resp = response.getJSONArray("results");
-
-            for (int i = 0; i < 1 && i < resp.length(); i++) {
-                Episode e = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Episode.class);
-                episodes.add(e);
-
-            }
-
-            aChannel.setImage(episodes.get(0).getImage());
-            aChannel.setName(episodes.get(0).getTitle_original());
-
-            addChannelToRecycler(aChannel);
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
+    // TODO: does this need to be separate from serach create?
+//    private void createChannel(JSONObject response) {
+//
+//        Channel aChannel = new Channel();
+//        ArrayList<Episode> episodes = new ArrayList<Episode>();
+//
+//        try {
+//            JSONArray resp = response.getJSONArray("results");
+//
+//            for (int i = 0; i < 1 && i < resp.length(); i++) {
+//                Episode e = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Episode.class);
+//                episodes.add(e);
+//
+//            }
+//            aChannel.setImage(episodes.get(0).getImage());
+//            aChannel.setName(episodes.get(0).getTitle_original());
+//
+//            addChannelToRecycler(aChannel);
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private void addChannelToSearchRecycler(Channel aChannel) {
         RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), aChannel.getImage());
@@ -437,23 +385,16 @@ public class ChannelFragment extends Fragment {
         channelRecycler.setAdapter(rAdapterSearch);
     }
 
-    private void addChannelToRecycler(Channel aChannel) {
+    // TODO: does this need to be separate from search recycler?
+//    private void addChannelToRecycler(Channel aChannel) {
+//
 //        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), 1);
 //
 //        rListItems.add(APIresult);
 //
 //        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
 //        channelRecycler.setAdapter(rAdapter);
-    }
-
-
-
-//    @OnClick(R.id.test_music)
-//    public void onClickTestMusic() {
-//        Episode testEpisode = Episode.getSampleEpisode();
-//        playerInterface.playEpisode(testEpisode);
 //    }
-
 
 }
 
