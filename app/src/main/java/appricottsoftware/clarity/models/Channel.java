@@ -1,8 +1,10 @@
 package appricottsoftware.clarity.models;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import appricottsoftware.clarity.sync.ClarityApp;
 
@@ -61,13 +63,34 @@ public class Channel {
         return ClarityApp.getGson().toJson(this);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+
+        if(!(obj instanceof Channel)) {
+            return false;
+        }
+
+        Channel c = (Channel) obj;
+        int comMetadataSize = CollectionUtils.retainAll(metadata, c.getMetadata()).size();
+
+        return cid == c.cid
+                && uid == c.uid
+                && name.equals(c.name)
+                && image.equals(c.image)
+                && comMetadataSize == metadata.size()
+                && comMetadataSize == c.getMetadata().size();
+    }
+
     public String getGenreIds() {
         String genre_ids = "";
         for(Metadata m : metadata) {
             genre_ids += m.getMid() + ", ";
         }
         if(genre_ids.length() > 2) {
-            genre_ids = genre_ids.substring(0, genre_ids.length() - 2);
+            genre_ids = genre_ids.substring(0, genre_ids.lastIndexOf(','));
         }
         return genre_ids;
     }

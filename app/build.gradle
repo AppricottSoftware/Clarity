@@ -46,6 +46,7 @@ dependencies {
         exclude group: "com.android.support"
     }
     implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation 'org.apache.commons:commons-collections4:4.1'
     implementation('com.facebook.android:facebook-android-sdk:4.29.0') {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.android.support', module: 'appcompat-v7'

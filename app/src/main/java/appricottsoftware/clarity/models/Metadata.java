@@ -40,4 +40,20 @@ public class Metadata {
     public void setScore(int score) {
         this.score = score;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+
+        if(!(obj instanceof Metadata)) {
+            return false;
+        }
+
+        Metadata m = (Metadata) obj;
+        return category.equals(m.category)
+                && mid == m.mid
+                && score == m.score;
+    }
 }

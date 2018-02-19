@@ -76,6 +76,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private static final String EMPTY_MEDIA_ROOT_ID = "empty_root_id";
     private static final String NOTIFICATION_CHANNEL_ID = "clarity_channel_id";
     private static final int NOTIFICATION_ID = 1;
+    private static final int PREFETCH_CONSTANT = 5;
 
     private AudioManager.OnAudioFocusChangeListener afChangeListener;
     private PlaybackReceiver playbackReceiver;
@@ -95,21 +96,19 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
     private Queue<Episode> playlist; // Playlist to keep track of where we are in the playback
     private int nextOffset; // Next page of Podcast API results
-    private int total;
-    private HashMap<Episode, MediaSource> elements;
-    private String currentQuery;
+    private int total; // Total Podcast API results for currentQuery
+    private Channel currentChannel; // Current channel
 
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
         intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-
-        nextOffset = 0;
-        total = 0;
+        
+        // Reset the state of the playlist
         playlist = new LinkedList<>();
-        currentQuery = "";
-
+        resetCounters();
+        
         // Acquire a lock so CPU stays on even when screen is locked
         wakeLock = ((PowerManager) context.getSystemService(Context.POWER_SERVICE))
                 .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getString(R.string.player_service_wake_lock));
@@ -158,14 +157,14 @@ public class PlayerService extends MediaBrowserServiceCompat {
                         .setBufferedPosition(exoMediaPlayer.getDuration())
                         .setState(PlaybackStateCompat.STATE_PLAYING, exoMediaPlayer.getCurrentPosition(), 1.0f, exoMediaPlayer.getDuration());
                 mediaSession.setPlaybackState(stateBuilder.build());
-                Log.i(TAG, "playbackStateRunnable: currentPosition: " + exoMediaPlayer.getCurrentPosition() / 1000 + " duration: " + exoMediaPlayer.getDuration() / 1000);
+                Log.v(TAG, "playbackStateRunnable: currentPosition: " + exoMediaPlayer.getCurrentPosition() / 1000 + " duration: " + exoMediaPlayer.getDuration() / 1000);
                 playbackStateHandler.postDelayed(this, 1000);
             }
         };
+        
+        dynamicConcatenatingMediaSource = new DynamicConcatenatingMediaSource();
 
         // TODO: Attach the media player to the media session
-        dynamicConcatenatingMediaSource = new DynamicConcatenatingMediaSource();
-//        exoMediaPlayer.prepare(dynamicConcatenatingMediaSource, false, false);
         // MediaSessionConnector mediaSessionConnector= new MediaSessionConnector(mediaSession);
         // mediaSessionConnector.setPlayer(exoMediaPlayer, null, null);
     }
@@ -220,15 +219,14 @@ public class PlayerService extends MediaBrowserServiceCompat {
     }
 
     private long getAvailableActions() {
+        // Get the actions the media session can handle at the moment
         long actions = PlaybackStateCompat.ACTION_PLAY_PAUSE
                 | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
                 | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
                 | PlaybackStateCompat.ACTION_SKIP_TO_NEXT;
         if(exoMediaPlayer.getPlaybackState() == PlaybackStateCompat.STATE_PLAYING) {
-            Log.d(TAG, "getAvailableActions: mediaPlayer isPlaying()");
             actions |= PlaybackStateCompat.ACTION_PAUSE;
         } else {
-            Log.d(TAG, "getAvailableActions: mediaPlayer !isPlaying()");
             actions |= PlaybackStateCompat.ACTION_PLAY;
         }
         return actions;
@@ -238,28 +236,28 @@ public class PlayerService extends MediaBrowserServiceCompat {
         exoMediaPlayer = ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(this), new DefaultTrackSelector(), new DefaultLoadControl());
         exoMediaPlayer.addListener(new Player.EventListener() {
             @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-                Log.i(TAG, "onTracksChanged: trackGroups:" + trackGroups.toString() + " trackSelections: " + trackSelections.toString());
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) { 
+                Log.v(TAG, "onTracksChanged: trackGroups:" + trackGroups.toString() + " trackSelections: " + trackSelections.toString()); 
             }
 
             @Override
-            public void onLoadingChanged(boolean isLoading) {
-                Log.i(TAG, "onLoadingChanged: isLoading: " + isLoading);
+            public void onLoadingChanged(boolean isLoading) { 
+                Log.v(TAG, "onLoadingChanged: isLoading: " + isLoading); 
             }
 
             @Override
-            public void onPlayerError(ExoPlaybackException error) {
-                Log.e(TAG, "onPlayerError: " + error.toString());
+            public void onPlayerError(ExoPlaybackException error) { 
+                Log.v(TAG, "onPlayerError: " + error.toString());
             }
 
             @Override
             public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-                Log.i(TAG, "onPlaybackParametersChanged: " + playbackParameters.toString());
+                Log.v(TAG, "onPlaybackParametersChanged: " + playbackParameters.toString());
             }
 
             @Override
             public void onSeekProcessed() {
-                Log.d(TAG, "onSeekProcessed");
+                Log.v(TAG, "onSeekProcessed");
             }
 
             @Override
@@ -267,31 +265,28 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 String r = "";
                 switch(reason) {
                     case Player.DISCONTINUITY_REASON_PERIOD_TRANSITION:
+                        // The next element in the playlist has started playing
                         updatePlaylist();
-                        r = "0: DISCONTINUITY_REASON_PERIOD_TRANSITION"; break;
+                        r = "0: DISCONTINUITY_REASON_PERIOD_TRANSITION"; 
+                        break;
                     case Player.DISCONTINUITY_REASON_SEEK:
-                        r = "1: DISCONTINUITY_REASON_SEEK"; break;
+                        r = "1: DISCONTINUITY_REASON_SEEK"; 
+                        break;
                     case Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT:
-                        r = "2: DISCONTINUITY_REASON_SEEK_ADJUSTMENT"; break;
+                        r = "2: DISCONTINUITY_REASON_SEEK_ADJUSTMENT"; 
+                        break;
                     case Player.DISCONTINUITY_REASON_INTERNAL:
-                        r = "3: DISCONTINUITY_REASON_INTERNAL"; break;
+                        r = "3: DISCONTINUITY_REASON_INTERNAL"; 
+                        break;
                     default:
-                        r = " NO REASON DETECTED";
+                        r = "NO REASON DETECTED";
+                        break;
                 }
-                Log.i(TAG, "onPositionDiscontinuity: " + r);
-
-
-                // TODO: Signal next element in playlist started
-//                updatePlaylist();
-                /*
-                    Called when a position discontinuity occurs without a change to the timeline. A position discontinuity occurs when the current window or period index changes (as a result of playback transitioning from one period in the timeline to the next), or when the playback position jumps within the period currently being played (as a result of a seek being performed, or when the source introduces a discontinuity internally).
-                    When a position discontinuity occurs as a result of a change to the timeline this method is not called. onTimelineChanged(Timeline, Object) is called in this case.
-                 */
+                Log.v(TAG, "onPositionDiscontinuity: " + r);
             }
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                Log.d(TAG, "onPlayerStateChanged: playWhenReady: " + playWhenReady + " playbackState: " + getStateChanged(playbackState));
                 // Push the state to the media session when the audio starts or stops playing
                 if(playWhenReady && playbackState == PlaybackStateCompat.STATE_PLAYING) {
                     playbackStateHandler.post(playbackStateRunnable);
@@ -304,24 +299,25 @@ public class PlayerService extends MediaBrowserServiceCompat {
                                     exoMediaPlayer.getCurrentPosition(),
                                     1.0f,
                                     exoMediaPlayer.getDuration());
-                    Log.i(TAG, "onPlayerStateChanged: NOT PLAYING currentPosition: "  + exoMediaPlayer.getCurrentPosition() / 1000 + " duration: " + exoMediaPlayer.getDuration() / 1000);
                     mediaSession.setPlaybackState(stateBuilder.build());
+                    Log.v(TAG, "onPlayerStateChanged: NOT PLAYING currentPosition: "  + exoMediaPlayer.getCurrentPosition() / 1000 + " duration: " + exoMediaPlayer.getDuration() / 1000);
                 }
+                
                 // TODO: Set the notification
-//                setNotification(playbackState);
+                // setNotification(playbackState);
             }
 
             @Override
             public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-                Log.i(TAG, "onShuffleModeEnabledChanged: " + shuffleModeEnabled);
+                Log.v(TAG, "onShuffleModeEnabledChanged: " + shuffleModeEnabled);
             }
 
             @Override
             public void onTimelineChanged(Timeline timeline, Object manifest) {
                 if(timeline != null && manifest != null) {
-                    Log.i(TAG, "onTimelineChanged: timeline: " + timeline.toString() + " manifest: " + manifest.toString());
+                    Log.v(TAG, "onTimelineChanged: timeline: " + timeline.toString() + " manifest: " + manifest.toString());
                 } else {
-                    Log.i(TAG, "onTimelineChanged");
+                    Log.v(TAG, "onTimelineChanged");
                 }
             }
 
@@ -338,40 +334,56 @@ public class PlayerService extends MediaBrowserServiceCompat {
                     default:
                         r = "NO REPEATMODE DETECTED";
                 }
-                Log.i(TAG, "onRepeatModeChanged: " + r);
+                Log.v(TAG, "onRepeatModeChanged: " + r);
             }
         });
     }
 
     private void updatePlaylist() {
-        if(dynamicConcatenatingMediaSource.getSize() > 1 && playlist.size() > 1) {
+        if(dynamicConcatenatingMediaSource.getSize() > 1
+                && playlist.size() > 1) {
+            // If there are items left in the playlist, pop and move to the next item
             dynamicConcatenatingMediaSource.removeMediaSource(0);
             playlist.remove();
             mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
-            Log.i(TAG, "updatePlaylist: " + dynamicConcatenatingMediaSource.getSize() + " " + playlist.size());
         }
+
+        // Prefetch the next page of results
+        playChannel(currentChannel);
     }
 
-    private void playChannel(String query) {
-        if(!query.equals(currentQuery)) {
-            currentQuery = query;
-            total = 0;
-            nextOffset = 0;
+    private void playChannel(Channel channel) {
+        // If the query is new, reset and load the new query
+        if(currentChannel == null
+            || !channel.equals(currentChannel)) {
+            currentChannel = channel;
+            resetCounters();
             clearQueue();
         }
-        // TODO: make prefetching constant = 5
-        if(dynamicConcatenatingMediaSource.getSize() < 5 && playlist.size() < 5) {
+
+        // If the playlist is running low, fetch the next page if it exists
+        if(dynamicConcatenatingMediaSource.getSize() < PREFETCH_CONSTANT
+            && playlist.size() < PREFETCH_CONSTANT
+            && nextOffset < total) {
             try {
-                Channel channel = ClarityApp.getGson().fromJson(currentQuery, Channel.class);
-                ClarityApp.getRestClient(context).getFullTextSearch(channel.getGenreIds(), nextOffset, channel.getName(), 0, "episode", new JsonHttpResponseHandler() {
+                // Fetch the next page of results from this channel
+                ClarityApp.getRestClient(context)
+                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getName(), 0, "episode", new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        // Add the response to the playlist
+                        Log.e(TAG, response.toString());
                         playPlaylist(response);
                     }
 
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                         super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        super.onSuccess(statusCode, headers, responseString);
                     }
 
                     @Override
@@ -387,11 +399,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                         super.onFailure(statusCode, headers, responseString, throwable);
-                    }
-
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                        super.onSuccess(statusCode, headers, responseString);
                     }
                 });
             } catch(Exception e) {
@@ -416,7 +423,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
     }
 
     private void clearQueue() {
+        // Stop the media player
         exoMediaPlayer.stop();
+
         // Empty the play queue
         while(dynamicConcatenatingMediaSource.getSize() > 0) {
             dynamicConcatenatingMediaSource.removeMediaSource(0);
@@ -427,28 +436,42 @@ public class PlayerService extends MediaBrowserServiceCompat {
     }
 
     private void insertIntoQueue(Episode episode) {
+        // Add episode to the playlist and media source
         playlist.add(episode);
         dynamicConcatenatingMediaSource.addMediaSource(toAudioSource(episode));
     }
 
+    private void resetCounters() {
+        // Reset Podcast API parameters
+        nextOffset = -1;
+        total = 0;
+    }
+
     private void playPlaylist(JSONObject response) {
         try {
+            // Save the next offset and total
             nextOffset = response.getInt("next_offset");
             total = response.getInt("total");
+
+            // Convert the response into Episodes
             TypeToken<ArrayList<Episode>> token = new TypeToken<ArrayList<Episode>>() {};
             ArrayList<Episode> episodes = ClarityApp.getGson().fromJson(response.getString("results"), token.getType());
+
             int prevPlaylistSize = dynamicConcatenatingMediaSource.getSize();
+
+            // Load the episodes into the playlist
             for(Episode episode : episodes) {
                 if(episode != null && episode.isValid()) {
                     insertIntoQueue(episode);
                 }
             }
+
             if(prevPlaylistSize < 1) {
                 exoMediaPlayer.prepare(dynamicConcatenatingMediaSource);
                 exoMediaPlayer.setPlayWhenReady(true);
+                mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
             }
-            mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
-            Log.e(TAG, episodes.toString());
+
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -512,7 +535,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
         }
     }
 
-    // TODO: Decouple from PlayerService
     public class PlayerCallback extends MediaSessionCompat.Callback {
 
         public PlayerCallback() {
@@ -544,14 +566,14 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         @Override
         public void onPlay() {
-            Log.d(TAG, "onPlay");
+            Log.v(TAG, "onPlay");
             // Start the player
             exoMediaPlayer.setPlayWhenReady(true);
         }
 
         @Override
         public void onPause() {
-            Log.d(TAG, "onPause");
+            Log.v(TAG, "onPause");
             // Pause the player
             exoMediaPlayer.setPlayWhenReady(false);
         }
@@ -581,26 +603,19 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         @Override
         public void onSeekTo(long pos) {
-            Log.d(TAG, "Seeking to " + pos);
+            Log.v(TAG, "onSeekTo: " + pos);
             exoMediaPlayer.seekTo(pos);
         }
 
         @Override
         public void onSkipToNext() {
-            Log.e(TAG, "Skipping to next track");
-            // TODO: find the right function for skipping
+            Log.v(TAG, "onSkipToNext");
             updatePlaylist();
-//            if(exoMediaPlayer.getNextWindowIndex() > 0) {
-//                updatePlaylist();
-//                exoMediaPlayer.seekTo(exoMediaPlayer.getNextWindowIndex());
-//            } else {
-//                Toast.makeText(context, "No tracks remaining", Toast.LENGTH_SHORT);
-//            }
         }
 
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras) {
-            Log.d(TAG, "onPlayFromMediaId: " + mediaId + " " + extras.toString());
+            Log.v(TAG, "onPlayFromMediaId: " + mediaId + " " + extras.toString());
             try {
                 Episode episode = ClarityApp.getGson().fromJson(mediaId, Episode.class);
 
@@ -609,7 +624,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 if(dynamicConcatenatingMediaSource.getSize() == 1) {
                     exoMediaPlayer.prepare(dynamicConcatenatingMediaSource, false, false);
                 }
-                Log.i(TAG, "onPlayFromMediaId: mediaSource.getSize(): " + dynamicConcatenatingMediaSource.getSize());
 
                 // Start playing the audio
                 exoMediaPlayer.setPlayWhenReady(true);
@@ -623,17 +637,18 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         @Override
         public void onPlayFromSearch(String query, Bundle extras) {
-            Log.i(TAG,"onPlayFromSearch: query: " + query + " extras: " + extras.toString());
-            playChannel(query);
-
-            // TODO: Play channel
+            Log.v(TAG,"onPlayFromSearch: query: " + query + " extras: " + extras.toString());
+            Channel channel = ClarityApp.getGson().fromJson(query, Channel.class);
+            playChannel(channel);
         }
 
-//        @Override
-//        TODO: Figure out if this works for changing speed
-//        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-//            return super.onMediaButtonEvent(mediaButtonEvent);
-//        }
+        /*
+        @Override
+        TODO: Figure out if this works for changing speed
+        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            return super.onMediaButtonEvent(mediaButtonEvent);
+        }
+        */
     }
 
     public String getStateChanged(int playbackState) {

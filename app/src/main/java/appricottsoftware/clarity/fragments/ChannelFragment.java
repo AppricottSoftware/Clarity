@@ -55,7 +55,6 @@ public class ChannelFragment extends Fragment {
 
     private PlayerInterface playerInterface;
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
