@@ -1,9 +1,6 @@
-package appricottsoftware.clarity;
+package appricottsoftware.clarity.adapters;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,11 +16,9 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
-import appricottsoftware.clarity.models.Channel;
+import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.sync.ClarityApp;
@@ -112,10 +107,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                 String title = recyclerList_ItemList.get(selected_position).getTitle();
                 String imageURL = recyclerList_ItemList.get(selected_position).getImage();
 
+                // TODO: re-add onSuccess and on Failure methods to be handled in future.
                 ClarityApp.getRestClient().createChannel(uid, title, imageURL, view.getContext(), new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        Log.e(TAG, "onSuccess1 : " + response.toString() );
                         super.onSuccess(statusCode, headers, response);
                     }
 

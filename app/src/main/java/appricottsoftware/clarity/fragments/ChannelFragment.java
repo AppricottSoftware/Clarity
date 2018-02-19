@@ -1,7 +1,6 @@
 package appricottsoftware.clarity.fragments;
 
 import android.content.Context;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
@@ -31,15 +30,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import appricottsoftware.clarity.R;
-import appricottsoftware.clarity.RecyclerAdapter;
-import appricottsoftware.clarity.RecyclerListItem;
+import appricottsoftware.clarity.adapters.RecyclerAdapter;
+import appricottsoftware.clarity.adapters.RecyclerListItem;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import cz.msebera.android.httpclient.Header;
 
 import static appricottsoftware.clarity.sync.ClarityApp.getGson;
@@ -150,16 +148,11 @@ public class ChannelFragment extends Fragment {
 
         goToChannelList();
 
-
         backImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 rListItems = new ArrayList<>();
                 goToChannelList();
-
-
-
-
             }
         });
 
@@ -352,6 +345,7 @@ public class ChannelFragment extends Fragment {
 
     }
 
+    // TODO: currently hard coded search with "episode" type. May need to be changed eventually.
     private void searchAPI(String query) {
         ClarityApp.getRestClient().getFullTextSearch(offset, query, 0, "episode", getActivity(), new JsonHttpResponseHandler() {
             @Override
@@ -393,7 +387,6 @@ public class ChannelFragment extends Fragment {
                 aChannel.setName(episodes.get(i).getTitle_original());
                 addChannelToSearchRecycler(aChannel);
             }
-
 
         } catch (JSONException e) {
             e.printStackTrace();

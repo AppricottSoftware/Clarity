@@ -163,9 +163,9 @@ public class ClarityClient {
 
         JSONObject jsonParams = new JSONObject();
 
+        // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in serach so it may be added to db.
         JSONObject aMetadata = new JSONObject();
         JSONObject bMetadata = new JSONObject();
-
         try {
             aMetadata.put("genre", "politics");
             aMetadata.put("mid", 123);

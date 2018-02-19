@@ -1,4 +1,4 @@
-package appricottsoftware.clarity;
+package appricottsoftware.clarity.adapters;
 
 import android.media.Image;
 
