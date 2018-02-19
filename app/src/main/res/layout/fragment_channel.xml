@@ -7,10 +7,58 @@
     android:background="@android:color/white">
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout_Header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/textView_CreateChannel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:padding="8dp"
+            android:text="@string/create"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:visibility="visible"
+            app:layout_constraintStart_toEndOf="@+id/imageButton_back"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView_SearchResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:padding="8dp"
+            android:text="@string/search_result"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:visibility="visible"
+            app:layout_constraintStart_toEndOf="@+id/imageButton_back"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/imageButton_back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="42dp"
+            android:layout_marginTop="28dp"
+            android:background="@android:color/white"
+            android:contentDescription="@string/description"
+            android:scaleType="fitXY"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/back_icon" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/constraintLayout_search"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -18,38 +66,23 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0">
 
-        <TextView
-            android:id="@+id/textView_createChannel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/create"
-            android:textAlignment="center"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <EditText
             android:id="@+id/editText_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="168dp"
             android:ems="10"
             android:hint="@string/search_keyword"
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView_createChannel" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView_searchText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="224dp"
-            android:layout_marginTop="8dp"
             android:text="@string/search"
             android:textSize="32sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -62,7 +95,7 @@
             android:id="@+id/imageButton_serachIcon"
             android:layout_width="112dp"
             android:layout_height="112dp"
-            android:layout_marginTop="64dp"
+            android:layout_marginTop="56dp"
             android:background="@android:color/white"
             android:contentDescription="@string/description"
             android:scaleType="centerCrop"
@@ -79,12 +112,13 @@
         android:id="@+id/cardView_ChannelButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="4dp">
+            android:layout_margin="4dp"
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/imageView_create"
@@ -127,6 +161,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="56dp"
+        android:layout_marginTop="16dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

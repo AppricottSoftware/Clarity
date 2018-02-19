@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -54,10 +55,18 @@ public class ChannelFragment extends Fragment {
     @BindView(R.id.constraintLayout_search)
     ConstraintLayout searchConstraintLayout;
 
+    @BindView(R.id.textView_CreateChannel)
+    TextView createChannelTextView;
+    @BindView(R.id.textView_SearchResult)
+    TextView searchResultTextView;
     @BindView(R.id.editText_search)
     EditText searchEditText;
     @BindView(R.id.imageButton_serachIcon)
     ImageButton searchIconImageButton;
+    @BindView(R.id.imageButton_back)
+    ImageButton backImageButton;
+    @BindView(R.id.constraintLayout_Header)
+    ConstraintLayout headerConstraintLayout;
 
     @BindView(R.id.toggleButton_cat1)
     ToggleButton btCat1;
@@ -70,8 +79,11 @@ public class ChannelFragment extends Fragment {
     private RecyclerView.Adapter rAdapter;
     private List<RecyclerListItem> rListItems;
 
+    private RecyclerView.Adapter rAdapterSearch;
+    private List<RecyclerListItem> rListItemsSearch;
+
     int offset = 0;
-    String query = "starwars";
+
 
     // To set - query to see if channels exist for user.
     boolean seeSurvey = false;
@@ -102,44 +114,31 @@ public class ChannelFragment extends Fragment {
 
         //View view;
 
-        if (seeSurvey) {
+//        if (seeSurvey) {
+//
+//            channelButtonCardView.setVisibility(View.INVISIBLE);
+//            channelRecycler.setVisibility(View.INVISIBLE);
+//            searchConstraintLayout.setVisibility(View.INVISIBLE);
+//            surveyConstraintLayout.setVisibility(View.VISIBLE);
+//
+//        }
+//        else {
 
-            channelButtonCardView.setVisibility(View.INVISIBLE);
-            channelRecycler.setVisibility(View.INVISIBLE);
-            searchConstraintLayout.setVisibility(View.INVISIBLE);
-            surveyConstraintLayout.setVisibility(View.VISIBLE);
+//        }
 
-        }
-        else {
+        channelRecycler.setHasFixedSize(true);
+        channelRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            channelButtonCardView.setVisibility(View.VISIBLE);
-            channelRecycler.setVisibility(View.VISIBLE);
-            surveyConstraintLayout.setVisibility(View.INVISIBLE);
-            searchConstraintLayout.setVisibility(View.INVISIBLE);
+        rListItems = new ArrayList<>();
+        rListItemsSearch = new ArrayList<>();
 
-            ButterKnife.bind(this, view);
+        rAdapter = new RecyclerAdapter(rListItems, getContext());
+        channelRecycler.setAdapter(rAdapter);
 
-            channelRecycler.setHasFixedSize(true);
-            channelRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            rListItems = new ArrayList<>();
-
-            RecyclerListItem item1 = new RecyclerListItem("Fake Channel 1", 1);
-            RecyclerListItem item2 = new RecyclerListItem("Fake Channel 2", 1);
-            RecyclerListItem item3 = new RecyclerListItem("Fake Channel 3", 1);
-            RecyclerListItem item4 = new RecyclerListItem("Fake Channel 4", 1);
-            rListItems.add(item1);
-            rListItems.add(item2);
-            rListItems.add(item3);
-            rListItems.add(item4);
-
-            rAdapter = new RecyclerAdapter(rListItems, getContext());
-            channelRecycler.setAdapter(rAdapter);
-
-        }
-
-          return view;
+        return view;
     }
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -147,68 +146,94 @@ public class ChannelFragment extends Fragment {
 
         Button createChannelsButton = view.findViewById(R.id.button_createChannel);
 
+        channelRecycler.setHasFixedSize(true);
+        channelRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        goToChannelList();
+
+
+        backImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rListItems = new ArrayList<>();
+                goToChannelList();
+            }
+        });
+
 
         if (!seeSurvey) {
             createChannelsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(getActivity(), "create channel clicked", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "create channel clicked", Toast.LENGTH_SHORT).show();
 
-                    channelButtonCardView.setVisibility(View.INVISIBLE);
-                    channelRecycler.setVisibility(View.INVISIBLE);
-                    searchConstraintLayout.setVisibility(View.VISIBLE);
+                    gotoCreateChannel();
 
                     searchIconImageButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+
+                            rListItemsSearch = new ArrayList<>();
+                            rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext());
+                            channelRecycler.setAdapter(rAdapterSearch);
+
                             String searchKeyword = searchEditText.getText().toString();
+
+                            if (searchKeyword.length() == 0){
+                                Toast.makeText(getContext(), "Please enter a topic to search", Toast.LENGTH_LONG).show();
+                                return;
+                            }
 
                             searchAPI(searchKeyword);
 
-                            
+//                            searchResults = new ArrayList<>();
+//
+//                            RecyclerListItem searchItem1 = new RecyclerListItem("Fake Search Result 1", 1);
+//                            RecyclerListItem searchItem2 = new RecyclerListItem("Fake Search Result 2", 1);
+//
+//                            searchResults.add(searchItem1);
+//                            searchResults.add(searchItem2);
+//
+//                            rAdapterSearch = new RecyclerAdapter(searchResults, getContext());
+//                            channelRecycler.setAdapter(rAdapterSearch);
+
+                            goToSearchResults();
+
                         }
                     });
 
-                    int uid = 1;
-                    String name = "testChannelTitle";
-
-                    ClarityApp.getRestClient().createChannel(uid, name, getActivity(), new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            Log.e(TAG, "onSuccess1 : " + response.toString() );
-                            super.onSuccess(statusCode, headers, response);
-                        }
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                            Log.e(TAG, "onSuccess2 : " + response.toString());
-                            super.onSuccess(statusCode, headers, response);
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            Log.e(TAG, "onFailue1 : " + errorResponse.toString());
-                            super.onFailure(statusCode, headers, throwable, errorResponse);
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                            Log.e(TAG, "onFailue2 : " + errorResponse.toString());
-                            super.onFailure(statusCode, headers, throwable, errorResponse);
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                            Log.e(TAG, "onFailue3 : " + responseString.toString());
-                            super.onFailure(statusCode, headers, responseString, throwable);
-                        }
-
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                            Log.e(TAG, "onSuccess3 : " + responseString.toString());
-                            super.onSuccess(statusCode, headers, responseString);
-                        }
-                    });
-
+                        //ADD CHANNEL TO DATABASE
+//                    int uid = 1;
+//                    String name = "testChannelTitle";
+//
+//                    ClarityApp.getRestClient().createChannel(uid, name, getActivity(), new JsonHttpResponseHandler() {
+//                        @Override
+//                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+//                            Log.e(TAG, "onSuccess1 : " + response.toString() );
+//                            super.onSuccess(statusCode, headers, response);
+//                        }
+//
+//                        @Override
+//                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+//                            try {
+//                                switch(statusCode) {
+//                                    case(0):
+//                                        Toast.makeText(getContext(),
+//                                                "Server is down. Please try later.",
+//                                                Toast.LENGTH_LONG).show();
+//                                        break;
+//                                    default:
+//                                        Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
+//                                        break;
+//                                }
+//                            }
+//                            catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                            super.onFailure(statusCode, headers, throwable, errorResponse);
+//                        }
+//
+//                    });
 
                 }
             });
@@ -269,6 +294,52 @@ public class ChannelFragment extends Fragment {
 
     }
 
+    private void goToSearchResults() {
+        channelButtonCardView.setVisibility(View.INVISIBLE);
+        createChannelTextView.setVisibility(View.INVISIBLE);
+        searchResultTextView.setVisibility(View.VISIBLE);
+        channelRecycler.setVisibility(View.VISIBLE);
+        searchConstraintLayout.setVisibility(View.INVISIBLE);
+        createChannelTextView.setVisibility(View.INVISIBLE);
+        searchResultTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void gotoCreateChannel() {
+        channelButtonCardView.setVisibility(View.INVISIBLE);
+        createChannelTextView.setVisibility(View.VISIBLE);
+        searchResultTextView.setVisibility(View.INVISIBLE);
+        channelRecycler.setVisibility(View.INVISIBLE);
+        searchConstraintLayout.setVisibility(View.VISIBLE);
+        headerConstraintLayout.setVisibility(View.VISIBLE);
+        createChannelTextView.setVisibility(View.VISIBLE);
+        searchResultTextView.setVisibility(View.INVISIBLE);
+    }
+
+    private void goToChannelList() {
+
+        channelButtonCardView.setVisibility(View.VISIBLE);
+        channelRecycler.setVisibility(View.VISIBLE);
+        surveyConstraintLayout.setVisibility(View.INVISIBLE);
+        searchConstraintLayout.setVisibility(View.INVISIBLE);
+        headerConstraintLayout.setVisibility(View.INVISIBLE);
+
+
+        rListItems = new ArrayList<>();
+
+        RecyclerListItem item1 = new RecyclerListItem("Fake Channel 1", 1);
+        RecyclerListItem item2 = new RecyclerListItem("Fake Channel 2", 1);
+        RecyclerListItem item3 = new RecyclerListItem("Fake Channel 3", 1);
+        RecyclerListItem item4 = new RecyclerListItem("Fake Channel 4", 1);
+        rListItems.add(item1);
+        rListItems.add(item2);
+        rListItems.add(item3);
+        rListItems.add(item4);
+
+        rAdapter = new RecyclerAdapter(rListItems, getContext());
+        channelRecycler.setAdapter(rAdapter);
+
+    }
+
     private void searchAPI(String query) {
         ClarityApp.getRestClient().getFullTextSearch(offset, query, 0, "episode", getActivity(), new JsonHttpResponseHandler() {
             @Override
@@ -276,8 +347,11 @@ public class ChannelFragment extends Fragment {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     offset = response.getInt("next_offset");
-                    //Log.e(TAG, response.toString());
-                    createChannel(response);
+                    //Log.e(TAG, "MY JSON SEARCH RESPONSE: " + response.toString());
+
+                    ////createChannel(response);
+
+                    createSearchResult(response);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -293,6 +367,32 @@ public class ChannelFragment extends Fragment {
         });
     }
 
+    private void createSearchResult(JSONObject response) {
+
+        Channel aChannel = new Channel();
+        ArrayList<Episode> episodes = new ArrayList<Episode>();
+
+        try {
+            JSONArray resp = response.getJSONArray("results");
+
+            for (int i = 0; i < 10 && i < resp.length(); i++) {
+                Episode e = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Episode.class);
+                episodes.add(e);
+            }
+            for (int i = 0; i < episodes.size(); i++) {
+                aChannel.setImage(episodes.get(i).getImage());
+                aChannel.setName(episodes.get(i).getTitle_original());
+                addChannelToSearchRecycler(aChannel);
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     private void createChannel(JSONObject response) {
 
         Channel aChannel = new Channel();
@@ -304,12 +404,14 @@ public class ChannelFragment extends Fragment {
             for (int i = 0; i < 1 && i < resp.length(); i++) {
                 Episode e = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Episode.class);
                 episodes.add(e);
+
             }
 
             aChannel.setImage(episodes.get(0).getImage());
             aChannel.setName(episodes.get(0).getTitle_original());
 
-            populateRecycler(aChannel);
+            addChannelToRecycler(aChannel);
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -317,15 +419,26 @@ public class ChannelFragment extends Fragment {
 
     }
 
-    private void populateRecycler(Channel aChannel) {
+    private void addChannelToSearchRecycler(Channel aChannel) {
+        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), 1);
 
+        rListItemsSearch.add(APIresult);
+
+        rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext());
+        channelRecycler.setAdapter(rAdapterSearch);
+
+    }
+
+    private void addChannelToRecycler(Channel aChannel) {
         RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), 1);
 
         rListItems.add(APIresult);
 
         rAdapter = new RecyclerAdapter(rListItems, getContext());
         channelRecycler.setAdapter(rAdapter);
+
     }
+
 
 
 //    @OnClick(R.id.test_music)
@@ -337,15 +450,3 @@ public class ChannelFragment extends Fragment {
 
 }
 
-
-
-/*
-
-TV & Film                   68
-Sports & Recreation         77
-Technology                  127
-History                     125
-News & Politics             99
-Religion & Spirituality     69
-
-*/
