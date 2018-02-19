@@ -1,6 +1,5 @@
 package appricottsoftware.clarity;
 
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.e("MainActivity", "On Query text" + query);
         // Specify the callback functions for the response handler
-        ClarityApp.getRestClient().getFullTextSearch(offset, query, 0, "episode", new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().getFullTextSearch(offset, query, 0, "episode", getApplicationContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
