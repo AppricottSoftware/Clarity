@@ -437,6 +437,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
     private void insertIntoQueue(Episode episode) {
         // Add episode to the playlist and media source
+        Log.e(TAG, "insertIntoQueue: " + episode.toString());
         playlist.add(episode);
         dynamicConcatenatingMediaSource.addMediaSource(toAudioSource(episode));
     }
@@ -450,7 +451,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private void playPlaylist(JSONObject response) {
         try {
             // Save the next offset and total
-            nextOffset = response.getInt("next_offset");
+            nextOffset = response.getInt("next_offset") + 1;
             total = response.getInt("total");
 
             // Convert the response into Episodes
