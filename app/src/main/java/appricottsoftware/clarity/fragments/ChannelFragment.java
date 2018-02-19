@@ -283,23 +283,72 @@ public class ChannelFragment extends Fragment {
 
         rListItems = new ArrayList<>();
 
-        // TODO: Test getChannel endpoint to populate channels for realz
-        String iURL = "https://d3sv2eduhewoas.cloudfront.net/channel/image/5f39803be9b14489a47cb6d187dfd2fe.jpeg";
-        RecyclerListItem item1 = new RecyclerListItem("Fake Channel 1", iURL);
-        RecyclerListItem item2 = new RecyclerListItem("Fake Channel 2", iURL);
-        RecyclerListItem item3 = new RecyclerListItem("Fake Channel 3", iURL);
-        RecyclerListItem item4 = new RecyclerListItem("Fake Channel 4", iURL);
-        rListItems.add(item1);
-        rListItems.add(item2);
-        rListItems.add(item3);
-        rListItems.add(item4);
-        rListItems.add(item1);
-        rListItems.add(item2);
-        rListItems.add(item3);
-        rListItems.add(item4);
+        int uid = 1;
+        ClarityApp.getRestClient().getChannel(uid, getContext(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.e(TAG , "onSuccess: Object");
+                //Log.i(TAG, "JSON CHANNEL RESPONSE" + response.toString());
+            }
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.e(TAG , "onSuccess: Array");
+                //Log.i(TAG, "JSON CHANNEL RESPONSE" + response.toString());
 
-        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
-        channelRecycler.setAdapter(rAdapter);
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject aChannel = response.getJSONObject(i);
+                        String title = aChannel.getString("title").toString();
+                        String imageURL = aChannel.getString("image").toString();
+                        RecyclerListItem newItem = new RecyclerListItem(title, imageURL);
+                        rListItems.add(newItem);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
+                channelRecycler.setAdapter(rAdapter);
+            }
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                super.onSuccess(statusCode, headers, responseString);
+                Log.e(TAG, "");
+            }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                try {
+                    switch(statusCode) {
+                        case(0):
+                            Toast.makeText(getContext(),
+                                    "Server is down. Please try later.",
+                                    Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
+                            break;
+                    }
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                throwable.printStackTrace();
+                Log.e(TAG, "");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                throwable.printStackTrace();
+                Log.e(TAG, "");
+            }
+        });
 
     }
 

@@ -33,7 +33,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.editText_email) EditText email;
     @BindView(R.id.editText_password) EditText password;
 
-    boolean seeSurvey = false;
     private static final String TAG = "RegisterActivity";
 
     @Override
@@ -63,65 +62,52 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     return;
                 }
 
-                // create instance of clarityClient
-                // pass information to database to store
-                if (seeSurvey == true){
-                    Intent surveyActivityIntent = new Intent(this, SurveyActivity.class);
-                    surveyActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(surveyActivityIntent);
-                    finish();
-                }
+                ClarityApp.getRestClient().registerRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        Log.e(TAG, "onSuccess1 : " + response.toString() );
+                        super.onSuccess(statusCode, headers, response);
 
-                else {
-                    ClarityApp.getRestClient().registerRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            Log.e(TAG, "onSuccess1 : " + response.toString() );
-                            super.onSuccess(statusCode, headers, response);
+                        // Setting userID for the session from returned JSON object
+                        try {
+                            ClarityApp.getSession(getApplicationContext()).setUserID(response.getInt("userId"));
 
-                            // Setting userID for the session from returned JSON object
-                            try {
-                                ClarityApp.getSession(getApplicationContext()).setUserID(response.getInt("userId"));
+                            // After successful save of user info on back end
+                            // Switch to home activity
+                            Intent homeActivityIntent = new Intent(getApplicationContext(), HomeActivity.class);
+                            homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            homeActivityIntent.putExtra("loginType", getString(R.string.registered_login_type));
+                            startActivity(homeActivityIntent);
+                            finish();
+                        }
+                        catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
-                                // After successful save of user info on back end
-                                // Switch to home activity
-                                Intent homeActivityIntent = new Intent(getApplicationContext(), HomeActivity.class);
-                                homeActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                homeActivityIntent.putExtra("loginType", getString(R.string.registered_login_type));
-                                startActivity(homeActivityIntent);
-                                finish();
-                            }
-                            catch (JSONException e) {
-                                e.printStackTrace();
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        try {
+                            switch(statusCode) {
+                                case(0):
+                                    Toast.makeText(getApplicationContext(),
+                                            "Server is down. Please try later.",
+                                            Toast.LENGTH_LONG).show();
+                                    break;
+                                default:
+                                    Log.i(TAG, "Register onFailure. Default Switch. Status Code: " + statusCode);
+                                    break;
                             }
                         }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            try {
-                                switch(statusCode) {
-                                    case(0):
-                                        Toast.makeText(getApplicationContext(),
-                                                "Server is down. Please try later.",
-                                                Toast.LENGTH_LONG).show();
-                                        break;
-                                    default:
-                                        Log.i(TAG, "Register onFailure. Default Switch. Status Code: " + statusCode);
-                                        break;
-                                }
-                            }
-                            catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            super.onFailure(statusCode, headers, throwable, errorResponse);
+                        catch (Exception e) {
+                            e.printStackTrace();
                         }
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
 
-                    });
-                }
-
-
-
+                });
                 break;
+
             default:
                 break;
         }

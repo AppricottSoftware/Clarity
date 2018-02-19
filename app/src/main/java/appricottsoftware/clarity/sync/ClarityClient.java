@@ -192,5 +192,23 @@ public class ClarityClient {
 
     }
 
+    public void getChannel(int uid, Context context, JsonHttpResponseHandler handler) {
+        // Create the rest client and add header(s)
+
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            jsonParams.put("uid", uid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.get(context, context.getString(R.string.get_channel_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
