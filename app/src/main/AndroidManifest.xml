@@ -24,7 +24,7 @@
             </intent-filter>
         </receiver>
         <activity
-            android:name=".HomeActivity"
+            android:name=".SplashActivity"
             android:hardwareAccelerated="false"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -38,15 +38,12 @@
         <activity
             android:name=".RegisterActivity"
             android:screenOrientation="portrait" />
-        <!--<activity-->
-            <!--android:name=".HomeActivity"-->
-            <!--android:label="@string/toolbar_home_activity"-->
-            <!--android:screenOrientation="portrait" />-->
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
+            android:label="@string/toolbar_home_activity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SurveyActivity"
+            android:name=".MainActivity"
             android:screenOrientation="portrait" />
 
         <meta-data android:name="com.facebook.sdk.ApplicationId"
