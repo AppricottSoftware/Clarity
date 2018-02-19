@@ -15,13 +15,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import appricottsoftware.clarity.sync.ClarityApp;
+import cz.msebera.android.httpclient.Header;
+
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.CustomViewHolder> {
+
+    private static final String TAG = "RecyclerAdapter";
 
     private List<RecyclerListItem> recyclerList_ItemList;
     private Context theContext;
@@ -73,13 +81,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
         }
 
         @Override
-        public void onClick(View view) {
+        public void onClick(final View view) {
             notifyItemChanged(selected_position);
             selected_position = getLayoutPosition();
             notifyItemChanged(selected_position);
-
-//            String toastText = recyclerList_ItemList.get(selected_position).getTitle();
-//            Toast.makeText(view.getContext(), toastText, Toast.LENGTH_SHORT).show();
 
             if (isChannelView){
                 Toast.makeText(view.getContext(),"You are in CHANNEL View", Toast.LENGTH_SHORT).show();
@@ -87,8 +92,40 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                 //TODO pass channel to Player fragment
             }
             else{
-                Toast.makeText(view.getContext(),"You are in SEARCH View", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(),"CHANNEL ADDED TO DATABASE AND CHANNEL LIST", Toast.LENGTH_SHORT).show();
 
+                int uid = 1;
+                String title = recyclerList_ItemList.get(selected_position).getTitle();
+                String imageURL = recyclerList_ItemList.get(selected_position).getImage();
+
+                ClarityApp.getRestClient().createChannel(uid, title, imageURL, view.getContext(), new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        Log.e(TAG, "onSuccess1 : " + response.toString() );
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        try {
+                            switch(statusCode) {
+                                case(0):
+                                    Toast.makeText(view.getContext(),
+                                            "Server is down. Please try later.",
+                                            Toast.LENGTH_LONG).show();
+                                    break;
+                                default:
+                                    Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
+                                    break;
+                            }
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                });
 
             }
 

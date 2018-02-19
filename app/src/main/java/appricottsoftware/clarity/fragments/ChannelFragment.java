@@ -356,7 +356,7 @@ public class ChannelFragment extends Fragment {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     offset = response.getInt("next_offset");
-                    Log.e(TAG, "MY JSON SEARCH RESPONSE: " + response.toString());
+                    //Log.e(TAG, "MY JSON SEARCH RESPONSE: " + response.toString());
 
                     ////createChannel(response);
 
@@ -392,7 +392,6 @@ public class ChannelFragment extends Fragment {
                 aChannel.setImage(episodes.get(i).getImage());
                 aChannel.setName(episodes.get(i).getTitle_original());
                 addChannelToSearchRecycler(aChannel);
-                Log.i(TAG, "IMAGEURLS: " + episodes.get(i).getImage());
             }
 
 

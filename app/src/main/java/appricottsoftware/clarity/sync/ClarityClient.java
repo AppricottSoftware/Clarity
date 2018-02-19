@@ -76,7 +76,7 @@ public class ClarityClient {
     }
 
 
-    public void createChannel(int uid, String name, Context context, JsonHttpResponseHandler handler) {
+    public void createChannel(int uid, String name, String imageURL, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         //pass in metadata
 
@@ -101,7 +101,7 @@ public class ClarityClient {
 
             jsonParams.put("uid", uid);
             jsonParams.put("title", name);
-            jsonParams.put("image", "image URL");
+            jsonParams.put("image", imageURL);
             jsonParams.put("metadata", metadata);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
