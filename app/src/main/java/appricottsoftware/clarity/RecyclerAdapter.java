@@ -17,12 +17,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
     private List<RecyclerListItem> recyclerList_ItemList;
     private Context theContext;
+    private boolean isChannelView;
 
     int selected_position = 0;
 
-    public RecyclerAdapter(List<RecyclerListItem> recyclerList_ItemList, Context theContext) {
+    public RecyclerAdapter(List<RecyclerListItem> recyclerList_ItemList, Context theContext, boolean isChannelView) {
         this.recyclerList_ItemList = recyclerList_ItemList;
         this.theContext = theContext;
+        this.isChannelView = isChannelView;
     }
 
     @Override
@@ -67,12 +69,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
             selected_position = getLayoutPosition();
             notifyItemChanged(selected_position);
 
-            String toastText = recyclerList_ItemList.get(selected_position).getTitle();
-            Toast.makeText(view.getContext(), toastText, Toast.LENGTH_SHORT).show();
+//            String toastText = recyclerList_ItemList.get(selected_position).getTitle();
+//            Toast.makeText(view.getContext(), toastText, Toast.LENGTH_SHORT).show();
 
+            if (isChannelView){
+                Toast.makeText(view.getContext(),"You are in CHANNEL View", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(view.getContext(),"You are in SEARCH View", Toast.LENGTH_SHORT).show();
+            }
 
-            // CHANGE CHANNEL ON CLICK
-            //ClarityApp.getRestClient().NEED METHOD
 
         }
     }

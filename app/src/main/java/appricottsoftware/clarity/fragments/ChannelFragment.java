@@ -132,7 +132,7 @@ public class ChannelFragment extends Fragment {
         rListItems = new ArrayList<>();
         rListItemsSearch = new ArrayList<>();
 
-        rAdapter = new RecyclerAdapter(rListItems, getContext());
+        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
         channelRecycler.setAdapter(rAdapter);
 
 
@@ -157,6 +157,10 @@ public class ChannelFragment extends Fragment {
             public void onClick(View view) {
                 rListItems = new ArrayList<>();
                 goToChannelList();
+
+
+
+
             }
         });
 
@@ -174,7 +178,7 @@ public class ChannelFragment extends Fragment {
                         public void onClick(View view) {
 
                             rListItemsSearch = new ArrayList<>();
-                            rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext());
+                            rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext(), false);
                             channelRecycler.setAdapter(rAdapterSearch);
 
                             String searchKeyword = searchEditText.getText().toString();
@@ -323,7 +327,6 @@ public class ChannelFragment extends Fragment {
         searchConstraintLayout.setVisibility(View.INVISIBLE);
         headerConstraintLayout.setVisibility(View.INVISIBLE);
 
-
         rListItems = new ArrayList<>();
 
         RecyclerListItem item1 = new RecyclerListItem("Fake Channel 1", 1);
@@ -334,8 +337,12 @@ public class ChannelFragment extends Fragment {
         rListItems.add(item2);
         rListItems.add(item3);
         rListItems.add(item4);
+        rListItems.add(item1);
+        rListItems.add(item2);
+        rListItems.add(item3);
+        rListItems.add(item4);
 
-        rAdapter = new RecyclerAdapter(rListItems, getContext());
+        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
         channelRecycler.setAdapter(rAdapter);
 
     }
@@ -424,7 +431,7 @@ public class ChannelFragment extends Fragment {
 
         rListItemsSearch.add(APIresult);
 
-        rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext());
+        rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext(), false);
         channelRecycler.setAdapter(rAdapterSearch);
 
     }
@@ -434,7 +441,7 @@ public class ChannelFragment extends Fragment {
 
         rListItems.add(APIresult);
 
-        rAdapter = new RecyclerAdapter(rListItems, getContext());
+        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
         channelRecycler.setAdapter(rAdapter);
 
     }
