@@ -25,8 +25,9 @@
     <string name="splash_content_desc">Logo Gif</string>
 
     <string name="register_button">Register</string>
-    <string name="email_hint">email</string>
-    <string name="password_hint">password</string>
+    <string name="registration">Registration</string>
+    <string name="email_hint">Email Address</string>
+    <string name="password_hint">Password</string>
     <string name="survey_prompt">Looks like you don\'t have any channels.\n
                                  Let\'s setup a channel for you.\n\n
                                  What are some of the topics you like to listen?\n\n
