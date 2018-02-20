@@ -240,7 +240,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 try {
                     Log.i(TAG, "Authenticate OnSuccess -> Status Code: " + statusCode + "\tLoginType: " + loginType  + "\t" +  response.toString());
 
-                    String uid = response.getString("userId");
+                    String uid = response.getString("uid");
                     if (uid == "-1") {
                         Toast unauthToast = Toast.makeText(getApplicationContext(),
                                 R.string.no_auth,
