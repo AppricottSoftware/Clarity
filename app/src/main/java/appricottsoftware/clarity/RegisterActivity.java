@@ -69,7 +69,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
                         // Setting userID for the session from returned JSON object
                         try {
-                            ClarityApp.getSession(getApplicationContext()).setUserID(response.getInt("userId"));
+                            ClarityApp.getSession(getApplicationContext()).setUserID(response.getInt("uid"));
 
                             // After successful save of user info on back end
                             // Switch to home activity
