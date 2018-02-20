@@ -1,30 +1,359 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@android:color/holo_green_light">
+    android:background="@android:color/white">
 
-    <TextView
-        android:id="@+id/test_channel_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Channel Fragment"/>
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout_Header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
-    <Button
-        android:id="@+id/test_music"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/test_channel_text"
-        android:text="Play Test Episode"
-        android:backgroundTint="@color/cardview_light_background"/>
+        <TextView
+            android:id="@+id/textView_CreateChannel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:padding="8dp"
+            android:text="@string/create"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:visibility="visible"
+            app:layout_constraintStart_toEndOf="@+id/imageButton_back"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/test_channel"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/textView_SearchResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:padding="8dp"
+            android:text="@string/search_result"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:visibility="visible"
+            app:layout_constraintStart_toEndOf="@+id/imageButton_back"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/imageButton_back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="42dp"
+            android:layout_marginTop="28dp"
+            android:background="@android:color/white"
+            android:contentDescription="@string/description"
+            android:scaleType="fitXY"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/back_icon" />
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <EditText
+            android:id="@+id/editText_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="168dp"
+            android:ems="10"
+            android:hint="@string/search_keyword"
+            android:inputType="textPersonName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView_searchText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="224dp"
+            android:text="@string/search"
+            android:textSize="32sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageButton_serachIcon" />
+
+        <ImageButton
+            android:id="@+id/imageButton_serachIcon"
+            android:layout_width="112dp"
+            android:layout_height="112dp"
+            android:layout_marginTop="56dp"
+            android:background="@android:color/white"
+            android:contentDescription="@string/description"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@+id/textView_searchText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editText_search"
+            app:srcCompat="@drawable/search_icon" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView_ChannelButton"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/test_music"
-        android:text="Play Test Channel"
-        android:backgroundTint="@color/cardview_light_background"/>
+        android:visibility="visible">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/imageView_create"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="40dp"
+                android:contentDescription="@string/description"
+                app:layout_constraintBottom_toBottomOf="@+id/button_createChannel"
+                app:layout_constraintEnd_toStartOf="@+id/button_createChannel"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/button_createChannel"
+                app:srcCompat="@drawable/create_plus_light_red" />
+
+            <Button
+                android:id="@+id/button_createChannel"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="16dp"
+                android:background="@android:color/white"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:text="@string/create"
+                android:textAlignment="viewStart"
+                android:textSize="@dimen/channel_buttons"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/imageView_create"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/RecyclerView_Channels"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="56dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView_ChannelButton"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <android.support.constraint.ConstraintLayout
+
+        android:id="@+id/ConstraintLayout_Survey"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textView_prompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:paddingLeft="@dimen/survey_prompt_LR_padding"
+            android:paddingRight="@dimen/survey_prompt_LR_padding"
+            android:text="@string/survey_prompt"
+            android:textAlignment="center"
+            android:textSize="@dimen/survey_prompt_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView_cat4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/category_4"
+            android:textSize="@dimen/survey_cat_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/textView_cat5"
+            app:layout_constraintEnd_toEndOf="@+id/textView_cat5"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/textView_cat5"
+            app:layout_constraintTop_toBottomOf="@+id/textView_cat2" />
+
+        <TextView
+            android:id="@+id/textView_cat5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/category_5"
+            android:textSize="@dimen/survey_cat_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/textView_cat6"
+            app:layout_constraintEnd_toEndOf="@+id/textView_cat6"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/textView_cat6"
+            app:layout_constraintTop_toBottomOf="@+id/textView_cat4" />
+
+        <TextView
+            android:id="@+id/textView_cat3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/category_3"
+            android:textSize="@dimen/survey_cat_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/textView_cat2"
+            app:layout_constraintEnd_toEndOf="@+id/textView_cat2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/textView_cat2"
+            app:layout_constraintTop_toBottomOf="@+id/textView_cat1" />
+
+        <TextView
+            android:id="@+id/textView_cat2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/category_2"
+            android:textSize="@dimen/survey_cat_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/textView_cat4"
+            app:layout_constraintEnd_toEndOf="@+id/textView_cat4"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/textView_cat4"
+            app:layout_constraintTop_toBottomOf="@+id/textView_cat3" />
+
+        <TextView
+            android:id="@+id/textView_cat1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/category_1"
+            android:textSize="@dimen/survey_cat_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/textView_cat3"
+            app:layout_constraintEnd_toEndOf="@+id/textView_cat3"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/textView_cat3"
+            app:layout_constraintTop_toBottomOf="@+id/textView_prompt" />
+
+        <TextView
+            android:id="@+id/textView_cat6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:layout_marginStart="48dp"
+            android:text="@string/category_6"
+            android:textSize="@dimen/survey_cat_text_size"
+            app:layout_constraintBottom_toTopOf="@+id/button_surveyCreateChannel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_cat5" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton_cat1"
+            android:layout_width="@dimen/survey_thumb"
+            android:layout_height="@dimen/survey_thumb"
+            android:layout_marginEnd="72dp"
+            android:background="@drawable/ic_nav_drawer_like_white"
+            android:textOff=""
+            android:textOn=""
+            app:layout_constraintBottom_toBottomOf="@+id/textView_cat1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView_cat1" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton_cat2"
+            android:layout_width="@dimen/survey_thumb"
+            android:layout_height="@dimen/survey_thumb"
+            android:background="@drawable/ic_nav_drawer_like_white"
+            android:textOff=""
+            android:textOn=""
+            app:layout_constraintBottom_toBottomOf="@+id/textView_cat2"
+            app:layout_constraintEnd_toEndOf="@+id/toggleButton_cat3"
+            app:layout_constraintStart_toStartOf="@+id/toggleButton_cat3"
+            app:layout_constraintTop_toTopOf="@+id/textView_cat2" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton_cat4"
+            android:layout_width="@dimen/survey_thumb"
+            android:layout_height="@dimen/survey_thumb"
+            android:background="@drawable/ic_nav_drawer_like_white"
+            android:textOff=""
+            android:textOn=""
+            app:layout_constraintBottom_toBottomOf="@+id/textView_cat4"
+            app:layout_constraintEnd_toEndOf="@+id/toggleButton_cat2"
+            app:layout_constraintStart_toStartOf="@+id/toggleButton_cat2"
+            app:layout_constraintTop_toTopOf="@+id/textView_cat4" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton_cat5"
+            android:layout_width="@dimen/survey_thumb"
+            android:layout_height="@dimen/survey_thumb"
+            android:background="@drawable/ic_nav_drawer_like_white"
+            android:textOff=""
+            android:textOn=""
+            app:layout_constraintBottom_toBottomOf="@+id/textView_cat5"
+            app:layout_constraintEnd_toEndOf="@+id/toggleButton_cat4"
+            app:layout_constraintStart_toStartOf="@+id/toggleButton_cat4"
+            app:layout_constraintTop_toTopOf="@+id/textView_cat5" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton_cat3"
+            android:layout_width="@dimen/survey_thumb"
+            android:layout_height="@dimen/survey_thumb"
+            android:background="@drawable/ic_nav_drawer_like_white"
+            android:textOff=""
+            android:textOn=""
+            app:layout_constraintBottom_toBottomOf="@+id/textView_cat3"
+            app:layout_constraintEnd_toEndOf="@+id/toggleButton_cat1"
+            app:layout_constraintStart_toStartOf="@+id/toggleButton_cat1"
+            app:layout_constraintTop_toTopOf="@+id/textView_cat3" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton_cat6"
+            android:layout_width="@dimen/survey_thumb"
+            android:layout_height="@dimen/survey_thumb"
+            android:layout_marginEnd="72dp"
+            android:background="@drawable/ic_nav_drawer_like_white"
+            android:textOff=""
+            android:textOn=""
+            app:layout_constraintBottom_toBottomOf="@+id/textView_cat6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView_cat6" />
+
+        <Button
+            android:id="@+id/button_surveyCreateChannel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="72dp"
+            android:text="@string/create"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+
+    <!--<Button-->
+    <!--android:id="@+id/test_music"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="test" />-->
 
 </android.support.constraint.ConstraintLayout>

@@ -62,4 +62,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    android.defaultConfig.vectorDrawables.useSupportLibrary = true
 }
