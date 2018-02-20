@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -289,6 +290,15 @@ public class ChannelFragment extends Fragment {
                 //Log.i(TAG, "JSON CHANNEL RESPONSE" + response.toString());
 
                 try {
+                    // Convert the response to Channels
+                    TypeToken<ArrayList<Channel>> token = new TypeToken<ArrayList<Channel>>() {};
+                    ArrayList<Channel> channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
+
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+
+                try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject aChannel = response.getJSONObject(i);
                         String title = aChannel.getString("title").toString();
@@ -382,7 +392,7 @@ public class ChannelFragment extends Fragment {
             }
             for (int i = 0; i < episodes.size(); i++) {
                 aChannel.setImage(episodes.get(i).getImage());
-                aChannel.setName(episodes.get(i).getTitle_original());
+                aChannel.setTitle(episodes.get(i).getTitle_original());
                 addChannelToSearchRecycler(aChannel);
             }
 
@@ -417,7 +427,7 @@ public class ChannelFragment extends Fragment {
 //    }
 
     private void addChannelToSearchRecycler(Channel aChannel) {
-        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), aChannel.getImage());
+        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getTitle(), aChannel.getImage());
 
         rListItemsSearch.add(APIresult);
 

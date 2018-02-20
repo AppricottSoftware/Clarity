@@ -4,7 +4,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import appricottsoftware.clarity.sync.ClarityApp;
 
@@ -13,7 +12,7 @@ public class Channel {
 
     int cid;
     int uid;
-    String name;
+    String title;
     String image;
     ArrayList<Metadata> metadata;
 
@@ -35,12 +34,12 @@ public class Channel {
         this.uid = uid;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getImage() {
@@ -78,7 +77,7 @@ public class Channel {
 
         return cid == c.cid
                 && uid == c.uid
-                && name.equals(c.name)
+                && title.equals(c.title)
                 && image.equals(c.image)
                 && comMetadataSize == metadata.size()
                 && comMetadataSize == c.getMetadata().size();
@@ -99,7 +98,7 @@ public class Channel {
         Channel channel = new Channel();
         channel.setCid(123);
         channel.setUid(1);
-        channel.setName("Net Neutrality");
+        channel.setTitle("Net Neutrality");
         channel.setImage("https://cdn-images-1.medium.com/max/1200/1*_Q5d0q-_GumdWTFwXxVcuQ.jpeg");
         ArrayList<Metadata> meta = new ArrayList<>();
         meta.add(new Metadata("Professional", 78, 12));
@@ -112,7 +111,7 @@ public class Channel {
         Channel channel = new Channel();
         channel.setCid(124);
         channel.setUid(1);
-        channel.setName("Android");
+        channel.setTitle("Android");
         channel.setImage("https://cdn-images-1.medium.com/max/1200/1*_Q5d0q-_GumdWTFwXxVcuQ.jpeg");
         ArrayList<Metadata> meta = new ArrayList<>();
         meta.add(new Metadata("Professional", 78, 12));

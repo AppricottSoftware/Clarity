@@ -5,24 +5,24 @@ import org.parceler.Parcel;
 @Parcel
 public class Metadata {
 
-    String category;
+    String genre;
     int mid;
     int score;
 
     public Metadata() { /* Empty constructor required by GSON and Parcel */ }
 
-    public Metadata(String category, int mid, int score) {
-        this.category = category;
+    public Metadata(String genre, int mid, int score) {
+        this.genre = genre;
         this.mid = mid;
         this.score = score;
     }
 
-    public String getCategory() {
-        return category;
+    public String getGenre() {
+        return genre;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setGenre(String genre) {
+        this.genre = genre;
     }
 
     public int getMid() {
@@ -52,7 +52,7 @@ public class Metadata {
         }
 
         Metadata m = (Metadata) obj;
-        return category.equals(m.category)
+        return genre.equals(m.genre)
                 && mid == m.mid
                 && score == m.score;
     }

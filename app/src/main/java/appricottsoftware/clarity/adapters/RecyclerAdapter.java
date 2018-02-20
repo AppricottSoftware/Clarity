@@ -95,6 +95,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                     throw new ClassCastException(view.getContext().toString() + " must implement PlayerInterface");
                 }
 
+
                 //Channel epToPlay = recyclerList_ItemList.get(selected_position).getClass();
 
                 Episode testEpisode = Episode.getSampleEpisode();
