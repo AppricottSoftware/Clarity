@@ -24,10 +24,10 @@ import static com.loopj.android.http.AsyncHttpClient.log;
 
 public class HomeFragment extends Fragment {
 
+    private static final String TAG = "HomeFragment";
+
     @BindView(R.id.vp_tabs) ViewPager vpTabs;
     @BindView(R.id.tl_tabs) TabLayout tlTabs;
-
-    private static final String TAG = "HomeFragment";
 
     @Nullable
     @Override
@@ -44,6 +44,7 @@ public class HomeFragment extends Fragment {
         // Get the view pager to display tabs
         TabPagerAdapter tpaAdapter = new TabPagerAdapter(getChildFragmentManager());
         vpTabs.setAdapter(tpaAdapter);
+
         // Plug view pager into the tab layout
         tlTabs.setupWithViewPager(vpTabs);
     }

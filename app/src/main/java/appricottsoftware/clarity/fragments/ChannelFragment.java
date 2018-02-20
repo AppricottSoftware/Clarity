@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -89,7 +90,6 @@ public class ChannelFragment extends Fragment {
 
     private PlayerInterface playerInterface;
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -99,7 +99,6 @@ public class ChannelFragment extends Fragment {
             Log.e(TAG, context.toString() + " must implement PlayerInterface");
             throw new ClassCastException(context.toString() + " must implement PlayerInterface");
         }
-
     }
 
     @Nullable
@@ -277,7 +276,7 @@ public class ChannelFragment extends Fragment {
         rListItems = new ArrayList<>();
 
         int uid = 1;
-        ClarityApp.getRestClient().getChannel(uid, getContext(), new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient(getContext()).getChannel(uid, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -289,6 +288,15 @@ public class ChannelFragment extends Fragment {
                 super.onSuccess(statusCode, headers, response);
                 Log.e(TAG , "onSuccess: Array");
                 //Log.i(TAG, "JSON CHANNEL RESPONSE" + response.toString());
+
+                try {
+                    // Convert the response to Channels
+                    TypeToken<ArrayList<Channel>> token = new TypeToken<ArrayList<Channel>>() {};
+                    ArrayList<Channel> channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
+
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
 
                 try {
                     for (int i = 0; i < response.length(); i++) {
@@ -347,7 +355,7 @@ public class ChannelFragment extends Fragment {
 
     // TODO: currently hard coded search with "episode" type. May need to be changed eventually.
     private void searchAPI(String query) {
-        ClarityApp.getRestClient().getFullTextSearch(offset, query, 0, "episode", getActivity(), new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient(getContext()).getFullTextSearch("", offset, query, 0, "episode", new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -384,7 +392,7 @@ public class ChannelFragment extends Fragment {
             }
             for (int i = 0; i < episodes.size(); i++) {
                 aChannel.setImage(episodes.get(i).getImage());
-                aChannel.setName(episodes.get(i).getTitle_original());
+                aChannel.setTitle(episodes.get(i).getTitle_original());
                 addChannelToSearchRecycler(aChannel);
             }
 
@@ -419,7 +427,7 @@ public class ChannelFragment extends Fragment {
 //    }
 
     private void addChannelToSearchRecycler(Channel aChannel) {
-        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getName(), aChannel.getImage());
+        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getTitle(), aChannel.getImage());
 
         rListItemsSearch.add(APIresult);
 
@@ -437,6 +445,5 @@ public class ChannelFragment extends Fragment {
 //        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
 //        channelRecycler.setAdapter(rAdapter);
 //    }
-
 }
 

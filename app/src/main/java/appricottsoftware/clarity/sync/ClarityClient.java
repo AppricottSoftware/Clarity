@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Looper;
 import android.util.Log;
 
+import com.google.android.gms.common.api.Response;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -22,7 +23,11 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ClarityClient {
 
-    public ClarityClient() {}
+    private Context context;
+
+    public ClarityClient(Context context) {
+        this.context = context;
+    }
 
     // Insert API calls here //
     // Calls the /search endpoint (fulltextsearch)
@@ -31,12 +36,13 @@ public class ClarityClient {
     // q: Search term
     // sort_by_date: Sort by date or not? If 1, sort by date. If 0 (default), sort by relevance.
     // type: What to search: "episode" (default) or "podcast"?
-    public void getFullTextSearch(int offset, String q, int sort_by_date, String type, Context context, JsonHttpResponseHandler handler) {
+    public void getFullTextSearch(String genre_ids, int offset, String q, int sort_by_date, String type, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
         client.addHeader("X-Mashape-Key", context.getString(R.string.listen_notes_api_key));
         // Next, we add the parameters for the api call (see function description above)
         RequestParams params = new RequestParams();
+        params.put("genre_ids", genre_ids);
         params.put("offset", offset);
         params.put("q", q);
         params.put("sort_by_date", sort_by_date);
@@ -44,7 +50,7 @@ public class ClarityClient {
         client.get(context.getString(R.string.listen_notes_api_url) + "search", params, handler);
     }
 
-    public void authenticateUser(String email, String password, Context context, JsonHttpResponseHandler handler) {
+    public void authenticateUser(String email, String password, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
 
         // Added conditional to handle this issue:
@@ -85,7 +91,7 @@ public class ClarityClient {
     }
 
 
-    public void registerRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
+    public void registerRequest(String email, String password, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
 
         // Added conditional to handle this issue:
@@ -126,7 +132,7 @@ public class ClarityClient {
     }
 
 
-    public void metadataUpVoteRequest(Context context, JsonHttpResponseHandler handler) {
+    public void metadataUpVoteRequest(JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
 
         JSONObject jsonParams = new JSONObject();
@@ -147,7 +153,7 @@ public class ClarityClient {
             jsonParams.put("metadata", metadata);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
-            Log.e("TESTING", jsonParams.toString() + " TO: " + R.string.put_dislike_request_url);
+            Log.e("TESTING", jsonParams.toString() + " TO: " + context.getString(R.string.put_dislike_request_url));
             client.post(context, context.getString(R.string.put_dislike_request_url), entity, "application/json", handler);
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,7 +161,7 @@ public class ClarityClient {
     }
 
 
-    public void createChannel(int uid, String name, String imageURL, Context context, JsonHttpResponseHandler handler) {
+    public void createChannel(int uid, String name, String imageURL, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         //pass in metadata
 
@@ -192,7 +198,7 @@ public class ClarityClient {
 
     }
 
-    public void getChannel(int uid, Context context, JsonHttpResponseHandler handler) {
+    public void getChannel(int uid, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
 
         AsyncHttpClient client = new AsyncHttpClient();

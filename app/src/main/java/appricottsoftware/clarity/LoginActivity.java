@@ -157,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void registerSocialMediaUser(final String email, String password, final String loginType) {
-        ClarityApp.getRestClient().registerRequest(email, password, this, new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient(this).registerRequest(email, password, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -234,17 +234,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     // HTTPS GET function to authenticate user
     public void authenticate(String email, String password, final String loginType) {
-        ClarityApp.getRestClient().authenticateUser(email, password, this, new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient(this).authenticateUser(email, password, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
                     Log.i(TAG, "Authenticate OnSuccess -> Status Code: " + statusCode + "\tLoginType: " + loginType  + "\t" +  response.toString());
 
-                    String uid = response.getString("userId");
+                    String uid = response.getString("uid");
                     if (uid == "-1") {
                         Toast unauthToast = Toast.makeText(getApplicationContext(),
-                                            R.string.no_auth,
-                                            Toast.LENGTH_SHORT);
+                                R.string.no_auth,
+                                Toast.LENGTH_SHORT);
                         unauthToast.show();
                     } else {
                         ClarityApp.getSession(getApplicationContext()).setUserID(Integer.parseInt((uid)));

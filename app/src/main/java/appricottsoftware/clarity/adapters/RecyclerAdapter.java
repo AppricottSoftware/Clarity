@@ -95,6 +95,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                     throw new ClassCastException(view.getContext().toString() + " must implement PlayerInterface");
                 }
 
+
                 //Channel epToPlay = recyclerList_ItemList.get(selected_position).getClass();
 
                 Episode testEpisode = Episode.getSampleEpisode();
@@ -108,7 +109,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                 String imageURL = recyclerList_ItemList.get(selected_position).getImage();
 
                 // TODO: re-add onSuccess and on Failure methods to be handled in future.
-                ClarityApp.getRestClient().createChannel(uid, title, imageURL, view.getContext(), new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient(view.getContext()).createChannel(uid, title, imageURL, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         super.onSuccess(statusCode, headers, response);

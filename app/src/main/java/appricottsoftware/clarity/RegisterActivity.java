@@ -62,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     return;
                 }
 
-                ClarityApp.getRestClient().registerRequest(emailString, hashedPassword, this, new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient(this).registerRequest(emailString, hashedPassword, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         super.onSuccess(statusCode, headers, response);
@@ -161,6 +161,3 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
 
 } //end RegisterActivity
-
-
-
