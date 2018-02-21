@@ -131,35 +131,51 @@ public class ClarityClient {
         }
     }
 
-
-    public void metadataUpVoteRequest(JsonHttpResponseHandler handler) {
+    public void metadataUpVoteRequest(int cid, ArrayList<Integer> genres, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
 
         JSONObject jsonParams = new JSONObject();
         try {
-            jsonParams.put("cid", 1);
+            jsonParams.put("cid", cid);
             JSONArray metadata = new JSONArray();
 
-            JSONObject element1 = new JSONObject();
-            element1.put("mid", 1);
-            JSONObject element2 = new JSONObject();
-            element2.put("mid", 2);
-
-            metadata.put(element1);
-            metadata.put(element2);
-
-            jsonParams.put("metadata", metadata);
+            for(Integer g : genres) {
+                JSONObject elem = new JSONObject();
+                elem.put("mid", g);
+                metadata.put(elem);
+            }
 
             jsonParams.put("metadata", metadata);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
-            Log.e("TESTING", jsonParams.toString() + " TO: " + context.getString(R.string.put_dislike_request_url));
-            client.post(context, context.getString(R.string.put_dislike_request_url), entity, "application/json", handler);
+            client.post(context, context.getString(R.string.put_likes_request_url), entity, "application/json", handler);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void metadataDownVoteRequest(int cid, ArrayList<Integer> genres, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("cid", cid);
+
+            JSONArray metadata = new JSONArray();
+            for (Integer g : genres) {
+                JSONObject elem = new JSONObject();
+                elem.put("mid", g);
+                metadata.put(elem);
+            }
+
+            jsonParams.put("metadata", metadata);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.put_dislike_request_url), entity, "application/json", handler);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void createChannel(int uid, String name, String imageURL, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
@@ -169,19 +185,23 @@ public class ClarityClient {
 
         JSONObject jsonParams = new JSONObject();
 
-        // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in serach so it may be added to db.
-        JSONObject aMetadata = new JSONObject();
-        JSONObject bMetadata = new JSONObject();
+        // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in search so it may be added to db.
         try {
-            aMetadata.put("genre", "politics");
-            aMetadata.put("mid", 123);
-            aMetadata.put("score", 5);
-            bMetadata.put("genre", "social");
-            bMetadata.put("mid", 456);
-            bMetadata.put("score", 10);
 
             JSONArray metadata = new JSONArray();
+
+            // Metadata 1
+            JSONObject aMetadata = new JSONObject();
+            aMetadata.put("genre", "Something1");
+            aMetadata.put("mid", 111);
+            aMetadata.put("score", 123);
             metadata.put(aMetadata);
+
+            // Metadata 2
+            JSONObject bMetadata = new JSONObject();
+            bMetadata.put("genre", "Something2");
+            bMetadata.put("mid", 114);
+            bMetadata.put("score", 123);
             metadata.put(bMetadata);
 
             jsonParams.put("uid", uid);
@@ -191,7 +211,6 @@ public class ClarityClient {
 
             StringEntity entity = new StringEntity(jsonParams.toString());
             client.post(context, context.getString(R.string.create_channel_request_url), entity, "application/json", handler);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
