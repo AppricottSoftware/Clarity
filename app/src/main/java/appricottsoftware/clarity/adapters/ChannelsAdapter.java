@@ -98,11 +98,10 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
             }
             else{
                 int uid = ClarityApp.getSession(view.getContext()).getUserID();
-                String title = channels.get(selected_position).getTitle();
-                String imageURL = channels.get(selected_position).getImage();
+                Channel channel = channels.get(selected_position);
 
                 // TODO: re-add onSuccess and on Failure methods to be handled in future.
-                ClarityApp.getRestClient(view.getContext()).createChannel(uid, title, imageURL, new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient(view.getContext()).createChannel(uid, channel, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         super.onSuccess(statusCode, headers, response);

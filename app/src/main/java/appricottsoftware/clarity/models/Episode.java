@@ -222,6 +222,17 @@ public class Episode {
         return gens;
     }
 
+    public ArrayList<Metadata> getMetadata() {
+        ArrayList<Metadata> metadata = new ArrayList<>();
+        ArrayList<Integer> genres = getIntGenres();
+        for(Integer g : genres) {
+            Metadata m = new Metadata();
+            m.setMid(g);
+            metadata.add(m);
+        }
+        return metadata;
+    }
+
     public boolean isValid() {
         return !(description_original == null
                 || rss == null

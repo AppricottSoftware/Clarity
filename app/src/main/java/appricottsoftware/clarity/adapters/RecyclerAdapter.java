@@ -107,33 +107,33 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                 String imageURL = recyclerList_ItemList.get(selected_position).getImage();
 
                 // TODO: re-add onSuccess and on Failure methods to be handled in future.
-                ClarityApp.getRestClient(view.getContext()).createChannel(uid, title, imageURL, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                        try {
-                            switch(statusCode) {
-                                case(0):
-                                    Toast.makeText(view.getContext(),
-                                            "Server is down. Please try later.",
-                                            Toast.LENGTH_LONG).show();
-                                    break;
-                                default:
-                                    Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
-                                    break;
-                            }
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        super.onFailure(statusCode, headers, throwable, errorResponse);
-                    }
-
-                });
+//                ClarityApp.getRestClient(view.getContext()).createChannel(uid, title, imageURL, new JsonHttpResponseHandler() {
+//                    @Override
+//                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+//                        super.onSuccess(statusCode, headers, response);
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+//                        try {
+//                            switch(statusCode) {
+//                                case(0):
+//                                    Toast.makeText(view.getContext(),
+//                                            "Server is down. Please try later.",
+//                                            Toast.LENGTH_LONG).show();
+//                                    break;
+//                                default:
+//                                    Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
+//                                    break;
+//                            }
+//                        }
+//                        catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        super.onFailure(statusCode, headers, throwable, errorResponse);
+//                    }
+//
+//                });
 
             }
 

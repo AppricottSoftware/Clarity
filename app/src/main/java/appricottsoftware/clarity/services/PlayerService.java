@@ -27,6 +27,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -363,11 +364,12 @@ public class PlayerService extends MediaBrowserServiceCompat {
         // If the playlist is running low, fetch the next page if it exists
         if(dynamicConcatenatingMediaSource.getSize() < PREFETCH_CONSTANT
             && playlist.size() < PREFETCH_CONSTANT
-            && nextOffset < total) {
+            && nextOffset < total
+            && ClarityApp.getRestClient(context).isSearchQuotaRemaining()) {
             try {
                 // Fetch the next page of results from this channel
                 ClarityApp.getRestClient(context)
-                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getTitle(), 0, "episode", new JsonHttpResponseHandler() {
+                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getSearchTerm(context), 0, "episode", new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         // Add the response to the playlist
@@ -404,7 +406,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 e.printStackTrace();
             }
         } else {
-            Log.e(TAG, "playChannel: Out of results");
+            Log.e(TAG, "playChannel: Podcast API quota has been exceeded.");
         }
     }
 

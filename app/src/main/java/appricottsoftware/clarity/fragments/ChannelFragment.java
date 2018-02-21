@@ -275,7 +275,6 @@ public class ChannelFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
 //                super.onSuccess(statusCode, headers, response);
-                Log.e(TAG , "onSuccess: Array");
                 //Log.i(TAG, "JSON CHANNEL RESPONSE" + response.toString());
 
                 try {
@@ -361,6 +360,7 @@ public class ChannelFragment extends Fragment {
                 Channel channel = new Channel();
                 channel.setImage(episode.getImage());
                 channel.setTitle(episode.getTitle_original());
+                channel.setMetadata(episode.getMetadata());
                 addChannelToSearchRecycler(channel);
             }
 

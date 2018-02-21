@@ -18,15 +18,19 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Metadata;
+import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ClarityClient {
 
     private Context context;
+    private boolean searchQuotaRemaining;
 
     public ClarityClient(Context context) {
         this.context = context;
+        this.searchQuotaRemaining = true;
     }
 
     // Insert API calls here //
@@ -148,6 +152,7 @@ public class ClarityClient {
             jsonParams.put("metadata", metadata);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
+            Log.e("Client: ", jsonParams.toString());
             client.post(context, context.getString(R.string.put_likes_request_url), entity, "application/json", handler);
         } catch (Exception e) {
             e.printStackTrace();
@@ -171,13 +176,14 @@ public class ClarityClient {
             jsonParams.put("metadata", metadata);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
+            Log.e("Client: ", jsonParams.toString());
             client.post(context, context.getString(R.string.put_dislike_request_url), entity, "application/json", handler);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void createChannel(int uid, String name, String imageURL, JsonHttpResponseHandler handler) {
+    public void createChannel(int uid, Channel channel, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         //pass in metadata
 
@@ -191,25 +197,20 @@ public class ClarityClient {
             JSONArray metadata = new JSONArray();
 
             // Metadata 1
-            JSONObject aMetadata = new JSONObject();
-            aMetadata.put("genre", "Something1");
-            aMetadata.put("mid", 111);
-            aMetadata.put("score", 123);
-            metadata.put(aMetadata);
-
-            // Metadata 2
-            JSONObject bMetadata = new JSONObject();
-            bMetadata.put("genre", "Something2");
-            bMetadata.put("mid", 114);
-            bMetadata.put("score", 123);
-            metadata.put(bMetadata);
+            JSONObject meta = new JSONObject();
+            ArrayList<Metadata> channelMetadata = channel.getMetadata();
+            for(Metadata cm : channelMetadata) {
+                meta.put("mid", cm.getMid());
+            }
+            metadata.put(meta);
 
             jsonParams.put("uid", uid);
-            jsonParams.put("title", name);
-            jsonParams.put("image", imageURL);
+            jsonParams.put("title", channel.getTitle());
+            jsonParams.put("image", channel.getImage());
             jsonParams.put("metadata", metadata);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
+            Log.e("ClarityClient", "createChannel: "+ jsonParams.toString());
             client.post(context, context.getString(R.string.create_channel_request_url), entity, "application/json", handler);
         } catch (Exception e) {
             e.printStackTrace();
@@ -236,4 +237,23 @@ public class ClarityClient {
 
     }
 
+    // If search quota is remaining, return true; if out of search quota, return false
+    public boolean isSearchQuotaRemaining(Header[] headers) {
+        int quota_remaining = 0;
+        for(Header h : headers) {
+            if(h.getName().equals(context.getString(R.string.full_text_search_quota_remaining_key))) {
+                quota_remaining = Integer.parseInt(h.getValue());
+            }
+        }
+        if(quota_remaining < 50) {
+            searchQuotaRemaining = false;
+            return false;
+        }
+        searchQuotaRemaining = true;
+        return true;
+    }
+
+    public boolean isSearchQuotaRemaining() {
+        return searchQuotaRemaining;
+    }
 }
