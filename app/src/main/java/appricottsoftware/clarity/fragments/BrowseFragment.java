@@ -87,13 +87,13 @@ public class BrowseFragment extends Fragment {
                 Channel c = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Channel.class);
                 c.setUid(ClarityApp.getSession(getActivity()).getUserID());
 
-                Metadata m = new Metadata();
-                m.setCategory(c.getName());
-                m.setMid(c.getCid());       // Hard-coded metadata id as cid in browse.json
-                c.setCid(0);                // Need to figure out how to set channel ID's in backend
-                m.setScore(1);
+//                Metadata m = new Metadata();
+//                m.setGenre(c.getTitle());
+//                m.setMid(c.getCid());       // Hard-coded metadata id as cid in browse.json
+//                c.setCid(0);                // Need to figure out how to set channel ID's in backend
+//                m.setScore(1);
 
-                c.addMetadata(m);
+//                c.addMetadata(m);
                 channels.add(c);
             }
         } catch (JSONException e) {
@@ -127,7 +127,12 @@ public class BrowseFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 // TODO write interface to send onClicked Channel object to ChannelFragment
-                Toast.makeText(getActivity(), "" + position,
+                Toast.makeText(getActivity(), "Title: " + channels.get(position).getTitle()
+                                                + "\nCid: " + channels.get(position).getCid()
+                                                + "\nUid: " + channels.get(position).getUid()
+                                                + "\nMetadata: " + channels.get(position).getMetadata().get(0).getGenre()
+                                                + " " + channels.get(position).getMetadata().get(0).getMid()
+                                                + " " + channels.get(position).getMetadata().get(0).getScore(),
                         Toast.LENGTH_SHORT).show();
 
                 // Removes channel from browse once user clicks it
@@ -145,7 +150,7 @@ public class BrowseFragment extends Fragment {
             this.query = q;
         }
         // Specify the callback functions for the response handler
-        ClarityApp.getRestClient().getFullTextSearch(offset, query, 0, "episode", getActivity(), new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().getFullTextSearch("", offset, query, 0, "episode", getActivity(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);

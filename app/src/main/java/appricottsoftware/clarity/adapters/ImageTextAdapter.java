@@ -88,7 +88,7 @@ public class ImageTextAdapter extends BaseAdapter {
         // Using flag in order to decide to load Channel or Podcast objects
         if (isChannel) {
             Glide.with(context).load(channels.get(position).getImage()).into(holder.imageView);
-            holder.textView.setText(channels.get(position).getName());
+            holder.textView.setText(channels.get(position).getTitle());
         }
         else {
             Glide.with(context).load(podcasts.get(position).getImage()).into(holder.imageView);

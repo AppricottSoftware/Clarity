@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.e("MainActivity", "On Query text" + query);
         // Specify the callback functions for the response handler
-        ClarityApp.getRestClient().getFullTextSearch(offset, query, 0, "episode", this, new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().getFullTextSearch("", offset, query, 0, "episode", this, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
