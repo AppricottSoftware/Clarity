@@ -69,13 +69,8 @@ public class BrowseAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public class ViewHolder implements View.OnClickListener {
+    public class ViewHolder {
         ImageView imageView;
         TextView textView;
-
-        @Override
-        public void onClick(View view) {
-
-        }
     }
 }
