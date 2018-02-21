@@ -615,7 +615,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             if(rating.getRatingStyle() == RatingCompat.RATING_THUMB_UP_DOWN) {
                 Episode currentEpisode = playlist.peek();
 //                int cid = currentChannel.getCid();
-                int cid = 121;
+                int cid = 1;
                 ArrayList<Integer> genres = currentEpisode.getIntGenres();
 
                 if(rating.isThumbUp()) {
@@ -638,7 +638,19 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 } else {
                     // TODO: get client, post thumbs down
                     Log.e(TAG, "onSetRating: thumbs down");
+                    ClarityApp.getRestClient(context).metadataDownVoteRequest(cid, genres, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            Log.e(TAG, "onSuccess");
+                        }
 
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            super.onFailure(statusCode, headers, throwable, errorResponse);
+                            Log.e(TAG, "onFailure");
+                        }
+                    });
                 }
             }
         }

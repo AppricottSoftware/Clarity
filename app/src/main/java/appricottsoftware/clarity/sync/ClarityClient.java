@@ -161,9 +161,9 @@ public class ClarityClient {
         JSONObject jsonParams = new JSONObject();
         try {
             jsonParams.put("cid", cid);
-            JSONArray metadata = new JSONArray();
 
-            for(Integer g : genres) {
+            JSONArray metadata = new JSONArray();
+            for (Integer g : genres) {
                 JSONObject elem = new JSONObject();
                 elem.put("mid", g);
                 metadata.put(elem);
@@ -187,19 +187,17 @@ public class ClarityClient {
 
         JSONObject jsonParams = new JSONObject();
 
-        // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in serach so it may be added to db.
-        JSONObject aMetadata = new JSONObject();
-        JSONObject bMetadata = new JSONObject();
+        // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in search so it may be added to db.
         try {
-            aMetadata.put("genre", "politics");
-            aMetadata.put("mid", 123);
-            aMetadata.put("score", 5);
-            bMetadata.put("genre", "social");
-            bMetadata.put("mid", 456);
-            bMetadata.put("score", 10);
 
             JSONArray metadata = new JSONArray();
+
+            JSONObject aMetadata = new JSONObject();
+            aMetadata.put("mid", 111);
             metadata.put(aMetadata);
+
+            JSONObject bMetadata = new JSONObject();
+            bMetadata.put("mid", 114);
             metadata.put(bMetadata);
 
             jsonParams.put("uid", uid);
@@ -209,7 +207,6 @@ public class ClarityClient {
 
             StringEntity entity = new StringEntity(jsonParams.toString());
             client.post(context, context.getString(R.string.create_channel_request_url), entity, "application/json", handler);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
