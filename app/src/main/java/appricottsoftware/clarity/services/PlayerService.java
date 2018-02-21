@@ -613,9 +613,16 @@ public class PlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onSetRating(RatingCompat rating) {
             if(rating.getRatingStyle() == RatingCompat.RATING_THUMB_UP_DOWN) {
-                int cid = currentChannel.getCid();
+                int cid = 0;
+                if(currentChannel != null) {
+                    cid = currentChannel.getCid();
+                }
+
                 Episode currentEpisode = playlist.peek();
-                ArrayList<Integer> genres = currentEpisode.getIntGenres();
+                ArrayList<Integer> genres = new ArrayList<>();
+                if(currentEpisode != null) {
+                    genres = currentEpisode.getIntGenres();
+                }
 
                 if(rating.isThumbUp()) {
                     // TODO: get client, post thumbs up
