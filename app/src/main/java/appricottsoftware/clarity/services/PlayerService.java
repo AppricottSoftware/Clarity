@@ -374,6 +374,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         // Add the response to the playlist
                         Log.e(TAG, response.toString());
+                        ClarityApp.getRestClient(context).setSearchQuotaRemaining(headers);
                         playPlaylist(response);
                     }
 

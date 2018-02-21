@@ -238,7 +238,7 @@ public class ClarityClient {
     }
 
     // If search quota is remaining, return true; if out of search quota, return false
-    public boolean isSearchQuotaRemaining(Header[] headers) {
+    public boolean setSearchQuotaRemaining(Header[] headers) {
         int quota_remaining = 0;
         for(Header h : headers) {
             if(h.getName().equals(context.getString(R.string.full_text_search_quota_remaining_key))) {
