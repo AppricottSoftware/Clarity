@@ -1,9 +1,7 @@
 package appricottsoftware.clarity.fragments;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -11,11 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Toast;
-
-import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,14 +21,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import appricottsoftware.clarity.R;
-import appricottsoftware.clarity.adapters.ImageTextAdapter;
+import appricottsoftware.clarity.adapters.BrowseAdapter;
 import appricottsoftware.clarity.models.Channel;
-import appricottsoftware.clarity.models.Metadata;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.ButterKnife;
-import cz.msebera.android.httpclient.Header;
 
 import static appricottsoftware.clarity.sync.ClarityApp.getGson;
 
@@ -111,7 +104,7 @@ public class BrowseFragment extends Fragment {
 
     private void populateBrowseGrid() {
         final GridView gridview = getActivity().findViewById(R.id.gv_browse);
-        final ImageTextAdapter adapter = new ImageTextAdapter(getActivity(), channels);
+        final BrowseAdapter adapter = new BrowseAdapter(getActivity(), channels);
         gridview.setAdapter(adapter);
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {

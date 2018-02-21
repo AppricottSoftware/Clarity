@@ -25,6 +25,7 @@
             android:id="@+id/ivBrowseImg"
             android:layout_width="170dp"
             android:layout_height="170dp"
+            android:padding="8px"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_launcher_background" />

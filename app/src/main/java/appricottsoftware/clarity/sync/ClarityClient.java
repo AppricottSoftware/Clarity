@@ -72,7 +72,7 @@ public class ClarityClient {
 
             JSONObject jsonParams = new JSONObject();
             try {
-                client.setMaxRetriesAndTimeout(0, 1000);
+                client.setMaxRetriesAndTimeout(1, 1000);
 
                 jsonParams.put("email", email);
                 jsonParams.put("password", password);
@@ -113,7 +113,7 @@ public class ClarityClient {
 
             JSONObject jsonParams = new JSONObject();
             try {
-                client.setMaxRetriesAndTimeout(0, 1000);
+                client.setMaxRetriesAndTimeout(1, 1000);
 
                 jsonParams.put("email", email);
                 jsonParams.put("password", password);
@@ -132,6 +132,8 @@ public class ClarityClient {
 
         JSONObject jsonParams = new JSONObject();
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("cid", cid);
             JSONArray metadata = new JSONArray();
 
@@ -155,6 +157,8 @@ public class ClarityClient {
 
         JSONObject jsonParams = new JSONObject();
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("cid", cid);
 
             JSONArray metadata = new JSONArray();
@@ -184,6 +188,7 @@ public class ClarityClient {
 
         // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in search so it may be added to db.
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
 
             JSONArray metadata = new JSONArray();
 
@@ -222,6 +227,8 @@ public class ClarityClient {
         JSONObject jsonParams = new JSONObject();
 
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("uid", uid);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
@@ -230,7 +237,5 @@ public class ClarityClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 }

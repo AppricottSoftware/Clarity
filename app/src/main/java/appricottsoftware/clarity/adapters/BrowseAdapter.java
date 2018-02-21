@@ -15,18 +15,20 @@ import java.util.ArrayList;
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Podcast;
+import butterknife.OnClick;
 
 /**
  * Created by ttony on 1/30/2018.
  */
 
-public class ImageTextAdapter extends BaseAdapter {
+public class BrowseAdapter extends BaseAdapter {
+    private View view;
     private Context context;
     private ArrayList<Channel> channels;
 
     private static final String TAG = "ImageTextAdapter";
 
-    public ImageTextAdapter(Context c, ArrayList<Channel> ch) {
+    public BrowseAdapter(Context c, ArrayList<Channel> ch) {
         context = c;
         channels = ch;
     }
@@ -54,7 +56,6 @@ public class ImageTextAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.item_browse_result, parent, false);
             holder.textView = convertView.findViewById(R.id.ivBrowseEpisodeName);
             holder.imageView = convertView.findViewById(R.id.ivBrowseImg);
-            holder.imageView.setPadding(8, 8, 8, 8);
             convertView.setTag(holder);
         }
         else {
@@ -64,11 +65,17 @@ public class ImageTextAdapter extends BaseAdapter {
         Glide.with(context).load(channels.get(position).getImage()).into(holder.imageView);
         holder.textView.setText(channels.get(position).getTitle());
 
+        view = convertView;
         return convertView;
     }
 
-    static class ViewHolder {
+    public class ViewHolder implements View.OnClickListener {
         ImageView imageView;
         TextView textView;
+
+        @Override
+        public void onClick(View view) {
+
+        }
     }
 }
