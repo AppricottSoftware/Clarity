@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.google.gson.reflect.TypeToken;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,13 +75,22 @@ public class BrowseFragment extends Fragment {
     // Parses json file and adds contexts to Channel ArrayList
     void parseJSON() {
         try {
-            JSONObject obj = new JSONObject(loadJSONFromAsset());
-            JSONArray resp = obj.getJSONArray("results");
-            for (int i = 0; i < resp.length(); i++) {
-                Channel c = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Channel.class);
-                c.setUid(ClarityApp.getSession(getActivity()).getUserID());
-                channels.add(c);
-            }
+            JSONObject object = new JSONObject(loadJSONFromAsset());
+            JSONArray response = object.getJSONArray("results");
+
+            // This code is a messier way to parse JSON, but allows setting UID. Leaving commented code
+            // in case UID must be set here.
+//            for (int i = 0; i < response.length(); i++) {
+//                Channel c = getGson().fromJson(String.valueOf(response.getJSONObject(i)), Channel.class);
+//                c.setUid(ClarityApp.getSession(getActivity()).getUserID());
+//                channels.add(c);
+//            }
+
+            // This code below is a more elegant way of parsing the JSON file but doesn't allow setting UID
+            TypeToken<ArrayList<Channel>> token = new TypeToken<ArrayList<Channel>>() {};
+            channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
