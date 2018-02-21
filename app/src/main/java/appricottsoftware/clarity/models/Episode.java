@@ -8,6 +8,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import org.parceler.Parcel;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -48,7 +49,7 @@ public class Episode {
     String audio_length;
     String podcast_title_highlighted;
     String image;
-    ArrayList<String> genres;    
+    ArrayList<String> genres;
     String title_original;
     String podcast_title_original;
     String publisher_highlighted;
@@ -211,6 +212,14 @@ public class Episode {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public ArrayList<Integer> getIntGenres() {
+        ArrayList<Integer> gens = new ArrayList<>();
+        for(String g : genres) {
+            gens.add(Integer.parseInt(g));
+        }
+        return gens;
     }
 
     public boolean isValid() {

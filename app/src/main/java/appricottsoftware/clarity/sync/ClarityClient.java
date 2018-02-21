@@ -131,24 +131,43 @@ public class ClarityClient {
         }
     }
 
-
-    public void metadataUpVoteRequest(JsonHttpResponseHandler handler) {
+    public void metadataUpVoteRequest(int cid, ArrayList<Integer> genres, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
 
         JSONObject jsonParams = new JSONObject();
         try {
-            jsonParams.put("cid", 1);
+            jsonParams.put("cid", cid);
             JSONArray metadata = new JSONArray();
 
-            JSONObject element1 = new JSONObject();
-            element1.put("mid", 1);
-            JSONObject element2 = new JSONObject();
-            element2.put("mid", 2);
-
-            metadata.put(element1);
-            metadata.put(element2);
+            for(Integer g : genres) {
+                JSONObject elem = new JSONObject();
+                elem.put("mid", g);
+                metadata.put(elem);
+            }
 
             jsonParams.put("metadata", metadata);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            Log.e("TESTING", jsonParams.toString() + " TO: " + context.getString(R.string.put_likes_request_url));
+            client.post(context, context.getString(R.string.put_likes_request_url), entity, "application/json", handler);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void metadataDownVoteRequest(int cid, ArrayList<Integer> genres, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        JSONObject jsonParams = new JSONObject();
+        try {
+            jsonParams.put("cid", cid);
+            JSONArray metadata = new JSONArray();
+
+            for(Integer g : genres) {
+                JSONObject elem = new JSONObject();
+                elem.put("mid", g);
+                metadata.put(elem);
+            }
 
             jsonParams.put("metadata", metadata);
 
@@ -159,7 +178,6 @@ public class ClarityClient {
             e.printStackTrace();
         }
     }
-
 
     public void createChannel(int uid, String name, String imageURL, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
