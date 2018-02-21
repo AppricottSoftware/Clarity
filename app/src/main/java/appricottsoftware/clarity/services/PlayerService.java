@@ -613,42 +613,39 @@ public class PlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onSetRating(RatingCompat rating) {
             if(rating.getRatingStyle() == RatingCompat.RATING_THUMB_UP_DOWN) {
+                int cid = currentChannel.getCid();
                 Episode currentEpisode = playlist.peek();
-//                int cid = currentChannel.getCid();
-                int cid = 1;
                 ArrayList<Integer> genres = currentEpisode.getIntGenres();
 
                 if(rating.isThumbUp()) {
                     // TODO: get client, post thumbs up
-                    Log.e(TAG, "onSetRating: thumbs up");
                     ClarityApp.getRestClient(context).metadataUpVoteRequest(cid, genres, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             super.onSuccess(statusCode, headers, response);
-                            Log.e(TAG, "onSuccess");
+                            Log.v(TAG, "onSuccess");
                         }
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                             super.onFailure(statusCode, headers, throwable, errorResponse);
-                            Log.e(TAG, "onFailure");
+                            Log.v(TAG, "onFailure");
                         }
                     });
 
                 } else {
                     // TODO: get client, post thumbs down
-                    Log.e(TAG, "onSetRating: thumbs down");
                     ClarityApp.getRestClient(context).metadataDownVoteRequest(cid, genres, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             super.onSuccess(statusCode, headers, response);
-                            Log.e(TAG, "onSuccess");
+                            Log.v(TAG, "onSuccess");
                         }
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                             super.onFailure(statusCode, headers, throwable, errorResponse);
-                            Log.e(TAG, "onFailure");
+                            Log.v(TAG, "onFailure");
                         }
                     });
                 }

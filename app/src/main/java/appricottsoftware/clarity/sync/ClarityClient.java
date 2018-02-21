@@ -148,7 +148,6 @@ public class ClarityClient {
             jsonParams.put("metadata", metadata);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
-            Log.e("TESTING", jsonParams.toString() + " TO: " + context.getString(R.string.put_likes_request_url));
             client.post(context, context.getString(R.string.put_likes_request_url), entity, "application/json", handler);
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,7 +171,6 @@ public class ClarityClient {
             jsonParams.put("metadata", metadata);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
-            Log.e("TESTING", jsonParams.toString() + " TO: " + context.getString(R.string.put_dislike_request_url));
             client.post(context, context.getString(R.string.put_dislike_request_url), entity, "application/json", handler);
         } catch (Exception e) {
             e.printStackTrace();
