@@ -62,7 +62,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     private static final String registeredLoginType = "1";
     private static final String facebookLoginType = "2";
     private static final String googleLoginType = "3";
-
     private static final String TAG = "HomeActivity";
 
     private ActionBarDrawerToggle drawerToggle;

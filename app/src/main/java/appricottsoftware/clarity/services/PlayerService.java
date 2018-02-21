@@ -626,7 +626,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
                 if(rating.isThumbUp()) {
                     // TODO: get client, post thumbs up
-                    ClarityApp.getRestClient(context).metadataUpVoteRequest(cid, genres, new JsonHttpResponseHandler() {
+                    ClarityApp.getRestClient().metadataUpVoteRequest(cid, genres, context, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             super.onSuccess(statusCode, headers, response);
@@ -642,7 +642,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
                 } else {
                     // TODO: get client, post thumbs down
-                    ClarityApp.getRestClient(context).metadataDownVoteRequest(cid, genres, new JsonHttpResponseHandler() {
+                    ClarityApp.getRestClient().metadataDownVoteRequest(cid, genres, context, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             super.onSuccess(statusCode, headers, response);

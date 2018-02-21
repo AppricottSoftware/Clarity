@@ -171,6 +171,7 @@ public class ClarityClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
 
     public void createChannel(int uid, String name, String imageURL, Context context, JsonHttpResponseHandler handler) {
