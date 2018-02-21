@@ -64,8 +64,6 @@ public class BrowseFragment extends Fragment {
         // Parse browse.json from assets to populate Channel array.
         parseJSON();
         populateBrowseGrid();
-
-//        getPodcasts("episode");
     }
 
     @Override
@@ -79,6 +77,7 @@ public class BrowseFragment extends Fragment {
         }
     }
 
+    // Parses json file and adds contexts to Channel ArrayList
     void parseJSON() {
         try {
             JSONObject obj = new JSONObject(loadJSONFromAsset());
@@ -86,14 +85,6 @@ public class BrowseFragment extends Fragment {
             for (int i = 0; i < resp.length(); i++) {
                 Channel c = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Channel.class);
                 c.setUid(ClarityApp.getSession(getActivity()).getUserID());
-
-//                Metadata m = new Metadata();
-//                m.setGenre(c.getTitle());
-//                m.setMid(c.getCid());       // Hard-coded metadata id as cid in browse.json
-//                c.setCid(0);                // Need to figure out how to set channel ID's in backend
-//                m.setScore(1);
-
-//                c.addMetadata(m);
                 channels.add(c);
             }
         } catch (JSONException e) {
@@ -101,6 +92,7 @@ public class BrowseFragment extends Fragment {
         }
     }
 
+    // Gets json from file. Will eventually update this code to pull json from database
     public String loadJSONFromAsset() {
         String json = null;
         try {
@@ -119,7 +111,7 @@ public class BrowseFragment extends Fragment {
 
     private void populateBrowseGrid() {
         final GridView gridview = getActivity().findViewById(R.id.gv_browse);
-        final ImageTextAdapter adapter = new ImageTextAdapter().useChannel(getActivity(), channels);
+        final ImageTextAdapter adapter = new ImageTextAdapter(getActivity(), channels);
         gridview.setAdapter(adapter);
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -128,11 +120,11 @@ public class BrowseFragment extends Fragment {
                                     int position, long id) {
                 // TODO write interface to send onClicked Channel object to ChannelFragment
                 Toast.makeText(getActivity(), "Title: " + channels.get(position).getTitle()
-                                                + "\nCid: " + channels.get(position).getCid()
-                                                + "\nUid: " + channels.get(position).getUid()
-                                                + "\nMetadata: " + channels.get(position).getMetadata().get(0).getGenre()
-                                                + " " + channels.get(position).getMetadata().get(0).getMid()
-                                                + " " + channels.get(position).getMetadata().get(0).getScore(),
+                                            + "\nCid: " + channels.get(position).getCid()
+                                            + "\nUid: " + channels.get(position).getUid()
+                                            + "\nMetadata: " + channels.get(position).getMetadata().get(0).getGenre()
+                                            + " " + channels.get(position).getMetadata().get(0).getMid()
+                                            + " " + channels.get(position).getMetadata().get(0).getScore(),
                         Toast.LENGTH_SHORT).show();
 
                 // Removes channel from browse once user clicks it
@@ -142,41 +134,5 @@ public class BrowseFragment extends Fragment {
                 // TODO write getter interface to retreive all Channels from ChannelFragment to avoid displaying duplicate Channels Here
             }
         });
-    }
-
-    // Make an API call to get podcasts from ListenNotes API
-    private void getPodcasts(String q) {
-        if(this.query != q) {
-            this.query = q;
-        }
-        // Specify the callback functions for the response handler
-        ClarityApp.getRestClient().getFullTextSearch("", offset, query, 0, "episode", getActivity(), new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                addPodcasts(response);
-            }
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                throwable.printStackTrace();
-            }
-        });
-    }
-
-    private void addPodcasts(JSONObject response) {
-        // Convert the JSON into Podcasts objects (our model)
-        try {
-            offset = response.getInt("next_offset");
-            JSONArray resp = response.getJSONArray("results");
-            Log.e(TAG, resp.toString());
-            for (int i = 0; i < 6 && i < resp.length(); i++) {
-                Podcast p = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Podcast.class);
-                podcasts.add(p);
-            }
-            populateBrowseGrid();
-        } catch(JSONException e) {
-            e.printStackTrace();
-        }
     }
 }
