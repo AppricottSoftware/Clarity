@@ -87,7 +87,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
             notifyItemChanged(selected_position);
 
             if (isChannelView){
-
                 if(view.getContext() instanceof PlayerInterface) {
                     playerInterface = (PlayerInterface) view.getContext();
                 } else {
@@ -95,8 +94,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                     throw new ClassCastException(view.getContext().toString() + " must implement PlayerInterface");
                 }
 
-
-                //Channel epToPlay = recyclerList_ItemList.get(selected_position).getClass();
+//                Channel epToPlay = recyclerList_ItemList.get(selected_position).getClass();
 
                 Episode testEpisode = Episode.getSampleEpisode();
                 playerInterface.playEpisode(testEpisode);

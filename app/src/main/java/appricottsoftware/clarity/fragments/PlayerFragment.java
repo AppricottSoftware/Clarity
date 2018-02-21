@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.drm.DrmStore;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.Rating;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.widget.AppCompatSeekBar;
@@ -149,6 +151,9 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         setSeekBarDrag(activity, sbExpandSeek);
         setSkipOnClick(activity, ibCollapseSkip);
         setSkipOnClick(activity, ibExpandSkip);
+        setLikeClick(activity, ibExpandLike);
+        setDislikeClick(activity, ibExpandDislike);
+
         // TODO: playback speed controls
     }
 
@@ -194,6 +199,24 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
             public void onClick(View v) {
                 // If the user clicks the skip button, call the service to skip to the next track
                 MediaControllerCompat.getMediaController(activity).getTransportControls().skipToNext();
+            }
+        });
+    }
+
+    private void setLikeClick(@NonNull final Activity activity, ImageButton like) {
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MediaControllerCompat.getMediaController(activity).getTransportControls().setRating(RatingCompat.newThumbRating(true));
+            }
+        });
+    }
+
+    private void setDislikeClick(@NonNull final Activity activity, ImageButton dislike) {
+        dislike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MediaControllerCompat.getMediaController(activity).getTransportControls().setRating(RatingCompat.newThumbRating(false));
             }
         });
     }

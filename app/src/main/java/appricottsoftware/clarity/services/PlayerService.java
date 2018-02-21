@@ -19,6 +19,7 @@ import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaBrowserServiceCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -61,7 +62,9 @@ import java.util.Queue;
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
+import appricottsoftware.clarity.models.Metadata;
 import appricottsoftware.clarity.sync.ClarityApp;
+import appricottsoftware.clarity.sync.ClarityClient;
 import cz.msebera.android.httpclient.Header;
 
 public class PlayerService extends MediaBrowserServiceCompat {
@@ -605,6 +608,55 @@ public class PlayerService extends MediaBrowserServiceCompat {
         public void onSkipToNext() {
             Log.v(TAG, "onSkipToNext");
             updatePlaylist();
+        }
+
+        @Override
+        public void onSetRating(RatingCompat rating) {
+            if(rating.getRatingStyle() == RatingCompat.RATING_THUMB_UP_DOWN) {
+                int cid = 0;
+                if(currentChannel != null) {
+                    cid = currentChannel.getCid();
+                }
+
+                Episode currentEpisode = playlist.peek();
+                ArrayList<Integer> genres = new ArrayList<>();
+                if(currentEpisode != null) {
+                    genres = currentEpisode.getIntGenres();
+                }
+
+                if(rating.isThumbUp()) {
+                    // TODO: get client, post thumbs up
+                    ClarityApp.getRestClient(context).metadataUpVoteRequest(cid, genres, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            Log.v(TAG, "onSuccess");
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            super.onFailure(statusCode, headers, throwable, errorResponse);
+                            Log.v(TAG, "onFailure");
+                        }
+                    });
+
+                } else {
+                    // TODO: get client, post thumbs down
+                    ClarityApp.getRestClient(context).metadataDownVoteRequest(cid, genres, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            Log.v(TAG, "onSuccess");
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            super.onFailure(statusCode, headers, throwable, errorResponse);
+                            Log.v(TAG, "onFailure");
+                        }
+                    });
+                }
+            }
         }
 
         @Override
