@@ -282,6 +282,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
                 context.startService(playerServiceIntent);
             }
         };
+
         // Launch it in a new thread so the UI thread isn't blocked
         final Thread thread = new Thread() {
             @Override
@@ -361,7 +362,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         return new MediaBrowserCompat.ConnectionCallback() {
             @Override
             public void onConnected() {
-                Log.d(TAG, "MediaBrowserCompat.ConnectionCallback: onConnected");
                 // Connect to media session
                 connectToSession(mediaBrowser.getSessionToken());
             }
@@ -382,32 +382,29 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         return new MediaControllerCompat.Callback() {
             @Override
             public void onMetadataChanged(MediaMetadataCompat metadata) {
-                Log.d(TAG, "OnMetadataChanged: " + metadata.toString());
                 playerFragment.onMetadataChanged(metadata);
             }
 
             @Override
             public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                Log.d(TAG, "OnPlaybackStateChanged: " + state.toString());
                 playerFragment.onPlaybackStateChanged(state, mediaController.getMetadata());
             }
 
             @Override
             public void onAudioInfoChanged(MediaControllerCompat.PlaybackInfo info) {
-                Log.d(TAG, "onAudioInfoChanged: " + info.toString());
-                super.onAudioInfoChanged(info);
+                // TODO: Use new audio info
             }
 
             @Override
             public void onSessionEvent(String event, Bundle extras) {
-                Log.d(TAG, "onSessionEvent" + event.toString());
-                super.onSessionEvent(event, extras);
+                // TODO: Use session event
             }
         };
     }
 
     @Override
     public void playChannel(Channel channel) {
+        // TODO: Figure out why bundle is not transmitting data
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_channel_bundle), Parcels.wrap(channel));
         mediaController.getTransportControls()
@@ -416,7 +413,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
     @Override
     public void playEpisode(Episode episode) {
-        // TODO: Figure out why bundle is not transmitting data
+        // TODO: Not used yet
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_episode_bundle), Parcels.wrap(episode));
         mediaController.getTransportControls()
@@ -425,6 +422,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
     @Override
     public void playPodcast(Podcast podcast) {
+        // TODO: Not used yet
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_podcast_bundle), Parcels.wrap(podcast));
         mediaController.getTransportControls()

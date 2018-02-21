@@ -37,6 +37,8 @@ import butterknife.ButterKnife;
 
 public class PlayerFragment extends Fragment /*implements View.OnClickListener*/ {
 
+    private static final String TAG = "PlayerFragment";
+
     // Collapsed state view elements
     @BindView(R.id.rl_collapse) ConstraintLayout rlCollapse;
     @BindView(R.id.iv_collapse_cover) ImageView ivCollapseCover;
@@ -59,8 +61,6 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @BindView(R.id.tv_expand_description) TextView tvExpandDescription;
     @BindView(R.id.iv_expand_cover) ImageView ivExpandCover;
 
-    private static final String TAG = "PlayerFragment";
-
     private MediaMetadataCompat currentMetadata;
     private boolean currentPlayState;
 
@@ -74,9 +74,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        // Initialize view lookups, listeners
-
-        // Set marquee scrolling
+        // Set marquee scrolling for title and description
         tvExpandTitle.setSelected(true);
         tvExpandDescription.setSelected(true);
         tvCollapseTitle.setSelected(true);
@@ -99,7 +97,6 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         rlCollapse.setVisibility(View.GONE);
     }
 
-
     public void closePanel() {
         // Hide/show view elements to make fragment bottom strip
         rlExpand.setVisibility(View.GONE);
@@ -107,28 +104,25 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     }
 
     public void onPlaybackStateChanged(PlaybackStateCompat state, MediaMetadataCompat metadata) {
+        Log.v(TAG, "onPlaybackStateChanged: " + state.getState());
         switch (state.getState()) {
             case PlaybackStateCompat.STATE_PLAYING:
-                Log.d(TAG, "onPlaybackStateChanged: State is playing " + state.getState());
                 setPlayPauseControls(true);
                 setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 onMetadataChanged(metadata);
                 break;
             case PlaybackStateCompat.STATE_PAUSED:
-                Log.d(TAG, "onPlaybackStateChanged: State is paused " + state.getState());
                 setPlayPauseControls(false);
                 setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 break;
             case PlaybackStateCompat.STATE_STOPPED:
-                Log.d(TAG, "onPlaybackStateChanged: State is stopped " + state.getState());
                 setPlayPauseControls(false);
                 setSeekBarControls((int) state.getPosition(), (int) state.getBufferedPosition());
                 break;
             case PlaybackStateCompat.STATE_ERROR:
-                Log.d(TAG, "onPlaybackStateChanged: Error state " + state.getErrorMessage());
+                // TODO: Alert user of problem
                 break;
             default:
-                Log.d(TAG, "onPlaybackStateChanged: Unhandled case " + state.getState());
                 break;
         }
     }
@@ -136,8 +130,8 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     public void onMetadataChanged(MediaMetadataCompat metadata) {
         // Load changed details into player fragment if the metadata has changed
         if (metadata != null
-                && (currentMetadata == null
-                || (!metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
+            && (currentMetadata == null
+            || (!metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI)
                 .equals(currentMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI))))) {
             tvCollapseTitle.setText(metadata.getDescription().getTitle());
             tvExpandTitle.setText(metadata.getDescription().getTitle());
@@ -145,9 +139,6 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
             tvExpandDescription.setText(metadata.getDescription().getDescription());
             Glide.with(getContext()).load(metadata.getDescription().getIconUri()).into(ivCollapseCover);
             Glide.with(getContext()).load(metadata.getDescription().getIconUri()).into(ivExpandCover);
-
-            if (currentMetadata != null)
-                Log.d(TAG, "OnMetadataChanged: " + metadata.toString() + " " + currentMetadata.toString());
             currentMetadata = metadata;
         }
     }
@@ -156,8 +147,9 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         setControlOnClick(activity, ibCollapsePlayPause);
         setControlOnClick(activity, ibExpandPlayPause);
         setSeekBarDrag(activity, sbExpandSeek);
+        setSkipOnClick(activity, ibCollapseSkip);
+        setSkipOnClick(activity, ibExpandSkip);
         // TODO: playback speed controls
-
     }
 
     private void setControlOnClick(@NonNull final Activity activity, ImageButton imageButton) {
@@ -183,18 +175,25 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    Log.d(TAG, "setSeekBarDrag: onProgressChanged: " + progress);
                     // If the user drags the seekbar, call the service to seek to a position (in milliseconds)
                     MediaControllerCompat.getMediaController(activity).getTransportControls().seekTo(progress * 1000);
                 }
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) { }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(SeekBar seekBar) { }
+        });
+    }
+
+    private void setSkipOnClick(@NonNull final Activity activity, ImageButton skip) {
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // If the user clicks the skip button, call the service to skip to the next track
+                MediaControllerCompat.getMediaController(activity).getTransportControls().skipToNext();
             }
         });
     }
@@ -203,6 +202,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         if (currentPlayState != play) {
             // If paused, set the play/pause button to play
             int rDrawable = R.drawable.ic_player_play;
+
             // If playing, set the play/pause button to pause
             if (play) {
                 rDrawable = R.drawable.ic_player_pause;

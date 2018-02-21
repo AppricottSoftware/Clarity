@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/textView_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="@dimen/survey_prompt_LR_padding"
+        android:paddingRight="@dimen/survey_prompt_LR_padding"
+        android:text="@string/survey_prompt"
+        android:textAlignment="center"
+        android:textSize="@dimen/survey_prompt_text_size"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/textView_cat1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_1"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="64dp"
+        tools:layout_editor_absoluteY="220dp" />
+
+    <TextView
+        android:id="@+id/textView_cat2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_2"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="24dp"
+        tools:layout_editor_absoluteY="268dp" />
+
+    <TextView
+        android:id="@+id/textView_cat3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_3"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="50dp"
+        tools:layout_editor_absoluteY="304dp" />
+
+    <TextView
+        android:id="@+id/textView_cat4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_4"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="64dp"
+        tools:layout_editor_absoluteY="369dp" />
+
+    <TextView
+        android:id="@+id/textView_cat5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_5"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="41dp"
+        tools:layout_editor_absoluteY="406dp" />
+
+
+    <TextView
+        android:id="@+id/textView_cat6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/category_6"
+        android:textSize="@dimen/survey_cat_text_size"
+        tools:layout_editor_absoluteX="24dp"
+        tools:layout_editor_absoluteY="461dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat1"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="220dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat2"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="268dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat3"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="311dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat4"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="369dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat5"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="425dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton_cat6"
+        android:layout_width="@dimen/survey_thumb"
+        android:layout_height="@dimen/survey_thumb"
+        android:background="@drawable/ic_nav_drawer_like_white"
+        android:textOff=""
+        android:textOn=""
+        tools:layout_editor_absoluteX="302dp"
+        tools:layout_editor_absoluteY="481dp" />
+
+
+</android.support.constraint.ConstraintLayout>

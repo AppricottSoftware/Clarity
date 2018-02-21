@@ -22,16 +22,17 @@ public class PlaybackReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
             // TODO: Pause the playback
+            Log.v(TAG, "onReceive: Noisy");
         } else if(PlaybackStateCompat.ACTION_PAUSE == Long.parseLong(intent.getAction())) {
-            // TODO: show play on notification
-            Log.d(TAG, "Play");
+            // TODO: Show play on notification
+            Log.v(TAG, "onReceive: Play");
         } else if(PlaybackStateCompat.ACTION_PLAY == Long.parseLong(intent.getAction())) {
-            // TODO: show pause on notification
-            Log.d(TAG, "Pause");
+            // TODO: Show pause on notification
+            Log.v(TAG, "onReceive: Pause");
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Action: " + intent.getAction() + "\n");
         sb.append("URI: " + intent.toUri(Intent.URI_INTENT_SCHEME).toString() + "\n");
-        Log.d(TAG, sb.toString());
+        Log.v(TAG, "onReceive: " + sb.toString());
     }
 }
