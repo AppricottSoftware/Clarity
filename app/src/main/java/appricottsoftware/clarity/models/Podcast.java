@@ -1,52 +1,58 @@
 package appricottsoftware.clarity.models;
 
+import org.parceler.Parcel;
+
+@Parcel
 public class Podcast {
 
-    private String image;
-    private String id;
-    private String audio_length;
-    private String rss;
-    private String title_original;
-    private int itunes_id;
-    private String audio;
-    private String podcast_id;
-    private String podcast_title_original;
-    private String description_original;
-    private String publisher_original;
-    private long pub_date_ms;
+    /* Sample API Response
+        "image": "http://is5.mzstatic.com/image/thumb/Music71/v4/9c/d5/a6/9cd5a666-79ea-4b76-c5f6-90cc508648e9/source/600x600bb.jpg",
+         "title_original": "Star Wars Uplink",
+         "publisher_highlighted": "<span class=\"ln-search-highlight\">Star</span> <span class=\"ln-search-highlight\">Wars</span> Uplink",
+         "itunes_id": 1160076174,
+         "lastest_pub_date_ms": "a year ago",
+         "id": "897cb5647c5447ebad5039be8293af5f",
+         "description_highlighted": "...Brought to you by Rex Overdrive and Adam Cook, comes the <span class=\"ln-search-highlight\">Star</span> <span class=\"ln-search-highlight\">Wars</span> Uplink podcast feed. Here you will find shows discussing and celebrating everything about <span class=\"ln-search-highlight\">Star</span> <span class=\"ln-search-highlight\">Wars</span>.\n\nSubscribe on Itunes!\nTwitter",
+         "title_highlighted": "<span class=\"ln-search-highlight\">Star</span> <span class=\"ln-search-highlight\">Wars</span> Uplink",
+         "publisher_original": "Star Wars Uplink",
+         "rss": "http://starwarsuplink.libsyn.com/rss",
+         "description_original": "Brought to you by Rex Overdrive and Adam Cook, comes the Star Wars Uplink podcast feed. Here you will find shows discussing and celebrating everything about Star Wars.\n\nSubscribe on Itunes!\nTwitter @starwarsuplink"
+     */
 
-    public Podcast() { /* Empty constructor required by GSON */}
+    String image;
+    String title_original;
+    String publisher_highlighted;
+    long itunes_id;
+    String lastest_pub_date_ms;
+    String id;
+    String description_highlighted;
+    String title_highlighted;
+    String publisher_original;
+    String rss;
+    String description_original;
+
+    public Podcast() { /* Empty constructor required by GSON and Parcel */}
+
+    public Podcast(String image, String title_original, String publisher_highlighted, long itunes_id, String lastest_pub_date_ms, String id, String description_highlighted, String title_highlighted, String publisher_original, String rss, String description_original) {
+        this.image = image;
+        this.title_original = title_original;
+        this.publisher_highlighted = publisher_highlighted;
+        this.itunes_id = itunes_id;
+        this.lastest_pub_date_ms = lastest_pub_date_ms;
+        this.id = id;
+        this.description_highlighted = description_highlighted;
+        this.title_highlighted = title_highlighted;
+        this.publisher_original = publisher_original;
+        this.rss = rss;
+        this.description_original = description_original;
+    }
 
     public String getImage() {
-        return image.replaceAll("\\/", "/");
+        return image;
     }
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getAudio_length() {
-        return audio_length;
-    }
-
-    public void setAudio_length(String audio_length) {
-        this.audio_length = audio_length;
-    }
-
-    public String getRss() {
-        return rss;
-    }
-
-    public void setRss(String rss) {
-        this.rss = rss;
     }
 
     public String getTitle_original() {
@@ -57,44 +63,52 @@ public class Podcast {
         this.title_original = title_original;
     }
 
-    public int getItunes_id() {
+    public String getPublisher_highlighted() {
+        return publisher_highlighted;
+    }
+
+    public void setPublisher_highlighted(String publisher_highlighted) {
+        this.publisher_highlighted = publisher_highlighted;
+    }
+
+    public long getItunes_id() {
         return itunes_id;
     }
 
-    public void setItunes_id(int itunes_id) {
+    public void setItunes_id(long itunes_id) {
         this.itunes_id = itunes_id;
     }
 
-    public String getAudio() {
-        return audio;
+    public String getLastest_pub_date_ms() {
+        return lastest_pub_date_ms;
     }
 
-    public void setAudio(String audio) {
-        this.audio = audio;
+    public void setLastest_pub_date_ms(String lastest_pub_date_ms) {
+        this.lastest_pub_date_ms = lastest_pub_date_ms;
     }
 
-    public String getPodcast_id() {
-        return podcast_id;
+    public String getId() {
+        return id;
     }
 
-    public void setPodcast_id(String podcast_id) {
-        this.podcast_id = podcast_id;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getPodcast_title_original() {
-        return podcast_title_original;
+    public String getDescription_highlighted() {
+        return description_highlighted;
     }
 
-    public void setPodcast_title_original(String podcast_title_original) {
-        this.podcast_title_original = podcast_title_original;
+    public void setDescription_highlighted(String description_highlighted) {
+        this.description_highlighted = description_highlighted;
     }
 
-    public String getDescription_original() {
-        return description_original;
+    public String getTitle_highlighted() {
+        return title_highlighted;
     }
 
-    public void setDescription_original(String description_original) {
-        this.description_original = description_original;
+    public void setTitle_highlighted(String title_highlighted) {
+        this.title_highlighted = title_highlighted;
     }
 
     public String getPublisher_original() {
@@ -105,12 +119,20 @@ public class Podcast {
         this.publisher_original = publisher_original;
     }
 
-    public long getPub_date_ms() {
-        return pub_date_ms;
+    public String getRss() {
+        return rss;
     }
 
-    public void setPub_date_ms(long pub_date_ms) {
-        this.pub_date_ms = pub_date_ms;
+    public void setRss(String rss) {
+        this.rss = rss;
+    }
+
+    public String getDescription_original() {
+        return description_original;
+    }
+
+    public void setDescription_original(String description_original) {
+        this.description_original = description_original;
     }
 }
 

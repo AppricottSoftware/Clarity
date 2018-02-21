@@ -6,11 +6,14 @@ import android.content.Context;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.gson.Gson;
 
+import appricottsoftware.clarity.models.Session;
+
 // Keep a state for the entire app for API calls
 public class ClarityApp extends Application {
 
     private static ClarityClient clarityClient;
     private static GoogleSignInClient googleSignInClient;
+    private static Session session;
     private static Gson gson;
 
     @Override
@@ -19,9 +22,9 @@ public class ClarityApp extends Application {
     }
 
     // Get the single instance of the API client
-    public static ClarityClient getRestClient() {
+    public static ClarityClient getRestClient(Context context) {
         if(clarityClient == null) {
-            clarityClient = new ClarityClient();
+            clarityClient = new ClarityClient(context);
         }
         return clarityClient;
     }
@@ -32,6 +35,14 @@ public class ClarityApp extends Application {
             gson = new Gson();
         }
         return gson;
+    }
+
+    // Get the single instance of a user Session
+    public static Session getSession(Context context) {
+        if (session == null) {
+            session = new Session(context);
+        }
+        return session;
     }
 
     public void setGoogleSignInClient(GoogleSignInClient googleSignInClient) {

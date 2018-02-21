@@ -12,6 +12,8 @@ import butterknife.ButterKnife;
 
 public class LikeFragment extends Fragment {
 
+    private static final String TAG = "LikeFragment";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
