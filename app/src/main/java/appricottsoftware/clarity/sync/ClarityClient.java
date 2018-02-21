@@ -192,12 +192,14 @@ public class ClarityClient {
 
             JSONArray metadata = new JSONArray();
 
+            // Metadata 1
             JSONObject aMetadata = new JSONObject();
             aMetadata.put("genre", "Something1");
             aMetadata.put("mid", 111);
             aMetadata.put("score", 123);
             metadata.put(aMetadata);
 
+            // Metadata 2
             JSONObject bMetadata = new JSONObject();
             bMetadata.put("genre", "Something2");
             bMetadata.put("mid", 114);
