@@ -406,8 +406,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
             } catch(Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            Log.e(TAG, "playChannel: Podcast API quota has been exceeded.");
         }
     }
 

@@ -219,13 +219,11 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                Log.e(TAG, "Expand");
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                Log.e(TAG, "Collapse");
                 // Hide results, replace with home fragment
                 insertFragment(homeFragment, getString(R.string.home_fragment_tag));
                 return true;
@@ -260,6 +258,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private void searchEpisodes(String query) {
         // Show channel search fragment, hide home fragment
         insertFragment(channelSearchFragment, getString(R.string.channel_search_fragment_tag));
+
 
         // Run the search when the fragment is ready
         searchChannel = true;

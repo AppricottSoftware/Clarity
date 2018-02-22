@@ -238,19 +238,19 @@ public class ClarityClient {
     }
 
     // If search quota is remaining, return true; if out of search quota, return false
-    public boolean setSearchQuotaRemaining(Header[] headers) {
+    public void setSearchQuotaRemaining(Header[] headers) {
         int quota_remaining = 0;
         for(Header h : headers) {
             if(h.getName().equals(context.getString(R.string.full_text_search_quota_remaining_key))) {
                 quota_remaining = Integer.parseInt(h.getValue());
+                Log.e("ClarityClient", "Search quota remaining: " + quota_remaining);
             }
         }
         if(quota_remaining < 50) {
             searchQuotaRemaining = false;
-            return false;
+        } else {
+            searchQuotaRemaining = true;
         }
-        searchQuotaRemaining = true;
-        return true;
     }
 
     public boolean isSearchQuotaRemaining() {

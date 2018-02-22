@@ -99,7 +99,7 @@ public class ChannelSearchFragment extends Fragment {
     }
 
     public void search(final String query) {
-        Log.e(TAG, "search: " + query);
+        Log.v(TAG, "search: " + query);
 
         // If this is a new search, clear everything
         if(!query.equals(searchQuery)) {
