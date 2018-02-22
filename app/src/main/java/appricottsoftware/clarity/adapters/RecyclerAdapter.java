@@ -12,17 +12,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.loopj.android.http.JsonHttpResponseHandler;
-
-import org.json.JSONObject;
 
 import java.util.List;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
-import appricottsoftware.clarity.sync.ClarityApp;
-import cz.msebera.android.httpclient.Header;
 
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.CustomViewHolder> {
@@ -46,7 +41,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View theView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.single_recycle_view_item, parent, false);
+                .inflate(R.layout.item_channel_adapter, parent, false);
         return new CustomViewHolder(theView);
 
     }

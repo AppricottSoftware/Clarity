@@ -254,6 +254,9 @@ public class ClarityClient {
     }
 
     public boolean isSearchQuotaRemaining() {
+        if(!searchQuotaRemaining) {
+            Log.e("ClarityClient", "No Search quota remaining");
+        }
         return searchQuotaRemaining;
     }
 }

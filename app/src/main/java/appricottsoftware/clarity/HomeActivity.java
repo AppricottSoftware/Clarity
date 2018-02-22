@@ -11,18 +11,23 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -35,12 +40,14 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
 
+import appricottsoftware.clarity.fragments.ChannelSearchFragment;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
+import appricottsoftware.clarity.models.FragmentListener;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
@@ -49,7 +56,7 @@ import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeActivity extends AppCompatActivity implements PlayerInterface {
+public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
@@ -69,6 +76,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     private static LikeFragment likeFragment;
     private static SettingFragment settingFragment;
     private static PlayerFragment playerFragment;
+    private static ChannelSearchFragment channelSearchFragment;
+
+    private MenuItem searchItem;
 
     private Intent playerServiceIntent;
     private MediaBrowserCompat mediaBrowser;
@@ -78,12 +88,18 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
     private Context context;
 
+    private String searchChannelQuery;
+    private boolean searchChannel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         context = this;
+
+        // Initialize search bar members
+        resetSearch();
 
         // Get Login Type
         loginType = getIntent().getStringExtra("loginType");
@@ -160,7 +176,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Drawer toggle handles events
+        // Drawer toggle handles events\
         if(drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -180,6 +196,67 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater= getMenuInflater();
+        menuInflater.inflate(R.menu.menu_main, menu);
+        searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Respond to the user pressing search/enter
+                searchView.clearFocus();
+                searchEpisodes(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                Log.e(TAG, "Expand");
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Log.e(TAG, "Collapse");
+                // Hide results, replace with home fragment
+                insertFragment(homeFragment, getString(R.string.home_fragment_tag));
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onCreatedView() {
+        // Run the search if there is one waiting
+        if(searchChannel && searchChannelQuery != "" && channelSearchFragment.isVisible()) {
+            channelSearchFragment.search(searchChannelQuery);
+            resetSearch();
+        }
+    }
+
+    private void resetSearch() {
+        searchChannelQuery = "";
+        searchChannel = false;
+    }
+
+    private void searchEpisodes(String query) {
+        // Show channel search fragment, hide home fragment
+        insertFragment(channelSearchFragment, getString(R.string.channel_search_fragment_tag));
+
+        // Run the search when the fragment is ready
+        searchChannel = true;
+        searchChannelQuery = query;
+    }
+
     private void logout() {
         ClarityApp.getSession(getApplicationContext()).setUserID(-1);
         Intent loginActivityIntent = new Intent(this, LoginActivity.class);
@@ -192,13 +269,12 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         homeFragment = new HomeFragment();
         likeFragment = new LikeFragment();
         settingFragment = new SettingFragment();
+        channelSearchFragment = new ChannelSearchFragment();
+
 
         // Start on the home fragment
         nvDrawer.setCheckedItem(R.id.nav_home_fragment);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fl_home_activity_main, homeFragment)
-                .commit();
+        insertFragment(homeFragment, getString(R.string.home_fragment_tag));
 
         nvDrawer.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -212,15 +288,19 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     private void selectDrawer(MenuItem item) {
         // Respond to clicking on an item in the nav drawer
         Fragment fragment = null;
+        String fragmentTag = "";
         switch(item.getItemId()) {
             case R.id.nav_home_fragment:
                 fragment = homeFragment;
+                fragmentTag = getString(R.string.home_fragment_tag);
                 break;
             case R.id.nav_like_fragment:
                 fragment = likeFragment;
+                fragmentTag = getString(R.string.like_fragment_tag);
                 break;
             case R.id.nav_setting_fragment:
                 fragment = settingFragment;
+                fragmentTag = getString(R.string.setting_fragment_tag);
                 break;
             case R.id.nav_logout:
                 switch(loginType) {
@@ -246,11 +326,17 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         }
 
         try {
-            // Insert fragment into frame layout
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.fl_home_activity_main, fragment)
-                    .commit();
+            // Populate home frame layout
+            insertFragment(fragment, fragmentTag);
+
+            // Show the search only if we are on home fragment
+            if(searchItem != null) {
+                if(fragment instanceof HomeFragment) {
+                    searchItem.setVisible(true);
+                } else {
+                    searchItem.setVisible(false);
+                }
+            }
 
             // Highlight the choice
             item.setChecked(true);
@@ -263,6 +349,14 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void insertFragment(Fragment fragment, String fragmentTag) {
+        // Insert fragment into frame layout
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fl_home_activity_main, fragment, fragmentTag)
+                .commit();
     }
 
     private ActionBarDrawerToggle setUpDrawerToggle() {

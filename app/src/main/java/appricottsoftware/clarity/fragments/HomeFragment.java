@@ -48,4 +48,6 @@ public class HomeFragment extends Fragment {
         // Plug view pager into the tab layout
         tlTabs.setupWithViewPager(vpTabs);
     }
+
+
 }

@@ -9,6 +9,13 @@
     <string name="nav_drawer_open">Open navigation drawer</string>
     <string name="nav_drawer_close">Close navigation drawer</string>
 
+    <string name="home_fragment_tag">HOME_FRAGMENT</string>
+    <string name="like_fragment_tag">LIKE_FRAGMENT</string>
+    <string name="setting_fragment_tag">SETTING_FRAGMENT</string>
+    <string name="channel_search_fragment_tag">CHANNEL_SEARCH_FRAGMENT</string>
+
+    <string name="menu_search">Search</string>
+
     <string name="toolbar_login_activity">Login</string>
     <string name="toolbar_register_activity">Register</string>
     <string name="toolbar_home_activity">Home</string>

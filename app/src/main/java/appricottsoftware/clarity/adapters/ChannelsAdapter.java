@@ -1,7 +1,6 @@
 package appricottsoftware.clarity.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,10 +19,8 @@ import java.util.List;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Channel;
-import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.sync.ClarityApp;
-import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
@@ -49,7 +46,7 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
     @Override
     public ChannelsAdapter.ChannelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.single_recycle_view_item, parent, false);
+                .inflate(R.layout.item_channel_adapter, parent, false);
         return new ChannelsAdapter.ChannelViewHolder(view);
     }
 
@@ -60,7 +57,7 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
         holder.tvTitle.setText(channel.getTitle());
         Glide.with(context).load(channel.getImage()).into(holder.ivAlbum);
 
-        holder.itemView.setBackgroundColor(selected_position == position ? Color.LTGRAY : Color.TRANSPARENT);
+//        holder.itemView.setBackgroundColor(selected_position == position ? Color.LTGRAY : Color.TRANSPARENT);
     }
 
     @Override

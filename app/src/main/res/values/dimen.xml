@@ -22,4 +22,10 @@
 
     <dimen name="channel_buttons">18sp</dimen>
     <dimen name="survey_thumb">36dp</dimen>
+
+    <dimen name="channels_fragment_recyclerview_margin">12dp</dimen>
+    <dimen name="channels_fragment_cardview_margin">6dp</dimen>
+    <dimen name="channels_fragment_title_padding">8dp</dimen>
+    <dimen name="channels_fragment_image_size">64dp</dimen>
+    <dimen name="channels_fragment_cardview_elevation">8dp</dimen>
 </resources>
