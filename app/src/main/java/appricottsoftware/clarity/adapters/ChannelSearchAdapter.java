@@ -1,5 +1,6 @@
 package appricottsoftware.clarity.adapters;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Channel;
+import appricottsoftware.clarity.models.FragmentListener;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
@@ -33,12 +35,14 @@ public class ChannelSearchAdapter extends RecyclerView.Adapter<ChannelSearchAdap
 
     private List<Channel> channels;
     private Context context;
+    private FragmentListener fragmentListener;
 
     private int selected_position = 0;
 
-    public ChannelSearchAdapter(List<Channel> chs, Context cntxt) {
-        channels = chs;
-        context = cntxt;
+    public ChannelSearchAdapter(List<Channel> cl, Context ct, FragmentListener fl) {
+        channels = cl;
+        context = ct;
+        fragmentListener = fl;
     }
 
     @Override
@@ -69,33 +73,6 @@ public class ChannelSearchAdapter extends RecyclerView.Adapter<ChannelSearchAdap
         public ChannelSearchViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    int uid = ClarityApp.getSession(context).getUserID();
-//                    Channel channel = channels.get(selected_position);
-//
-//                    // TODO: re-add onSuccess and on Failure methods to be handled in future.
-//                    ClarityApp.getRestClient(context).createChannel(uid, channel, new JsonHttpResponseHandler() {
-//                        @Override
-//                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-//                            Toast.makeText(context, "Created channel!", Toast.LENGTH_LONG).show();
-//                        }
-//
-//                        @Override
-//                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//                            switch(statusCode) {
-//                                case(0):
-//                                    Toast.makeText(context,"Server is down. Please try later.", Toast.LENGTH_LONG).show();
-//                                    break;
-//                                default:
-//                                    Log.e(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
-//                                    break;
-//                            }
-//                        }
-//                    });
-//                }
-//            });
         }
 
         @OnClick
@@ -108,6 +85,8 @@ public class ChannelSearchAdapter extends RecyclerView.Adapter<ChannelSearchAdap
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     Toast.makeText(context, "Created channel!", Toast.LENGTH_LONG).show();
+                    // Return to the home fragment
+                    fragmentListener.returnToHomeFragment();
                 }
 
                 @Override
@@ -123,31 +102,5 @@ public class ChannelSearchAdapter extends RecyclerView.Adapter<ChannelSearchAdap
                 }
             });
         }
-
-//        @Override
-//        public void onClick(View view) {
-//            int uid = ClarityApp.getSession(context).getUserID();
-//            Channel channel = channels.get(selected_position);
-//
-//            // TODO: re-add onSuccess and on Failure methods to be handled in future.
-//            ClarityApp.getRestClient(view.getContext()).createChannel(uid, channel, new JsonHttpResponseHandler() {
-//                @Override
-//                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-//                    Toast.makeText(context, "Created channel!", Toast.LENGTH_LONG).show();
-//                }
-//
-//                @Override
-//                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-//                    switch(statusCode) {
-//                        case(0):
-//                            Toast.makeText(context,"Server is down. Please try later.", Toast.LENGTH_LONG).show();
-//                            break;
-//                        default:
-//                            Log.e(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
-//                            break;
-//                    }
-//                }
-//            });
-//        }
     }
 }

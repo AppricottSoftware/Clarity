@@ -80,7 +80,7 @@ public class ChannelSearchFragment extends Fragment {
 
         // Set up the recycler view with searchResultsAdapter
         searchResults = new ArrayList<>();
-        searchResultsAdapter = new ChannelSearchAdapter(searchResults, context);
+        searchResultsAdapter = new ChannelSearchAdapter(searchResults, context, fragmentListener);
         rvSearchResults.setAdapter(searchResultsAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         rvSearchResults.setLayoutManager(linearLayoutManager);

@@ -243,6 +243,15 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         }
     }
 
+    @Override
+    public void returnToHomeFragment() {
+        // Show the home fragment
+        searchItem.collapseActionView();
+        insertFragment(homeFragment, getString(R.string.home_fragment_tag));
+        // TODO: Fix this or see if we need to return to home fragment after adding a new channel
+        homeFragment.showChannelFragment();
+    }
+
     private void resetSearch() {
         searchChannelQuery = "";
         searchChannel = false;
