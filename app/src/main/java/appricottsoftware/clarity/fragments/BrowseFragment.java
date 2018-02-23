@@ -13,6 +13,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.google.gson.reflect.TypeToken;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +29,9 @@ import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.sync.ClarityApp;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import cz.msebera.android.httpclient.Header;
 
 import static appricottsoftware.clarity.sync.ClarityApp.getGson;
 
@@ -36,11 +39,25 @@ public class BrowseFragment extends Fragment {
 
     private static final String TAG = "BrowseFragment";
 
+    @BindView(R.id.gv_browse) GridView gridView;
+
+    private BrowseAdapter adapter;
     private PlayerInterface playerInterface;
     private ArrayList<Podcast> podcasts;
     private ArrayList<Channel> channels;
     private String query;
     private int offset;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof PlayerInterface) {
+            playerInterface = (PlayerInterface) context;
+        } else {
+            Log.e(TAG, context.toString() + " must implement PlayerInterface");
+            throw new ClassCastException(context.toString() + " must implement PlayerInterface");
+        }
+    }
 
     @Nullable
     @Override
@@ -59,17 +76,6 @@ public class BrowseFragment extends Fragment {
         // Parse browse.json from assets to populate Channel array.
         parseJSON();
         populateBrowseGrid();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if(context instanceof PlayerInterface) {
-            playerInterface = (PlayerInterface) context;
-        } else {
-            Log.e(TAG, context.toString() + " must implement PlayerInterface");
-            throw new ClassCastException(context.toString() + " must implement PlayerInterface");
-        }
     }
 
     // Parses json file and adds contexts to Channel ArrayList
@@ -114,11 +120,10 @@ public class BrowseFragment extends Fragment {
     }
 
     private void populateBrowseGrid() {
-        final GridView gridview = getActivity().findViewById(R.id.gv_browse);
-        final BrowseAdapter adapter = new BrowseAdapter(getActivity(), channels);
-        gridview.setAdapter(adapter);
+        adapter = new BrowseAdapter(getActivity(), channels);
+        gridView.setAdapter(adapter);
 
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -131,11 +136,44 @@ public class BrowseFragment extends Fragment {
                                             + " " + channels.get(position).getMetadata().get(0).getScore(),
                         Toast.LENGTH_SHORT).show();
 
-                // Removes channel from browse once user clicks it
-//                channels.remove(position);
-//                adapter.notifyDataSetChanged();
+                // Get the channel that was clicked on
+                Channel channel = channels.get(position);
 
-                // TODO write getter interface to retreive all Channels from ChannelFragment to avoid displaying duplicate Channels Here
+                // Play the channel
+                playerInterface.playChannel(channels.get(position));
+
+                // Add it to the user's channels
+                addToChannels(channel, position);
+
+                // TODO: write getter interface to retreive all Channels from ChannelFragment to avoid displaying duplicate Channels Here
+                // TODO: or add default browse database and take the set difference of the user's channels on the backend
+            }
+        });
+    }
+
+    private void addToChannels(Channel channel, final int position) {
+        int uid = ClarityApp.getSession(getContext()).getUserID();
+
+        // TODO: re-add onSuccess and on Failure methods to be handled in future.
+        ClarityApp.getRestClient().createChannel(uid, channel, getContext(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Toast.makeText(getContext(), "Added channel!", Toast.LENGTH_LONG).show();
+                // Removes channel from browse once user clicks it
+                channels.remove(position);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                switch(statusCode) {
+                    case(0):
+                        Toast.makeText(getContext(),"Server is down. Please try later.", Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        Log.e(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
+                        break;
+                }
             }
         });
     }

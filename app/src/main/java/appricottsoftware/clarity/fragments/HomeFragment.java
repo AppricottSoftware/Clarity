@@ -29,6 +29,8 @@ public class HomeFragment extends Fragment {
     @BindView(R.id.vp_tabs) ViewPager vpTabs;
     @BindView(R.id.tl_tabs) TabLayout tlTabs;
 
+    private TabPagerAdapter tpaAdapter;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -42,10 +44,18 @@ public class HomeFragment extends Fragment {
         // Initialize view lookups, listeners
 
         // Get the view pager to display tabs
-        TabPagerAdapter tpaAdapter = new TabPagerAdapter(getChildFragmentManager());
+        tpaAdapter = new TabPagerAdapter(getChildFragmentManager());
         vpTabs.setAdapter(tpaAdapter);
 
         // Plug view pager into the tab layout
         tlTabs.setupWithViewPager(vpTabs);
     }
+
+    public void showChannelFragment() {
+        // Switch to the channel fragment if it is not showing
+        if(vpTabs.getCurrentItem() != 0) {
+            vpTabs.setCurrentItem(0);
+        }
+    }
+
 }

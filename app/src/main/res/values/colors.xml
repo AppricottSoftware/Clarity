@@ -6,4 +6,6 @@
 
     <color name="colorIconPandora">#0184ef</color>
     <color name="colorAppNamePandora">#019bc5</color>
+
+    <color name="colorHomeFragmentBackground">#E0E0E0</color>
 </resources>
