@@ -31,6 +31,7 @@ import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Task;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
@@ -46,6 +47,8 @@ import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
 import appricottsoftware.clarity.models.Session;
 import appricottsoftware.clarity.sync.ClarityApp;
+import appricottsoftware.clarity.sync.ClarityApp;
+import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -59,7 +62,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface {
     private static final String registeredLoginType = "1";
     private static final String facebookLoginType = "2";
     private static final String googleLoginType = "3";
-
     private static final String TAG = "HomeActivity";
 
     private ActionBarDrawerToggle drawerToggle;

@@ -276,7 +276,7 @@ public class ChannelFragment extends Fragment {
         rListItems = new ArrayList<>();
 
         int uid = 1;
-        ClarityApp.getRestClient(getContext()).getChannel(uid, new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().getChannel(uid, getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -355,7 +355,7 @@ public class ChannelFragment extends Fragment {
 
     // TODO: currently hard coded search with "episode" type. May need to be changed eventually.
     private void searchAPI(String query) {
-        ClarityApp.getRestClient(getContext()).getFullTextSearch("", offset, query, 0, "episode", new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().getFullTextSearch("", offset, query, 0, "episode", getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);

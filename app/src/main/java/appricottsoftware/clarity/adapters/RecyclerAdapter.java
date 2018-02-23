@@ -107,7 +107,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                 String imageURL = recyclerList_ItemList.get(selected_position).getImage();
 
                 // TODO: re-add onSuccess and on Failure methods to be handled in future.
-                ClarityApp.getRestClient(view.getContext()).createChannel(uid, title, imageURL, new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient().createChannel(uid, title, imageURL, view.getContext(), new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         super.onSuccess(statusCode, headers, response);

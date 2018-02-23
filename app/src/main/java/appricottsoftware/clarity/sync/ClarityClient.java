@@ -23,11 +23,7 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ClarityClient {
 
-    private Context context;
-
-    public ClarityClient(Context context) {
-        this.context = context;
-    }
+    public ClarityClient() {}
 
     // Insert API calls here //
     // Calls the /search endpoint (fulltextsearch)
@@ -36,7 +32,7 @@ public class ClarityClient {
     // q: Search term
     // sort_by_date: Sort by date or not? If 1, sort by date. If 0 (default), sort by relevance.
     // type: What to search: "episode" (default) or "podcast"?
-    public void getFullTextSearch(String genre_ids, int offset, String q, int sort_by_date, String type, JsonHttpResponseHandler handler) {
+    public void getFullTextSearch(String genre_ids, int offset, String q, int sort_by_date, String type, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
         client.addHeader("X-Mashape-Key", context.getString(R.string.listen_notes_api_key));
@@ -50,7 +46,7 @@ public class ClarityClient {
         client.get(context.getString(R.string.listen_notes_api_url) + "search", params, handler);
     }
 
-    public void authenticateUser(String email, String password, JsonHttpResponseHandler handler) {
+    public void authenticateUser(String email, String password, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
 
         // Added conditional to handle this issue:
@@ -91,7 +87,7 @@ public class ClarityClient {
     }
 
 
-    public void registerRequest(String email, String password, JsonHttpResponseHandler handler) {
+    public void registerRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
 
         // Added conditional to handle this issue:
@@ -131,11 +127,13 @@ public class ClarityClient {
         }
     }
 
-    public void metadataUpVoteRequest(int cid, ArrayList<Integer> genres, JsonHttpResponseHandler handler) {
+    public void metadataUpVoteRequest(int cid, ArrayList<Integer> genres, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
 
         JSONObject jsonParams = new JSONObject();
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("cid", cid);
             JSONArray metadata = new JSONArray();
 
@@ -154,11 +152,13 @@ public class ClarityClient {
         }
     }
 
-    public void metadataDownVoteRequest(int cid, ArrayList<Integer> genres, JsonHttpResponseHandler handler) {
+    public void metadataDownVoteRequest(int cid, ArrayList<Integer> genres, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
 
         JSONObject jsonParams = new JSONObject();
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("cid", cid);
 
             JSONArray metadata = new JSONArray();
@@ -177,7 +177,8 @@ public class ClarityClient {
         }
     }
 
-    public void createChannel(int uid, String name, String imageURL, JsonHttpResponseHandler handler) {
+
+    public void createChannel(int uid, String name, String imageURL, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         //pass in metadata
 
@@ -187,6 +188,7 @@ public class ClarityClient {
 
         // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in search so it may be added to db.
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
 
             JSONArray metadata = new JSONArray();
 
@@ -217,7 +219,7 @@ public class ClarityClient {
 
     }
 
-    public void getChannel(int uid, JsonHttpResponseHandler handler) {
+    public void getChannel(int uid, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -225,6 +227,8 @@ public class ClarityClient {
         JSONObject jsonParams = new JSONObject();
 
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("uid", uid);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
@@ -233,7 +237,5 @@ public class ClarityClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 }
