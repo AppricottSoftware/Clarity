@@ -156,10 +156,6 @@ public class ChannelFragment extends Fragment {
                         @Override
                         public void onClick(View view) {
 
-//                            rListItemsSearch = new ArrayList<>();
-//                            rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext(), false);
-//                            channelRecycler.setAdapter(rAdapterSearch);
-
                             searchChannels = new ArrayList<>();
                             rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
                             channelRecycler.setAdapter(rAdapterSearch);
@@ -266,17 +262,9 @@ public class ChannelFragment extends Fragment {
 
         int uid = ClarityApp.getSession(getContext()).getUserID();
         ClarityApp.getRestClient(getContext()).getChannel(uid, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-            }
-
+            
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-//                super.onSuccess(statusCode, headers, response);
-                //Log.i(TAG, "JSON CHANNEL RESPONSE" + response.toString());
-
                 try {
                     // Convert the response to Channels
                     TypeToken<ArrayList<Channel>> token = new TypeToken<ArrayList<Channel>>() {};
@@ -287,11 +275,6 @@ public class ChannelFragment extends Fragment {
                 } catch(Exception e) {
                     Log.e(TAG, "goToChannelList: Failed to get channels", e);
                 }
-            }
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                super.onSuccess(statusCode, headers, responseString);
             }
 
             @Override
@@ -312,18 +295,6 @@ public class ChannelFragment extends Fragment {
                     e.printStackTrace();
                 }
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                throwable.printStackTrace();
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                throwable.printStackTrace();
             }
         });
     }
