@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/browse_fragment_cardview_size"
+    android:layout_height="wrap_content"
+    android:id="@+id/card_view">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/browse_fragment_padding">
+
+        <ImageView
+            android:id="@+id/ivBrowseImg"
+            android:layout_width="@dimen/browse_fragment_image_size"
+            android:layout_height="@dimen/browse_fragment_image_size"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background" />
+
+        <TextView
+            android:id="@+id/ivBrowseEpisodeName"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/browse_fragment_text_padding"
+            android:singleLine="true"
+            android:text="Name"
+            android:textAlignment="viewStart"/>
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

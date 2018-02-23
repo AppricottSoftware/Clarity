@@ -98,7 +98,7 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
                 Channel channel = channels.get(selected_position);
 
                 // TODO: re-add onSuccess and on Failure methods to be handled in future.
-                ClarityApp.getRestClient(view.getContext()).createChannel(uid, channel, new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient().createChannel(uid, channel, view.getContext(), new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         super.onSuccess(statusCode, headers, response);

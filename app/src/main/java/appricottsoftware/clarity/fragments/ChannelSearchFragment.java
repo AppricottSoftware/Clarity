@@ -107,8 +107,8 @@ public class ChannelSearchFragment extends Fragment {
         }
 
         // If there are search quota left, search
-        if(ClarityApp.getRestClient(getContext()).isSearchQuotaRemaining()) {
-            ClarityApp.getRestClient(getContext()).getFullTextSearch("", nextOffset, query, 0, "episode", new JsonHttpResponseHandler() {
+        if(ClarityApp.getRestClient().isSearchQuotaRemaining()) {
+            ClarityApp.getRestClient().getFullTextSearch("", nextOffset, query, 0, "episode", context, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
@@ -120,7 +120,7 @@ public class ChannelSearchFragment extends Fragment {
                         nextOffset = response.getInt("next_offset") + 1;
 
                         // Set the remaining search quota based on header values
-                        ClarityApp.getRestClient(getContext()).setSearchQuotaRemaining(headers);
+                        ClarityApp.getRestClient().setSearchQuotaRemaining(headers, context);
 
                         // Fill the recyclerview with results
                         populateSearchResults(response);

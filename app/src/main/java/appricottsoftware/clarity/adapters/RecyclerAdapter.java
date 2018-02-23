@@ -12,12 +12,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
+import appricottsoftware.clarity.sync.ClarityApp;
+import cz.msebera.android.httpclient.Header;
 
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.CustomViewHolder> {
@@ -72,7 +77,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
             textViewTitle = itemView.findViewById(R.id.textView_title);
             ImageViewAlbum = itemView.findViewById(R.id.imageView_album);
-
         }
 
         @Override
@@ -102,7 +106,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                 String imageURL = recyclerList_ItemList.get(selected_position).getImage();
 
                 // TODO: re-add onSuccess and on Failure methods to be handled in future.
-//                ClarityApp.getRestClient(view.getContext()).createChannel(uid, title, imageURL, new JsonHttpResponseHandler() {
+//                ClarityApp.getRestClient().createChannel(uid, title, imageURL, view.getContext(), new JsonHttpResponseHandler() {
 //                    @Override
 //                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 //                        super.onSuccess(statusCode, headers, response);
@@ -129,12 +133,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 //                    }
 //
 //                });
-
             }
-
-
         }
     }
-
-
 }

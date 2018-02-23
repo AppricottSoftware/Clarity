@@ -131,4 +131,14 @@ public class Channel {
         channel.setMetadata(meta);
         return channel;
     }
+
+    public void addMetadata(Metadata metadata) {
+        if (this.metadata != null) {
+            this.metadata.add(metadata);
+        }
+        else {
+            this.metadata = new ArrayList<>();
+            this.metadata.add(metadata);
+        }
+    }
 }

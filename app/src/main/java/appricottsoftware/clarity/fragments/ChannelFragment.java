@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,6 +47,7 @@ import static appricottsoftware.clarity.sync.ClarityApp.getGson;
 
 public class ChannelFragment extends Fragment {
 
+    @BindView(R.id.srlSwipe) SwipeRefreshLayout swipeContainer;
     @BindView(R.id.RecyclerView_Channels) RecyclerView channelRecycler;
     @BindView(R.id.cardView_ChannelButton) CardView channelButtonCardView;
     @BindView(R.id.ConstraintLayout_Survey) ConstraintLayout surveyConstraintLayout;
@@ -111,6 +113,8 @@ public class ChannelFragment extends Fragment {
 //        else {
 
 //        }
+
+        initializeSwipeContainer();
 
         channelRecycler.setHasFixedSize(true);
         channelRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -229,6 +233,22 @@ public class ChannelFragment extends Fragment {
         }
     }
 
+    private void initializeSwipeContainer() {
+        // Listen for swipes
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh channels when swiped
+                goToChannelList();
+            }
+        });
+
+        // Set the color scheme for the refresh circle
+        swipeContainer.setColorSchemeColors(getResources().getColor(R.color.colorPrimary),
+                getResources().getColor(R.color.colorAccent),
+                getResources().getColor(R.color.colorPrimaryDark));
+    }
+
     private void goToSearchResults() {
         channelButtonCardView.setVisibility(View.INVISIBLE);
         createChannelTextView.setVisibility(View.INVISIBLE);
@@ -261,8 +281,7 @@ public class ChannelFragment extends Fragment {
         channels = new ArrayList<>();
 
         int uid = ClarityApp.getSession(getContext()).getUserID();
-        ClarityApp.getRestClient(getContext()).getChannel(uid, new JsonHttpResponseHandler() {
-            
+        ClarityApp.getRestClient().getChannel(uid, getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 try {
@@ -272,6 +291,8 @@ public class ChannelFragment extends Fragment {
                     rAdapter = new ChannelsAdapter(channels, getContext(), true);
                     channelRecycler.setAdapter(rAdapter);
 
+                    // Turn off loading circle
+                    swipeContainer.setRefreshing(false);
                 } catch(Exception e) {
                     Log.e(TAG, "goToChannelList: Failed to get channels", e);
                 }
@@ -301,7 +322,7 @@ public class ChannelFragment extends Fragment {
 
     // TODO: currently hard coded search with "episode" type. May need to be changed eventually.
     private void searchAPI(String query) {
-        ClarityApp.getRestClient(getContext()).getFullTextSearch("", offset, query, 0, "episode", new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().getFullTextSearch("", offset, query, 0, "episode", getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);

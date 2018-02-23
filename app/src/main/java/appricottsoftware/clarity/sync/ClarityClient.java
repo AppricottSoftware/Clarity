@@ -25,14 +25,11 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class ClarityClient {
 
-    private Context context;
     private boolean searchQuotaRemaining;
 
-    public ClarityClient(Context context) {
-        this.context = context;
-        this.searchQuotaRemaining = true;
+    public ClarityClient() {
+        searchQuotaRemaining = true;
     }
-
     // Insert API calls here //
     // Calls the /search endpoint (fulltextsearch)
     // Parameters //
@@ -40,7 +37,7 @@ public class ClarityClient {
     // q: Search term
     // sort_by_date: Sort by date or not? If 1, sort by date. If 0 (default), sort by relevance.
     // type: What to search: "episode" (default) or "podcast"?
-    public void getFullTextSearch(String genre_ids, int offset, String q, int sort_by_date, String type, JsonHttpResponseHandler handler) {
+    public void getFullTextSearch(String genre_ids, int offset, String q, int sort_by_date, String type, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
         client.addHeader("X-Mashape-Key", context.getString(R.string.listen_notes_api_key));
@@ -54,7 +51,7 @@ public class ClarityClient {
         client.get(context.getString(R.string.listen_notes_api_url) + "search", params, handler);
     }
 
-    public void authenticateUser(String email, String password, JsonHttpResponseHandler handler) {
+    public void authenticateUser(String email, String password, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
 
         // Added conditional to handle this issue:
@@ -77,7 +74,6 @@ public class ClarityClient {
 
         else {
             AsyncHttpClient client = new AsyncHttpClient();
-
             JSONObject jsonParams = new JSONObject();
             try {
                 client.setMaxRetriesAndTimeout(1, 1000);
@@ -95,14 +91,13 @@ public class ClarityClient {
     }
 
 
-    public void registerRequest(String email, String password, JsonHttpResponseHandler handler) {
+    public void registerRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
 
         // Added conditional to handle this issue:
         // W/AsyncHttpRH: Current thread has not called Looper.prepare(). Forcing synchronous mode.
         if (Looper.myLooper() == null) {
             SyncHttpClient client = new SyncHttpClient();
-
             JSONObject jsonParams = new JSONObject();
             try {
                 jsonParams.put("email", email);
@@ -118,7 +113,6 @@ public class ClarityClient {
 
         else {
             AsyncHttpClient client = new AsyncHttpClient();
-
             JSONObject jsonParams = new JSONObject();
             try {
                 client.setMaxRetriesAndTimeout(1, 1000);
@@ -135,11 +129,12 @@ public class ClarityClient {
         }
     }
 
-    public void metadataUpVoteRequest(int cid, ArrayList<Integer> genres, JsonHttpResponseHandler handler) {
+    public void metadataUpVoteRequest(int cid, ArrayList<Integer> genres, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
-
         JSONObject jsonParams = new JSONObject();
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("cid", cid);
             JSONArray metadata = new JSONArray();
 
@@ -159,11 +154,12 @@ public class ClarityClient {
         }
     }
 
-    public void metadataDownVoteRequest(int cid, ArrayList<Integer> genres, JsonHttpResponseHandler handler) {
+    public void metadataDownVoteRequest(int cid, ArrayList<Integer> genres, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
-
         JSONObject jsonParams = new JSONObject();
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("cid", cid);
 
             JSONArray metadata = new JSONArray();
@@ -183,16 +179,13 @@ public class ClarityClient {
         }
     }
 
-    public void createChannel(int uid, Channel channel, JsonHttpResponseHandler handler) {
-        // Create the rest client and add header(s)
-        //pass in metadata
-
+    public void createChannel(int uid, Channel channel, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
-
         JSONObject jsonParams = new JSONObject();
 
         // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in search so it may be added to db.
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
 
             JSONArray metadata = new JSONArray();
 
@@ -218,14 +211,13 @@ public class ClarityClient {
 
     }
 
-    public void getChannel(int uid, JsonHttpResponseHandler handler) {
-        // Create the rest client and add header(s)
-
+    public void getChannel(int uid, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
-
         JSONObject jsonParams = new JSONObject();
 
         try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
             jsonParams.put("uid", uid);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
@@ -234,11 +226,9 @@ public class ClarityClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    // If search quota is remaining, return true; if out of search quota, return false
-    public void setSearchQuotaRemaining(Header[] headers) {
+    public void setSearchQuotaRemaining(Header[] headers, Context context) {
         int quota_remaining = 0;
         for(Header h : headers) {
             if(h.getName().equals(context.getString(R.string.full_text_search_quota_remaining_key))) {
@@ -253,6 +243,7 @@ public class ClarityClient {
         }
     }
 
+    // If search quota is remaining, return true; if out of search quota, return false
     public boolean isSearchQuotaRemaining() {
         if(!searchQuotaRemaining) {
             Log.e("ClarityClient", "No Search quota remaining");

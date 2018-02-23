@@ -37,8 +37,6 @@ public class ChannelSearchAdapter extends RecyclerView.Adapter<ChannelSearchAdap
     private Context context;
     private FragmentListener fragmentListener;
 
-    private int selected_position = 0;
-
     public ChannelSearchAdapter(List<Channel> cl, Context ct, FragmentListener fl) {
         channels = cl;
         context = ct;
@@ -65,7 +63,7 @@ public class ChannelSearchAdapter extends RecyclerView.Adapter<ChannelSearchAdap
         return channels.size();
     }
 
-    public class ChannelSearchViewHolder extends RecyclerView.ViewHolder {
+    public class ChannelSearchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @BindView(R.id.imageView_album) public ImageView ivAlbum;
         @BindView(R.id.textView_title) public TextView tvTitle;
@@ -73,15 +71,16 @@ public class ChannelSearchAdapter extends RecyclerView.Adapter<ChannelSearchAdap
         public ChannelSearchViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
         }
 
-        @OnClick
-        void onClick(View view) {
+        @Override
+        public void onClick(View v) {
             int uid = ClarityApp.getSession(context).getUserID();
-            Channel channel = channels.get(selected_position);
+            Channel channel = channels.get(getLayoutPosition());
 
             // TODO: re-add onSuccess and on Failure methods to be handled in future.
-            ClarityApp.getRestClient(context).createChannel(uid, channel, new JsonHttpResponseHandler() {
+            ClarityApp.getRestClient().createChannel(uid, channel, context, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     Toast.makeText(context, "Created channel!", Toast.LENGTH_LONG).show();
