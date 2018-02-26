@@ -695,7 +695,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
         @Override
         TODO: Figure out if this works for changing speed
         public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            player.setPlaybackParameters(new PlaybackParameters(2.0f, 1.0f));
             return super.onMediaButtonEvent(mediaButtonEvent);
+            https://medium.com/google-exoplayer/variable-speed-playback-with-exoplayer-e6e6a71e0343
         }
         */
     }
