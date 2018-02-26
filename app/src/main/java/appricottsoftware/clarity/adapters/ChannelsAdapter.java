@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -131,10 +132,34 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v,
                                         ContextMenu.ContextMenuInfo menuInfo) {
+            //menu.setHeaderTitle("Delete Channel?");
+            //menu.add(0, v.getId(), 0, "DELETE");//groupId, itemId, order, title
+            //menu.add(0, v.getId(), 0, "NO");
 
-            menu.setHeaderTitle("Delete Channel?");
-            menu.add(0, v.getId(), 0, "YES");//groupId, itemId, order, title
-            menu.add(0, v.getId(), 0, "NO");
+            MenuItem Delete = menu.add(menu.NONE, 1, 1, "Delete");
+            Delete.setOnMenuItemClickListener(onEditMenu);
         }
+
+
+        private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case 1:
+                        //Toast.makeText(context, "case 1", Toast.LENGTH_SHORT).show();
+                        //Delete channel here
+
+                        break;
+
+                    default:
+                        //Toast.makeText(context, "default case", Toast.LENGTH_SHORT).show();
+                        //This case should never be reached
+                        break;
+                }
+                return true;
+            }
+        };
+
     }
+
 }
