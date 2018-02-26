@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -123,6 +125,9 @@ public class BrowseFragment extends Fragment {
         adapter = new BrowseAdapter(getActivity(), channels);
         gridView.setAdapter(adapter);
 
+        // Code for long press context menu. May be used to remove uninteresting channels
+        //registerForContextMenu(gridView);
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v,
@@ -149,6 +154,30 @@ public class BrowseFragment extends Fragment {
                 // TODO: or add default browse database and take the set difference of the user's channels on the backend
             }
         });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Context Menu");
+        AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        menu.add(1, cmi.position, 0, "Action 1");
+        menu.add(2, cmi.position, 0, "Action 2");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        GridView g = getActivity().findViewById(R.id.gv_browse);
+        String s = (String) g.getItemAtPosition(item.getItemId());
+        switch (item.getGroupId()) {
+            case 1:
+                Toast.makeText(getActivity(), "Action 1, Item "+s, Toast.LENGTH_SHORT).show();
+                break;
+            case 2:
+                Toast.makeText(getActivity(), "Action 2, Item "+s, Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
     }
 
     private void addToChannels(Channel channel, final int position) {
