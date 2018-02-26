@@ -35,7 +35,12 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
     private Context context;
     private boolean isChannelView;
 
+    public int getSelected_position() {
+        return selected_position;
+    }
+
     private int selected_position = 0;
+    private int long_hold_position = 0;
 
     private PlayerInterface playerInterface;
 
@@ -132,10 +137,8 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v,
                                         ContextMenu.ContextMenuInfo menuInfo) {
-            //menu.setHeaderTitle("Delete Channel?");
-            //menu.add(0, v.getId(), 0, "DELETE");//groupId, itemId, order, title
-            //menu.add(0, v.getId(), 0, "NO");
-
+            
+            long_hold_position = getLayoutPosition();
             MenuItem Delete = menu.add(menu.NONE, 1, 1, "Delete");
             Delete.setOnMenuItemClickListener(onEditMenu);
         }
@@ -146,8 +149,8 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case 1:
-                        //Toast.makeText(context, "case 1", Toast.LENGTH_SHORT).show();
-                        //Delete channel here
+                        int cid = channels.get(long_hold_position).getCid();
+                        Toast.makeText(context, "CID: " + cid, Toast.LENGTH_SHORT).show();
 
                         break;
 
