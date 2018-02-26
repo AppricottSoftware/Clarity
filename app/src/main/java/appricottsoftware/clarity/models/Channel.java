@@ -1,10 +1,14 @@
 package appricottsoftware.clarity.models;
 
+import android.content.Context;
+import android.util.Log;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
 
+import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.sync.ClarityApp;
 
 @Parcel
@@ -94,6 +98,14 @@ public class Channel {
         return genre_ids;
     }
 
+    public String getSearchTerm(Context context) {
+        if(metadata == null || metadata.size() == 0) {
+            Log.e("Channel", "getSearchTerm: No metadata");
+            return context.getString(R.string.channel_search_term);
+        }
+        return metadata.get(0).getGenre();
+    }
+
     public static Channel getSampleChannel() {
         Channel channel = new Channel();
         channel.setCid(123);
@@ -118,5 +130,15 @@ public class Channel {
         meta.add(new Metadata("Business", 93, 10));
         channel.setMetadata(meta);
         return channel;
+    }
+
+    public void addMetadata(Metadata metadata) {
+        if (this.metadata != null) {
+            this.metadata.add(metadata);
+        }
+        else {
+            this.metadata = new ArrayList<>();
+            this.metadata.add(metadata);
+        }
     }
 }

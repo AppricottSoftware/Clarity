@@ -46,7 +46,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
     @Override
     public CustomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View theView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.single_recycle_view_item, parent, false);
+                .inflate(R.layout.item_channel_adapter, parent, false);
         return new CustomViewHolder(theView);
 
     }
@@ -77,7 +77,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
 
             textViewTitle = itemView.findViewById(R.id.textView_title);
             ImageViewAlbum = itemView.findViewById(R.id.imageView_album);
-
         }
 
         @Override
@@ -107,39 +106,34 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.Custom
                 String imageURL = recyclerList_ItemList.get(selected_position).getImage();
 
                 // TODO: re-add onSuccess and on Failure methods to be handled in future.
-                ClarityApp.getRestClient(view.getContext()).createChannel(uid, title, imageURL, new JsonHttpResponseHandler() {
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                        try {
-                            switch(statusCode) {
-                                case(0):
-                                    Toast.makeText(view.getContext(),
-                                            "Server is down. Please try later.",
-                                            Toast.LENGTH_LONG).show();
-                                    break;
-                                default:
-                                    Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
-                                    break;
-                            }
-                        }
-                        catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        super.onFailure(statusCode, headers, throwable, errorResponse);
-                    }
-
-                });
-
+//                ClarityApp.getRestClient().createChannel(uid, title, imageURL, view.getContext(), new JsonHttpResponseHandler() {
+//                    @Override
+//                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+//                        super.onSuccess(statusCode, headers, response);
+//                    }
+//
+//                    @Override
+//                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+//                        try {
+//                            switch(statusCode) {
+//                                case(0):
+//                                    Toast.makeText(view.getContext(),
+//                                            "Server is down. Please try later.",
+//                                            Toast.LENGTH_LONG).show();
+//                                    break;
+//                                default:
+//                                    Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
+//                                    break;
+//                            }
+//                        }
+//                        catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        super.onFailure(statusCode, headers, throwable, errorResponse);
+//                    }
+//
+//                });
             }
-
-
         }
     }
-
-
 }

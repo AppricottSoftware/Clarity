@@ -157,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void registerSocialMediaUser(final String email, String password, final String loginType) {
-        ClarityApp.getRestClient(this).registerRequest(email, password, new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().registerRequest(email, password, getApplicationContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -234,7 +234,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     // HTTPS GET function to authenticate user
     public void authenticate(String email, String password, final String loginType) {
-        ClarityApp.getRestClient(this).authenticateUser(email, password, new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().authenticateUser(email, password, getApplicationContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {

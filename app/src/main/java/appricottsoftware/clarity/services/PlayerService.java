@@ -27,6 +27,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.media.app.NotificationCompat.MediaStyle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -363,15 +364,17 @@ public class PlayerService extends MediaBrowserServiceCompat {
         // If the playlist is running low, fetch the next page if it exists
         if(dynamicConcatenatingMediaSource.getSize() < PREFETCH_CONSTANT
             && playlist.size() < PREFETCH_CONSTANT
-            && nextOffset < total) {
+            && nextOffset < total
+            && ClarityApp.getRestClient().isSearchQuotaRemaining()) {
             try {
                 // Fetch the next page of results from this channel
-                ClarityApp.getRestClient(context)
-                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getTitle(), 0, "episode", new JsonHttpResponseHandler() {
+                ClarityApp.getRestClient()
+                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getSearchTerm(context), 0, "episode", context, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         // Add the response to the playlist
                         Log.e(TAG, response.toString());
+                        ClarityApp.getRestClient().setSearchQuotaRemaining(headers, context);
                         playPlaylist(response);
                     }
 
@@ -626,7 +629,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
                 if(rating.isThumbUp()) {
                     // TODO: get client, post thumbs up
-                    ClarityApp.getRestClient(context).metadataUpVoteRequest(cid, genres, new JsonHttpResponseHandler() {
+                    ClarityApp.getRestClient().metadataUpVoteRequest(cid, genres, context, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             super.onSuccess(statusCode, headers, response);
@@ -642,7 +645,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
                 } else {
                     // TODO: get client, post thumbs down
-                    ClarityApp.getRestClient(context).metadataDownVoteRequest(cid, genres, new JsonHttpResponseHandler() {
+                    ClarityApp.getRestClient().metadataDownVoteRequest(cid, genres, context, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             super.onSuccess(statusCode, headers, response);

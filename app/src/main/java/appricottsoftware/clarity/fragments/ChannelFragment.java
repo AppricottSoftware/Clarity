@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.adapters.ChannelsAdapter;
 import appricottsoftware.clarity.adapters.RecyclerAdapter;
 import appricottsoftware.clarity.adapters.RecyclerListItem;
 import appricottsoftware.clarity.models.Channel;
@@ -45,30 +47,20 @@ import static appricottsoftware.clarity.sync.ClarityApp.getGson;
 
 public class ChannelFragment extends Fragment {
 
-    @BindView(R.id.RecyclerView_Channels)
-    RecyclerView channelRecycler;
-    @BindView(R.id.cardView_ChannelButton)
-    CardView channelButtonCardView;
-    @BindView(R.id.ConstraintLayout_Survey)
-    ConstraintLayout surveyConstraintLayout;
-    @BindView(R.id.constraintLayout_search)
-    ConstraintLayout searchConstraintLayout;
+    @BindView(R.id.srlSwipe) SwipeRefreshLayout swipeContainer;
+    @BindView(R.id.RecyclerView_Channels) RecyclerView channelRecycler;
+    @BindView(R.id.cardView_ChannelButton) CardView channelButtonCardView;
+    @BindView(R.id.ConstraintLayout_Survey) ConstraintLayout surveyConstraintLayout;
+    @BindView(R.id.constraintLayout_search) ConstraintLayout searchConstraintLayout;
 
-    @BindView(R.id.textView_CreateChannel)
-    TextView createChannelTextView;
-    @BindView(R.id.textView_SearchResult)
-    TextView searchResultTextView;
-    @BindView(R.id.editText_search)
-    EditText searchEditText;
-    @BindView(R.id.imageButton_serachIcon)
-    ImageButton searchIconImageButton;
-    @BindView(R.id.imageButton_back)
-    ImageButton backImageButton;
-    @BindView(R.id.constraintLayout_Header)
-    ConstraintLayout headerConstraintLayout;
+    @BindView(R.id.textView_CreateChannel) TextView createChannelTextView;
+    @BindView(R.id.textView_SearchResult) TextView searchResultTextView;
+    @BindView(R.id.editText_search) EditText searchEditText;
+    @BindView(R.id.imageButton_serachIcon) ImageButton searchIconImageButton;
+    @BindView(R.id.imageButton_back) ImageButton backImageButton;
+    @BindView(R.id.constraintLayout_Header) ConstraintLayout headerConstraintLayout;
 
-    @BindView(R.id.toggleButton_cat1)
-    ToggleButton btCat1;
+    @BindView(R.id.toggleButton_cat1) ToggleButton btCat1;
     @BindView(R.id.toggleButton_cat2) ToggleButton btCat2;
     @BindView(R.id.toggleButton_cat3) ToggleButton btCat3;
     @BindView(R.id.toggleButton_cat4) ToggleButton btCat4;
@@ -76,10 +68,10 @@ public class ChannelFragment extends Fragment {
     @BindView(R.id.toggleButton_cat6) ToggleButton btCat6;
 
     private RecyclerView.Adapter rAdapter;
-    private List<RecyclerListItem> rListItems;
+    private List<Channel> channels;
 
     private RecyclerView.Adapter rAdapterSearch;
-    private List<RecyclerListItem> rListItemsSearch;
+    private List<Channel> searchChannels;
 
     int offset = 0;
 
@@ -122,15 +114,17 @@ public class ChannelFragment extends Fragment {
 
 //        }
 
+        initializeSwipeContainer();
+
         channelRecycler.setHasFixedSize(true);
         channelRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        rListItems = new ArrayList<>();
-        rListItemsSearch = new ArrayList<>();
+        channels = new ArrayList<>();
+        searchChannels = new ArrayList<>();
 
-        rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
+        rAdapter = new ChannelsAdapter(channels, getContext(), true);
+        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
         channelRecycler.setAdapter(rAdapter);
-
 
         return view;
     }
@@ -150,11 +144,10 @@ public class ChannelFragment extends Fragment {
         backImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                rListItems = new ArrayList<>();
+                channels = new ArrayList<>();
                 goToChannelList();
             }
         });
-
 
         if (!seeSurvey) {
             createChannelsButton.setOnClickListener(new View.OnClickListener() {
@@ -167,8 +160,8 @@ public class ChannelFragment extends Fragment {
                         @Override
                         public void onClick(View view) {
 
-                            rListItemsSearch = new ArrayList<>();
-                            rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext(), false);
+                            searchChannels = new ArrayList<>();
+                            rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
                             channelRecycler.setAdapter(rAdapterSearch);
 
                             String searchKeyword = searchEditText.getText().toString();
@@ -179,15 +172,13 @@ public class ChannelFragment extends Fragment {
                             }
 
                             searchAPI(searchKeyword);
-
                             goToSearchResults();
-
                         }
                     });
 
                 }
             });
-        }else {
+        } else {
 
             btCat1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -240,8 +231,22 @@ public class ChannelFragment extends Fragment {
                 }
             });
         }
+    }
 
+    private void initializeSwipeContainer() {
+        // Listen for swipes
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh channels when swiped
+                goToChannelList();
+            }
+        });
 
+        // Set the color scheme for the refresh circle
+        swipeContainer.setColorSchemeColors(getResources().getColor(R.color.colorPrimary),
+                getResources().getColor(R.color.colorAccent),
+                getResources().getColor(R.color.colorPrimaryDark));
     }
 
     private void goToSearchResults() {
@@ -273,50 +278,26 @@ public class ChannelFragment extends Fragment {
         searchConstraintLayout.setVisibility(View.INVISIBLE);
         headerConstraintLayout.setVisibility(View.INVISIBLE);
 
-        rListItems = new ArrayList<>();
+        channels = new ArrayList<>();
 
-        int uid = 1;
-        ClarityApp.getRestClient(getContext()).getChannel(uid, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Log.e(TAG , "onSuccess: Object");
-                //Log.i(TAG, "JSON CHANNEL RESPONSE" + response.toString());
-            }
+        int uid = ClarityApp.getSession(getContext()).getUserID();
+        ClarityApp.getRestClient().getChannel(uid, getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                super.onSuccess(statusCode, headers, response);
-                Log.e(TAG , "onSuccess: Array");
-                //Log.i(TAG, "JSON CHANNEL RESPONSE" + response.toString());
-
                 try {
                     // Convert the response to Channels
                     TypeToken<ArrayList<Channel>> token = new TypeToken<ArrayList<Channel>>() {};
-                    ArrayList<Channel> channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
+                    channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
+                    rAdapter = new ChannelsAdapter(channels, getContext(), true);
+                    channelRecycler.setAdapter(rAdapter);
 
+                    // Turn off loading circle
+                    swipeContainer.setRefreshing(false);
                 } catch(Exception e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "goToChannelList: Failed to get channels", e);
                 }
+            }
 
-                try {
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject aChannel = response.getJSONObject(i);
-                        String title = aChannel.getString("title").toString();
-                        String imageURL = aChannel.getString("image").toString();
-                        RecyclerListItem newItem = new RecyclerListItem(title, imageURL);
-                        rListItems.add(newItem);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                rAdapter = new RecyclerAdapter(rListItems, getContext(), true);
-                channelRecycler.setAdapter(rAdapter);
-            }
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                super.onSuccess(statusCode, headers, responseString);
-                Log.e(TAG, "");
-            }
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 try {
@@ -336,38 +317,22 @@ public class ChannelFragment extends Fragment {
                 }
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                throwable.printStackTrace();
-                Log.e(TAG, "");
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                throwable.printStackTrace();
-                Log.e(TAG, "");
-            }
         });
-
     }
 
     // TODO: currently hard coded search with "episode" type. May need to be changed eventually.
     private void searchAPI(String query) {
-        ClarityApp.getRestClient(getContext()).getFullTextSearch("", offset, query, 0, "episode", new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().getFullTextSearch("", offset, query, 0, "episode", getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     offset = response.getInt("next_offset");
-
                     createSearchResult(response);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
@@ -379,21 +344,16 @@ public class ChannelFragment extends Fragment {
     }
 
     private void createSearchResult(JSONObject response) {
-
-        Channel aChannel = new Channel();
-        ArrayList<Episode> episodes = new ArrayList<>();
-
         try {
-            JSONArray resp = response.getJSONArray("results");
+            TypeToken<ArrayList<Episode>> token = new TypeToken<ArrayList<Episode>>() {};
+            ArrayList<Episode> episodes = ClarityApp.getGson().fromJson(response.getString("results"), token.getType());
 
-            for (int i = 0; i < 10 && i < resp.length(); i++) {
-                Episode e = getGson().fromJson(String.valueOf(resp.getJSONObject(i)), Episode.class);
-                episodes.add(e);
-            }
-            for (int i = 0; i < episodes.size(); i++) {
-                aChannel.setImage(episodes.get(i).getImage());
-                aChannel.setTitle(episodes.get(i).getTitle_original());
-                addChannelToSearchRecycler(aChannel);
+            for(Episode episode : episodes) {
+                Channel channel = new Channel();
+                channel.setImage(episode.getImage());
+                channel.setTitle(episode.getTitle_original());
+                channel.setMetadata(episode.getMetadata());
+                addChannelToSearchRecycler(channel);
             }
 
         } catch (JSONException e) {
@@ -426,12 +386,9 @@ public class ChannelFragment extends Fragment {
 //        }
 //    }
 
-    private void addChannelToSearchRecycler(Channel aChannel) {
-        RecyclerListItem APIresult = new RecyclerListItem(aChannel.getTitle(), aChannel.getImage());
-
-        rListItemsSearch.add(APIresult);
-
-        rAdapterSearch = new RecyclerAdapter(rListItemsSearch, getContext(), false);
+    private void addChannelToSearchRecycler(Channel channel) {
+        searchChannels.add(channel);
+        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
         channelRecycler.setAdapter(rAdapterSearch);
     }
 
