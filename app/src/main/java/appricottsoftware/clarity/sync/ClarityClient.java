@@ -228,6 +228,24 @@ public class ClarityClient {
         }
     }
 
+    public void deleteChannel(int uid, int cid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("cid", cid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.get(context, context.getString(R.string.delete_channel_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setSearchQuotaRemaining(Header[] headers, Context context) {
         int quota_remaining = 0;
         for(Header h : headers) {

@@ -13,10 +13,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import appricottsoftware.clarity.R;
@@ -77,11 +80,14 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
         @BindView(R.id.imageView_album) public ImageView ivAlbum;
         @BindView(R.id.textView_title) public TextView tvTitle;
 
+        Context theContext;
+
         public ChannelViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
             itemView.setOnCreateContextMenuListener(this);
+            theContext = itemView.getContext();
         }
 
         @Override
@@ -137,7 +143,7 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v,
                                         ContextMenu.ContextMenuInfo menuInfo) {
-            
+
             long_hold_position = getLayoutPosition();
             MenuItem Delete = menu.add(menu.NONE, 1, 1, "Delete");
             Delete.setOnMenuItemClickListener(onEditMenu);
@@ -149,8 +155,39 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case 1:
+                        int uid = ClarityApp.getSession(theContext).getUserID();
                         int cid = channels.get(long_hold_position).getCid();
-                        Toast.makeText(context, "CID: " + cid, Toast.LENGTH_SHORT).show();
+
+                        ClarityApp.getRestClient().deleteChannel(uid, cid, theContext, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                                try {
+                                    Toast.makeText(context, "Channel Deleted", Toast.LENGTH_SHORT).show();
+                                } catch(Exception e) {
+                                    Log.e(TAG, "Failed to delete channels", e);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                try {
+                                    switch(statusCode) {
+                                        case(0):
+                                            Toast.makeText(theContext,
+                                                    "Server is down. Please try later.",
+                                                    Toast.LENGTH_LONG).show();
+                                            break;
+                                        default:
+                                            Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
+                                            break;
+                                    }
+                                }
+                                catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                super.onFailure(statusCode, headers, throwable, errorResponse);
+                            }
+                        });
 
                         break;
 
