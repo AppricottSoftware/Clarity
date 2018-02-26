@@ -3,6 +3,7 @@ package appricottsoftware.clarity.adapters;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +66,7 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
         return channels.size();
     }
 
-    public class ChannelViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ChannelViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener {
 
         @BindView(R.id.imageView_album) public ImageView ivAlbum;
         @BindView(R.id.textView_title) public TextView tvTitle;
@@ -74,6 +75,7 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            itemView.setOnCreateContextMenuListener(this);
         }
 
         @Override
@@ -124,6 +126,15 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
                     }
                 });
             }
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v,
+                                        ContextMenu.ContextMenuInfo menuInfo) {
+
+            menu.setHeaderTitle("Delete Channel?");
+            menu.add(0, v.getId(), 0, "YES");//groupId, itemId, order, title
+            menu.add(0, v.getId(), 0, "NO");
         }
     }
 }
