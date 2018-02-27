@@ -1,20 +1,31 @@
 package appricottsoftware.clarity.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cz.msebera.android.httpclient.Header;
 
 public class SettingFragment extends Fragment {
 
@@ -23,8 +34,8 @@ public class SettingFragment extends Fragment {
     @BindView(R.id.sb_setting_length_set) AppCompatSeekBar sbLength;
     @BindView(R.id.tv_setting_progress) TextView tvProgress;
     @BindView(R.id.tv_setting_length_current) TextView tvCurrent;
-    @BindView(R.id.Email) TextView email;
-    @BindView(R.id.Password) TextView password;
+    @BindView(R.id.Email) EditText email;
+    @BindView(R.id.Password) EditText password;
 
     @Nullable
     @Override
@@ -41,11 +52,73 @@ public class SettingFragment extends Fragment {
         tvProgress.setVisibility(View.GONE);
         setLengthText();
         setSeekBar();
+        getOldEmail();
+        setEmailListener();
+
+    }
+
+    private void getOldEmail() {
+        int uid = ClarityApp.getSession(getContext()).getUserID();
+        ClarityApp.getRestClient().getEmail(uid, getContext(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    email.setText("");
+                    email.setHint(response.getString("email"));
+                }
+                catch (Exception e) {
+                    Log.e(TAG, "getOldEmail: ", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG, "getOldEmail Failed");
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
+    }
+
+    private boolean validateEmail(String emailString) {
+        return emailString.length() > 0;
+    }
+
+
+    private void setEmailListener() {
+        email.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (validateEmail(email.getText().toString()) && (actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN))) {
+                    int uid = ClarityApp.getSession(getContext()).getUserID();
+                    ClarityApp.getRestClient().updateEmail(uid, email.getText().toString(), getContext(), new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            getOldEmail();
+                            Toast.makeText(getContext(), "Email Updated!", Toast.LENGTH_LONG).show();
+                            InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(email.getWindowToken(), 0);
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            Log.e(TAG, "Unable to update email ", throwable);
+                            Toast.makeText(getContext(), "Email Not Updated :(", Toast.LENGTH_LONG).show();
+                            getOldEmail();
+                            super.onFailure(statusCode, headers, throwable, errorResponse);
+                        }
+                    });
+                    return true;
+                }
+                else {
+                    Toast.makeText(getContext(), "Invalid Email", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        });
     }
 
     private void setSeekBar() {
         // Get the last used max length and set the seekbar to the max length
-
         sbLength.setOnSeekBarChangeListener(new AppCompatSeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
