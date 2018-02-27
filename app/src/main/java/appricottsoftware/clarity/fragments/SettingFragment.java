@@ -51,7 +51,7 @@ public class SettingFragment extends Fragment {
         // Initialize view lookups, listener
         // TODO: write a listener for when fragment is done drawing UI
         tvProgress.setVisibility(View.GONE);
-        getPodcastSpeed();
+        getPodcastLength();
         setSeekBar();
         getOldEmail();
         setEmailListener();
@@ -154,44 +154,44 @@ public class SettingFragment extends Fragment {
     }
 
 
-    private void getPodcastSpeed() {
+    private void getPodcastLength() {
         int uid = ClarityApp.getSession(getContext()).getUserID();
-        ClarityApp.getRestClient().getPodcastSpeed(uid, getContext(), new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().getPodcastLength(uid, getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
-                    setProgress(Integer.parseInt(response.getString("podcastSpeed")));
-                    Log.i(TAG, "Setting oldPodcastSpeed!");
+                    setProgress(Integer.parseInt(response.getString("podcastLength")));
+                    Log.i(TAG, "Setting podcastLength!");
                 }
                 catch (Exception e) {
-                    Log.e(TAG, "getPodcastSpeed: ", e);
+                    Log.e(TAG, "podcastLength: ", e);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, "getPodcastSpeed Failed");
+                Log.e(TAG, "podcastLength Failed");
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
     }
 
-    private void updatePodcastSpeed(int newPodcastSpeed) {
+    private void updatePodcastLength(int newPodcastLength) {
         int uid = ClarityApp.getSession(getContext()).getUserID();
-        ClarityApp.getRestClient().updatePodcastSpeed(uid, newPodcastSpeed, getContext(), new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().updatePodcastLength(uid, newPodcastLength, getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
-                    Log.i(TAG, "updatePodcastSpeed!");
+                    Log.i(TAG, "updatePodcastLength!");
                 }
                 catch (Exception e) {
-                    Log.e(TAG, "updatePodcastSpeed ONSUCCESS FAILED: ", e);
+                    Log.e(TAG, "updatePodcastLength ONSUCCESS FAILED: ", e);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, "updatePodcastSpeed Failed");
+                Log.e(TAG, "updatePodcastLength Failed");
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
@@ -204,13 +204,13 @@ public class SettingFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
                     setProgress(progress);
-                    updatePodcastSpeed(progress);
+                    updatePodcastLength(progress);
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                getPodcastSpeed();
+                getPodcastLength();
                 if (tvProgress.getVisibility() == View.GONE) {
                     tvProgress.setVisibility(View.VISIBLE);
                 }
@@ -222,7 +222,6 @@ public class SettingFragment extends Fragment {
                     tvProgress.setVisibility(View.GONE);
                 }
                 Log.e(TAG, "OnStopTrackingTouch " + seekBar.getProgress());
-//                setLengthText();
                 int maxLength = ClarityApp.getSession(getContext()).getMaxLength();
                 setMaxLength(maxLength);
             }
@@ -256,7 +255,6 @@ public class SettingFragment extends Fragment {
     }
 
     private void setMaxLength(int maxLength) {
-
-
+        ClarityApp.getSession(getContext()).setMaxLength(maxLength);
     }
 }

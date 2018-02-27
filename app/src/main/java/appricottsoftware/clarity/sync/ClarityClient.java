@@ -287,7 +287,7 @@ public class ClarityClient {
 
 
 
-    public void getPodcastSpeed(int uid, Context context, JsonHttpResponseHandler handler) {
+    public void getPodcastLength(int uid, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
         JSONObject jsonParams = new JSONObject();
 
@@ -297,14 +297,14 @@ public class ClarityClient {
             jsonParams.put("uid", uid);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
-            client.get(context, context.getString(R.string.get_podcastSpeed_request_url), entity, "application/json", handler);
+            client.get(context, context.getString(R.string.get_podcastLength_request_url), entity, "application/json", handler);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void updatePodcastSpeed(int uid, float newPodcastSpeed, Context context, JsonHttpResponseHandler handler) {
+    public void updatePodcastLength(int uid, float newPodcastSpeed, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
         JSONObject jsonParams = new JSONObject();
 
@@ -312,10 +312,10 @@ public class ClarityClient {
             client.setMaxRetriesAndTimeout(1, 1000);
 
             jsonParams.put("uid", uid);
-            jsonParams.put("podcastSpeed", newPodcastSpeed);
+            jsonParams.put("podcastLength", newPodcastSpeed);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
-            client.post(context, context.getString(R.string.update_podcastSpeed_request_url), entity, "application/json", handler);
+            client.post(context, context.getString(R.string.update_podcastLength_request_url), entity, "application/json", handler);
 
         } catch (Exception e) {
             e.printStackTrace();
