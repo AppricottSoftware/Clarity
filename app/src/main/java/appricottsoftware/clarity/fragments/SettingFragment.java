@@ -81,15 +81,11 @@ public class SettingFragment extends Fragment {
         });
     }
 
-    private boolean validateEmail(String emailString) {
-        return emailString.length() > 0;
-    }
-
     private void setEmailListener() {
         email.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (validateEmail(email.getText().toString()) && ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN)))) {
+                if (RegisterActivity.isValidEmail(email.getText().toString()) && ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN)))) {
                     int uid = ClarityApp.getSession(getContext()).getUserID();
                     ClarityApp.getRestClient().updateEmail(uid, email.getText().toString(), getContext(), new JsonHttpResponseHandler() {
                         @Override
@@ -120,7 +116,7 @@ public class SettingFragment extends Fragment {
     }
 
     private boolean validatePassword(String password) {
-        return password.length() >= 8;
+        return password.length() >= 6;
     }
 
     private void setPasswordListener() {
@@ -218,6 +214,7 @@ public class SettingFragment extends Fragment {
     }
 
     private void setMaxLength(int maxLength) {
-        
+
+
     }
 }
