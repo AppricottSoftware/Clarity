@@ -239,7 +239,7 @@ public class ClarityClient {
             jsonParams.put("cid", cid);
 
             StringEntity entity = new StringEntity(jsonParams.toString());
-            client.get(context, context.getString(R.string.delete_channel_request_url), entity, "application/json", handler);
+            client.post(context, context.getString(R.string.delete_channel_request_url), entity, "application/json", handler);
 
         } catch (Exception e) {
             e.printStackTrace();
