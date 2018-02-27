@@ -187,7 +187,6 @@ public class ClarityClient {
         AsyncHttpClient client = new AsyncHttpClient();
         JSONObject jsonParams = new JSONObject();
 
-        // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in search so it may be added to db.
         try {
             client.setMaxRetriesAndTimeout(1, 1000);
 
@@ -284,6 +283,48 @@ public class ClarityClient {
             e.printStackTrace();
         }
     }
+
+
+
+    
+    public void getPodcastSpeed(int uid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.get(context, context.getString(R.string.get_podcastSpeed_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updatePodcastSpeed(int uid, float newPodcastSpeed, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("podcastSpeed", newPodcastSpeed);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.update_podcastSpeed_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
     public void setSearchQuotaRemaining(Header[] headers, Context context) {
         int quota_remaining = 0;

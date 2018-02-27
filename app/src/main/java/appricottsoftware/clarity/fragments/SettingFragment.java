@@ -51,7 +51,7 @@ public class SettingFragment extends Fragment {
         // Initialize view lookups, listener
         // TODO: write a listener for when fragment is done drawing UI
         tvProgress.setVisibility(View.GONE);
-        setLengthText();
+        getPodcastSpeed();
         setSeekBar();
         getOldEmail();
         setEmailListener();
@@ -153,6 +153,30 @@ public class SettingFragment extends Fragment {
         });
     }
 
+
+    private void getPodcastSpeed() {
+        int uid = ClarityApp.getSession(getContext()).getUserID();
+        ClarityApp.getRestClient().getPodcastSpeed(uid, getContext(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    // TODO
+                    setProgress(Integer.parseInt(response.getString("podcastSpeed")));
+                    Log.i(TAG, "Setting oldPodcastSpeed!");
+                }
+                catch (Exception e) {
+                    Log.e(TAG, "getPodcastSpeed: ", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG, "getPodcastSpeed Failed");
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
+    }
+
     private void setSeekBar() {
         // Get the last used max length and set the seekbar to the max length
         sbLength.setOnSeekBarChangeListener(new AppCompatSeekBar.OnSeekBarChangeListener() {
@@ -160,11 +184,13 @@ public class SettingFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
                     setProgress(progress);
+                    updatePodcastSpeed();
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                getPodcastSpeed();
                 if (tvProgress.getVisibility() == View.GONE) {
                     tvProgress.setVisibility(View.VISIBLE);
                 }
@@ -176,7 +202,7 @@ public class SettingFragment extends Fragment {
                     tvProgress.setVisibility(View.GONE);
                 }
                 Log.e(TAG, "OnStopTrackingTouch " + seekBar.getProgress());
-                setLengthText();
+//                setLengthText();
                 int maxLength = ClarityApp.getSession(getContext()).getMaxLength();
                 setMaxLength(maxLength);
             }
@@ -185,8 +211,10 @@ public class SettingFragment extends Fragment {
 
     private void setProgress(int progress) {
         Log.e(TAG, "Progress: " + progress);
+
         // Round the progress to the nearest 10
         progress = ((progress + 5) / 10) * 10;
+
         // Set the text and progress bar
         sbLength.setProgress(progress);
         tvProgress.setText(getLengthText(progress));
@@ -196,6 +224,7 @@ public class SettingFragment extends Fragment {
         int progressX = (((progressRightX - progressLeftX) * progress) / sbLength.getMax()) + progressLeftX;
         progressX -= tvProgress.getWidth() / 2;
         tvProgress.setX(progressX);
+
         Log.e(TAG, "setProgress: " + sbLength.getRight() + " " + sbLength.getPaddingRight() + " lX: " + progressLeftX + " rX: " + progressRightX + " X: " + progressX);
     }
 
@@ -204,13 +233,6 @@ public class SettingFragment extends Fragment {
             return "off";
         }
         return Integer.toString(length);
-    }
-
-    private void setLengthText() {
-        int length = ClarityApp.getSession(getContext()).getMaxLength();
-        tvCurrent.setText(getLengthText(length));
-        setProgress(length);
-        Log.e(TAG, "Length: " + length);
     }
 
     private void setMaxLength(int maxLength) {
