@@ -286,7 +286,7 @@ public class ClarityClient {
 
 
 
-    
+
     public void getPodcastSpeed(int uid, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
         JSONObject jsonParams = new JSONObject();
@@ -321,9 +321,6 @@ public class ClarityClient {
             e.printStackTrace();
         }
     }
-
-
-
 
 
     public void setSearchQuotaRemaining(Header[] headers, Context context) {

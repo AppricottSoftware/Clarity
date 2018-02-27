@@ -160,7 +160,6 @@ public class SettingFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
-                    // TODO
                     setProgress(Integer.parseInt(response.getString("podcastSpeed")));
                     Log.i(TAG, "Setting oldPodcastSpeed!");
                 }
@@ -177,6 +176,27 @@ public class SettingFragment extends Fragment {
         });
     }
 
+    private void updatePodcastSpeed(int newPodcastSpeed) {
+        int uid = ClarityApp.getSession(getContext()).getUserID();
+        ClarityApp.getRestClient().updatePodcastSpeed(uid, newPodcastSpeed, getContext(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    Log.i(TAG, "updatePodcastSpeed!");
+                }
+                catch (Exception e) {
+                    Log.e(TAG, "updatePodcastSpeed ONSUCCESS FAILED: ", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG, "updatePodcastSpeed Failed");
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
+    }
+
     private void setSeekBar() {
         // Get the last used max length and set the seekbar to the max length
         sbLength.setOnSeekBarChangeListener(new AppCompatSeekBar.OnSeekBarChangeListener() {
@@ -184,7 +204,7 @@ public class SettingFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
                     setProgress(progress);
-                    updatePodcastSpeed();
+                    updatePodcastSpeed(progress);
                 }
             }
 
