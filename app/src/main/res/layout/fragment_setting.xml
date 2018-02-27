@@ -19,7 +19,7 @@
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText4" />
+        app:layout_constraintTop_toBottomOf="@+id/Password" />
 
     <TextView
         android:id="@+id/tv_setting_length6"
@@ -35,7 +35,7 @@
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText3" />
+        app:layout_constraintTop_toBottomOf="@+id/Email" />
 
     <TextView
         android:id="@+id/tv_setting_length4"
@@ -112,7 +112,7 @@
         app:layout_constraintTop_toBottomOf="@id/tv_setting_length" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/Email"
         android:layout_width="358dp"
         android:layout_height="43dp"
         android:layout_marginEnd="8dp"
@@ -128,7 +128,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_setting_length4" />
 
     <EditText
-        android:id="@+id/editText4"
+        android:id="@+id/Password"
         android:layout_width="358dp"
         android:layout_height="43dp"
         android:layout_marginEnd="8dp"

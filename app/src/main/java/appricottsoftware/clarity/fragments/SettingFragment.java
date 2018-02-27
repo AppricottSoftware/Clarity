@@ -23,6 +23,8 @@ public class SettingFragment extends Fragment {
     @BindView(R.id.sb_setting_length_set) AppCompatSeekBar sbLength;
     @BindView(R.id.tv_setting_progress) TextView tvProgress;
     @BindView(R.id.tv_setting_length_current) TextView tvCurrent;
+    @BindView(R.id.Email) TextView email;
+    @BindView(R.id.Password) TextView password;
 
     @Nullable
     @Override
