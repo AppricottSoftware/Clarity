@@ -103,6 +103,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         // Initialize search bar members
         resetSearch();
 
+        // Set max length if it hasn't been set
+
+
         // Get Login Type
         loginType = getIntent().getStringExtra("loginType");
 

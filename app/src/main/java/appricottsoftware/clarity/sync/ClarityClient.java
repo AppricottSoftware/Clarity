@@ -44,6 +44,10 @@ public class ClarityClient {
         // Next, we add the parameters for the api call (see function description above)
         RequestParams params = new RequestParams();
         params.put("genre_ids", genre_ids);
+        int maxLength = ClarityApp.getSession(context).getMaxLength();
+        if(maxLength > 0) {
+            params.put("len_max", maxLength);
+        }
         params.put("offset", offset);
         params.put("q", q);
         params.put("sort_by_date", sort_by_date);

@@ -1,13 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
+        android:id="@+id/tv_setting_length"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Setting Fragment"/>
+        android:layout_margin="12dp"
+        android:text="Max Length: "
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_setting_length_current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toTopOf="@id/tv_setting_length"
+        app:layout_constraintBottom_toBottomOf="@id/tv_setting_length"
+        app:layout_constraintStart_toEndOf="@id/tv_setting_length"
+        />
+
+    <TextView
+        android:id="@+id/tv_setting_length_off"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="off"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/sb_setting_length_set"
+        app:layout_constraintBottom_toBottomOf="@id/sb_setting_length_set"
+        app:layout_constraintEnd_toStartOf="@id/sb_setting_length_set"
+        android:paddingStart="12dp"/>
+
+    <android.support.v7.widget.AppCompatSeekBar
+        android:id="@+id/sb_setting_length_set"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/player_fragment_padding"
+        android:progressTint="@android:color/black"
+        android:thumbTint="@android:color/black"
+        android:max="120"
+        app:layout_constraintTop_toBottomOf="@+id/tv_setting_progress"
+        app:layout_constraintStart_toEndOf="@id/tv_setting_length_off"
+        app:layout_constraintEnd_toStartOf="@id/tv_setting_length_max"/>
+
+    <TextView
+        android:id="@+id/tv_setting_length_max"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="120m"
+        app:layout_constraintStart_toEndOf="@id/sb_setting_length_set"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/sb_setting_length_set"
+        app:layout_constraintBottom_toBottomOf="@id/sb_setting_length_set"
+        android:paddingEnd="12dp"/>
+
+    <TextView
+        android:id="@+id/tv_setting_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tv_setting_length"
+        android:text="Text"/>
 
 </android.support.constraint.ConstraintLayout>

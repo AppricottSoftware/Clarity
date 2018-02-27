@@ -19,4 +19,13 @@ public class Session {
         int userID = preferences.getInt("userID", -1);
         return userID;
     }
+
+    public void setMaxLength(int maxLength) {
+        preferences.edit().putInt("maxLength", maxLength).apply();
+    }
+
+    public int getMaxLength() {
+        int maxLength = preferences.getInt("maxLength", -1);
+        return maxLength;
+    }
 }
