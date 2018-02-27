@@ -22,6 +22,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONObject;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.RegisterActivity;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,7 +55,7 @@ public class SettingFragment extends Fragment {
         setSeekBar();
         getOldEmail();
         setEmailListener();
-
+        setPasswordListener();
     }
 
     private void getOldEmail() {
@@ -65,6 +66,7 @@ public class SettingFragment extends Fragment {
                 try {
                     email.setText("");
                     email.setHint(response.getString("email"));
+                    email.clearFocus();
                 }
                 catch (Exception e) {
                     Log.e(TAG, "getOldEmail: ", e);
@@ -83,26 +85,26 @@ public class SettingFragment extends Fragment {
         return emailString.length() > 0;
     }
 
-
     private void setEmailListener() {
         email.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (validateEmail(email.getText().toString()) && (actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN))) {
+                if (validateEmail(email.getText().toString()) && ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN)))) {
                     int uid = ClarityApp.getSession(getContext()).getUserID();
                     ClarityApp.getRestClient().updateEmail(uid, email.getText().toString(), getContext(), new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                             getOldEmail();
-                            Toast.makeText(getContext(), "Email Updated!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "Email updated!", Toast.LENGTH_LONG).show();
                             InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.hideSoftInputFromWindow(email.getWindowToken(), 0);
+                            email.clearFocus();
                         }
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                             Log.e(TAG, "Unable to update email ", throwable);
-                            Toast.makeText(getContext(), "Email Not Updated :(", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getContext(), "Email not updated", Toast.LENGTH_LONG).show();
                             getOldEmail();
                             super.onFailure(statusCode, headers, throwable, errorResponse);
                         }
@@ -110,7 +112,45 @@ public class SettingFragment extends Fragment {
                     return true;
                 }
                 else {
-                    Toast.makeText(getContext(), "Invalid Email", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Invalid email", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            }
+        });
+    }
+
+    private boolean validatePassword(String password) {
+        return password.length() >= 8;
+    }
+
+    private void setPasswordListener() {
+        password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (validatePassword(password.getText().toString()) && ((actionId == EditorInfo.IME_ACTION_DONE) || ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN)))) {
+                    int uid = ClarityApp.getSession(getContext()).getUserID();
+                    String newPassword = RegisterActivity.hashPassword(password.getText().toString());
+                    ClarityApp.getRestClient().updatePassword(uid, newPassword, getContext(), new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            Toast.makeText(getContext(), "Password updated!", Toast.LENGTH_LONG).show();
+                            InputMethodManager imm = (InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(password.getWindowToken(), 0);
+                            password.setText("");
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            Log.e(TAG, "Unable to update password ", throwable);
+                            Toast.makeText(getContext(), "Password not updated", Toast.LENGTH_LONG).show();
+                            getOldEmail();
+                            super.onFailure(statusCode, headers, throwable, errorResponse);
+                        }
+                    });
+                    return true;
+                }
+                else {
+                    Toast.makeText(getContext(), "Invalid password", Toast.LENGTH_LONG).show();
                     return false;
                 }
             }
@@ -139,7 +179,10 @@ public class SettingFragment extends Fragment {
                 if (tvProgress.getVisibility() == View.VISIBLE) {
                     tvProgress.setVisibility(View.GONE);
                 }
+                Log.e(TAG, "OnStopTrackingTouch " + seekBar.getProgress());
                 setLengthText();
+                int maxLength = ClarityApp.getSession(getContext()).getMaxLength();
+                setMaxLength(maxLength);
             }
         });
     }
@@ -172,5 +215,9 @@ public class SettingFragment extends Fragment {
         tvCurrent.setText(getLengthText(length));
         setProgress(length);
         Log.e(TAG, "Length: " + length);
+    }
+
+    private void setMaxLength(int maxLength) {
+        
     }
 }

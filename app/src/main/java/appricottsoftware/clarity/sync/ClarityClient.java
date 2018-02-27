@@ -267,6 +267,24 @@ public class ClarityClient {
         }
     }
 
+    public void updatePassword(int uid, String newPassword, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("newPassword", newPassword);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.update_password_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setSearchQuotaRemaining(Header[] headers, Context context) {
         int quota_remaining = 0;
         for(Header h : headers) {
