@@ -530,6 +530,12 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 .playFromSearch(podcast.getTitle_original(), bundle);
     }
 
+    @Override
+    public void setPlaybackSpeed(float speed) {
+        //TODO: Fill this out
+
+    }
+
     public void googleSignOut() {
         ClarityApp clarityApp = new ClarityApp();
         GoogleSignInClient mGoogleSignInClient = clarityApp.getGoogleSignInClient();
