@@ -3,7 +3,9 @@ package appricottsoftware.clarity.adapters;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -11,13 +13,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.sync.ClarityApp;
@@ -31,21 +37,29 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
 
     private List<Channel> channels;
     private Context context;
+    private View view;
+    private ChannelFragment channelFragment;
     private boolean isChannelView;
 
+    public int getSelected_position() {
+        return selected_position;
+    }
+
     private int selected_position = 0;
+    private int long_hold_position = 0;
 
     private PlayerInterface playerInterface;
 
-    public ChannelsAdapter(List<Channel> channels, Context context, boolean isChannelView) {
+    public ChannelsAdapter(List<Channel> channels, Context context, boolean isChannelView, ChannelFragment channelFragment) {
         this.channels = channels;
         this.context = context;
         this.isChannelView = isChannelView;
+        this.channelFragment = channelFragment;
     }
 
     @Override
     public ChannelsAdapter.ChannelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_channel_adapter, parent, false);
         return new ChannelsAdapter.ChannelViewHolder(view);
     }
@@ -65,15 +79,19 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
         return channels.size();
     }
 
-    public class ChannelViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ChannelViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener {
 
         @BindView(R.id.imageView_album) public ImageView ivAlbum;
         @BindView(R.id.textView_title) public TextView tvTitle;
+
+        Context theContext;
 
         public ChannelViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            itemView.setOnCreateContextMenuListener(this);
+            theContext = itemView.getContext();
         }
 
         @Override
@@ -125,5 +143,71 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
                 });
             }
         }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v,
+                                        ContextMenu.ContextMenuInfo menuInfo) {
+
+            long_hold_position = getLayoutPosition();
+            MenuItem Delete = menu.add(menu.NONE, 1, 1, "Delete");
+            Delete.setOnMenuItemClickListener(onEditMenu);
+        }
+
+
+        private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case 1:
+                        int uid = ClarityApp.getSession(theContext).getUserID();
+                        int cid = channels.get(long_hold_position).getCid();
+
+                        // Delete channel front-end
+                        channelFragment.deleteChannel(channels.get(long_hold_position));
+
+                        // Delete channel back-end
+                        ClarityApp.getRestClient().deleteChannel(uid, cid, theContext, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                                try {
+                                    Toast.makeText(context, "Channel Deleted", Toast.LENGTH_SHORT).show();
+                                } catch(Exception e) {
+                                    Log.e(TAG, "Failed to delete channels", e);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                try {
+                                    switch(statusCode) {
+                                        case(0):
+                                            Toast.makeText(theContext,
+                                                    "Server is down. Please try later.",
+                                                    Toast.LENGTH_LONG).show();
+                                            break;
+                                        default:
+                                            Log.i(TAG, "Channel onFailure. Default Switch. Status Code: " + statusCode);
+                                            break;
+                                    }
+                                }
+                                catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                super.onFailure(statusCode, headers, throwable, errorResponse);
+                            }
+                        });
+
+                        break;
+
+                    default:
+                        //Toast.makeText(context, "default case", Toast.LENGTH_SHORT).show();
+                        //This case should never be reached
+                        break;
+                }
+                return true;
+            }
+        };
+
     }
+
 }
