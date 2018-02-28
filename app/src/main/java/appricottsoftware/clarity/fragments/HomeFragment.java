@@ -57,5 +57,4 @@ public class HomeFragment extends Fragment {
             vpTabs.setCurrentItem(0);
         }
     }
-
 }

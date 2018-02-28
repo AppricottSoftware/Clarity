@@ -164,24 +164,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 try {
                     Log.e(TAG, "register onSuccess : " + statusCode + "\n" + response.toString() );
-
-                    // User already in database
-                    if (response.getInt("userId") == -1) {
-                        authenticate(userEmail, token, loginType);
-                    }
-
                     // First time social media user
-                    else {
-                        userId = response.getInt("userId");
-                        ClarityApp.getSession(getApplicationContext()).setUserID(userId);
 
-                        if (loginType == getString(R.string.facebook_login_type)) {
-                            login(getString(R.string.facebook_login_type));
-                        }
-                        else if (loginType == getString(R.string.google_login_type)) {
-                            login(getString(R.string.google_login_type));
-                        }
+                    userId = response.getInt("uid");
+                    ClarityApp.getSession(getApplicationContext()).setUserID(userId);
 
+                    if (loginType == getString(R.string.facebook_login_type)) {
+                        login(getString(R.string.facebook_login_type));
+                    }
+                    else if (loginType == getString(R.string.google_login_type)) {
+                        login(getString(R.string.google_login_type));
                     }
                 }
                 catch (JSONException e) {
