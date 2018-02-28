@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.sync.ClarityApp;
@@ -36,6 +37,8 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
 
     private List<Channel> channels;
     private Context context;
+    private View view;
+    private ChannelFragment channelFragment;
     private boolean isChannelView;
 
     public int getSelected_position() {
@@ -47,15 +50,16 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
 
     private PlayerInterface playerInterface;
 
-    public ChannelsAdapter(List<Channel> channels, Context context, boolean isChannelView) {
+    public ChannelsAdapter(List<Channel> channels, Context context, boolean isChannelView, ChannelFragment channelFragment) {
         this.channels = channels;
         this.context = context;
         this.isChannelView = isChannelView;
+        this.channelFragment = channelFragment;
     }
 
     @Override
     public ChannelsAdapter.ChannelViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_channel_adapter, parent, false);
         return new ChannelsAdapter.ChannelViewHolder(view);
     }
@@ -158,6 +162,10 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
                         int uid = ClarityApp.getSession(theContext).getUserID();
                         int cid = channels.get(long_hold_position).getCid();
 
+                        // Delete channel front-end
+                        channelFragment.deleteChannel(channels.get(long_hold_position));
+
+                        // Delete channel back-end
                         ClarityApp.getRestClient().deleteChannel(uid, cid, theContext, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
