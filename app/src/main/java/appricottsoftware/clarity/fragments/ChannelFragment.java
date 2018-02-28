@@ -73,6 +73,8 @@ public class ChannelFragment extends Fragment {
     private RecyclerView.Adapter rAdapterSearch;
     private List<Channel> searchChannels;
 
+    private ChannelFragment channelFragment;
+
     int offset = 0;
 
     // To set - query to see if channels exist for user.
@@ -99,6 +101,8 @@ public class ChannelFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_channel, container, false);
         ButterKnife.bind(this, view);
 
+        channelFragment = this;
+
         //View view;
 
         // TODO: decide on usefulness and form of survey
@@ -122,8 +126,8 @@ public class ChannelFragment extends Fragment {
         channels = new ArrayList<>();
         searchChannels = new ArrayList<>();
 
-        rAdapter = new ChannelsAdapter(channels, getContext(), true);
-        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
+        rAdapter = new ChannelsAdapter(channels, getContext(), true, this);
+        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false, this);
         channelRecycler.setAdapter(rAdapter);
 
         return view;
@@ -161,7 +165,7 @@ public class ChannelFragment extends Fragment {
                         public void onClick(View view) {
 
                             searchChannels = new ArrayList<>();
-                            rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
+                            rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false, channelFragment);
                             channelRecycler.setAdapter(rAdapterSearch);
 
                             String searchKeyword = searchEditText.getText().toString();
@@ -288,7 +292,7 @@ public class ChannelFragment extends Fragment {
                     // Convert the response to Channels
                     TypeToken<ArrayList<Channel>> token = new TypeToken<ArrayList<Channel>>() {};
                     channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
-                    rAdapter = new ChannelsAdapter(channels, getContext(), true);
+                    rAdapter = new ChannelsAdapter(channels, getContext(), true, channelFragment);
                     channelRecycler.setAdapter(rAdapter);
 
                     // Turn off loading circle
@@ -388,8 +392,15 @@ public class ChannelFragment extends Fragment {
 
     private void addChannelToSearchRecycler(Channel channel) {
         searchChannels.add(channel);
-        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
+        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false, this);
         channelRecycler.setAdapter(rAdapterSearch);
+    }
+
+    public void deleteChannel(Channel channel) {
+        if (channels.contains(channel) && rAdapter != null) {
+            channels.remove(channel);
+            rAdapter.notifyDataSetChanged();
+        }
     }
 
     // TODO: does this need to be separate from search recycler?
