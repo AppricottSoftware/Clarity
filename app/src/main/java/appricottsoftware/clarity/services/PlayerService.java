@@ -68,6 +68,8 @@ import appricottsoftware.clarity.sync.ClarityApp;
 import appricottsoftware.clarity.sync.ClarityClient;
 import cz.msebera.android.httpclient.Header;
 
+import static appricottsoftware.clarity.R.string.playback_speed_key;
+
 public class PlayerService extends MediaBrowserServiceCompat {
 
     private static final String TAG = "PlayerService";
@@ -700,6 +702,27 @@ public class PlayerService extends MediaBrowserServiceCompat {
             https://medium.com/google-exoplayer/variable-speed-playback-with-exoplayer-e6e6a71e0343
         }
         */
+
+        @Override
+        public void onCustomAction(String action, Bundle extras) {
+            Log.e(TAG, "onCustomAction: " + action);
+            // If the action requested is changing the playback speed
+            if(action.equals(context.getString(R.string.playback_speed_action))) {
+                // Get the bundled playback speed
+                float speed = extras.getFloat(context.getString(playback_speed_key));
+
+                // Validate the speed
+                if(speed < 0.5f || speed > 3f) {
+                    speed = 1.0f;
+                }
+
+                Log.e(TAG, "onCustomAction: " + speed);
+
+                // Set the media player to play at the playback speed
+                PlaybackParameters playbackParameters = new PlaybackParameters(speed, 1.0f);
+                exoMediaPlayer.setPlaybackParameters(playbackParameters);
+            }
+        }
     }
 
     public String getStateChanged(int playbackState) {

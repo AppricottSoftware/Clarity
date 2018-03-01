@@ -1,6 +1,10 @@
 package appricottsoftware.clarity.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.drm.DrmStore;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -20,22 +24,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Podcast;
+import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cz.msebera.android.httpclient.Header;
 
 public class PlayerFragment extends Fragment /*implements View.OnClickListener*/ {
 
@@ -63,6 +73,8 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @BindView(R.id.tv_expand_description) TextView tvExpandDescription;
     @BindView(R.id.iv_expand_cover) ImageView ivExpandCover;
 
+    PlaybackSpeedDialogFragment.PlaybackSpeedDialogListener playbackSpeedDialogListener;
+
     private MediaMetadataCompat currentMetadata;
     private boolean currentPlayState;
 
@@ -71,6 +83,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_player, container, false);
         ButterKnife.bind(this, view);
+        registerForContextMenu(tvExpandSpeed);
         return view;
     }
 
@@ -81,6 +94,18 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         tvExpandDescription.setSelected(true);
         tvCollapseTitle.setSelected(true);
         tvCollapseDescription.setSelected(true);
+        populatePlaybackSpeed();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof PlaybackSpeedDialogFragment.PlaybackSpeedDialogListener) {
+            playbackSpeedDialogListener = (PlaybackSpeedDialogFragment.PlaybackSpeedDialogListener) context;
+        } else {
+            Log.e(TAG, "Calling activity must implement PlaybackSpeedDialogListener");
+            throw new ClassCastException("Must implement PlaybackSpeedDialogListener");
+        }
     }
 
     @Override
@@ -91,6 +116,35 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @Override
     public void onStop() {
         super.onStop();
+    }
+
+    public void populatePlaybackSpeed() {
+        int uid = ClarityApp.getSession(getContext()).getUserID();
+        ClarityApp.getRestClient().getPlaybackSpeed(uid, getContext(), new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    float playbackSpeed = Float.parseFloat(response.get("playbackSpeed").toString());
+                    Log.e(TAG, "populatePlaybackSpeed: " + playbackSpeed);
+                    if(playbackSpeed < 0.5f || playbackSpeed > 3f) {
+                        playbackSpeed = 1f;
+                    }
+                    tvExpandSpeed.setText(playbackSpeed + "x");
+                    ClarityApp.getSession(getContext()).setPlaybackSpeed(playbackSpeed);
+                } catch(Exception e) {
+                    Log.e(TAG, "populatePlaybackSpeed: onSuccess", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG, "populatePlaybackSpeed: onFailure", throwable);
+            }
+        });
+    }
+
+    public void setPlaybackSpeed(float playbackSpeed) {
+        tvExpandSpeed.setText(playbackSpeed + "x");
     }
 
     public void openPanel() {
@@ -153,7 +207,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         setSkipOnClick(activity, ibExpandSkip);
         setLikeClick(activity, ibExpandLike);
         setDislikeClick(activity, ibExpandDislike);
-
+        setPlaybackSpeedClick(activity, tvExpandSpeed);
         // TODO: playback speed controls
     }
 
@@ -213,12 +267,34 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     }
 
     private void setDislikeClick(@NonNull final Activity activity, ImageButton dislike) {
-        dislike.setOnClickListener(new View.OnClickListener() {
+            dislike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MediaControllerCompat.getMediaController(activity).getTransportControls().setRating(RatingCompat.newThumbRating(false));
             }
         });
+    }
+
+    private void setPlaybackSpeedClick(@NonNull final Activity activity, TextView playbackText) {
+        playbackText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPlaybackSpeedDialog(activity);
+            }
+        });
+    }
+
+    private void showPlaybackSpeedDialog(@NonNull final Activity activity) {
+        // Remove all previous fragments
+        android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("PlaybackSpeedDialog");
+        if(prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        PlaybackSpeedDialogFragment dialog = new PlaybackSpeedDialogFragment();
+        dialog.show(ft, "PlaybackSpeedFragment");
     }
 
     private void setPlayPauseControls(boolean play) {

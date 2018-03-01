@@ -1,5 +1,6 @@
 package appricottsoftware.clarity;
 
+import android.app.DialogFragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -44,6 +45,7 @@ import org.parceler.Parcels;
 import appricottsoftware.clarity.fragments.ChannelSearchFragment;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
+import appricottsoftware.clarity.fragments.PlaybackSpeedDialogFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
 import appricottsoftware.clarity.models.Channel;
@@ -59,7 +61,9 @@ import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener {
+import static appricottsoftware.clarity.R.string.playback_speed_key;
+
+public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener, PlaybackSpeedDialogFragment.PlaybackSpeedDialogListener {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
@@ -260,7 +264,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private void searchEpisodes(String query) {
         // Show channel search fragment, hide home fragment
         insertFragment(channelSearchFragment, getString(R.string.channel_search_fragment_tag));
-
 
         // Run the search when the fragment is ready
         searchChannel = true;
@@ -506,6 +509,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     @Override
     public void playChannel(Channel channel) {
         // TODO: Figure out why bundle is not transmitting data
+        onDialogOK(ClarityApp.getSession(this).getPlaybackSpeed());
+
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_channel_bundle), Parcels.wrap(channel));
         mediaController.getTransportControls()
@@ -531,9 +536,12 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     }
 
     @Override
-    public void setPlaybackSpeed(float speed) {
-        //TODO: Fill this out
-
+    public void onDialogOK(float speed) {
+        playerFragment.setPlaybackSpeed(speed);
+        Bundle bundle = new Bundle();
+        bundle.putFloat(getString(playback_speed_key), speed);
+        mediaController.getTransportControls()
+                .sendCustomAction(getString(R.string.playback_speed_action), bundle);
     }
 
     public void googleSignOut() {

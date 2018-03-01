@@ -6,5 +6,4 @@ public interface PlayerInterface {
     void playChannel(Channel channel);
     void playEpisode(Episode episode);
     void playPodcast(Podcast podcast);
-    void setPlaybackSpeed(float speed);
 }
