@@ -205,7 +205,6 @@ public class SettingFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
                     setProgress(progress);
-                    updatePodcastLength(progress);
                 }
             }
 
@@ -222,6 +221,7 @@ public class SettingFragment extends Fragment {
                 if (tvProgress.getVisibility() == View.VISIBLE) {
                     tvProgress.setVisibility(View.GONE);
                 }
+                updatePodcastLength(seekBar.getProgress());
                 Log.e(TAG, "OnStopTrackingTouch " + seekBar.getProgress());
                 int maxLength = ClarityApp.getSession(getContext()).getMaxLength();
                 setMaxLength(maxLength);
