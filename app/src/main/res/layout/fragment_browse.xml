@@ -12,4 +12,4 @@
     android:verticalSpacing="@dimen/browse_fragment_vertical_spacing"
     android:horizontalSpacing="0dp"
     android:numColumns="2"
-    android:stretchMode="columnWidth" />
+    android:stretchMode="spacingWidthUniform" />

@@ -33,8 +33,6 @@ import java.util.List;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.adapters.ChannelsAdapter;
-import appricottsoftware.clarity.adapters.RecyclerAdapter;
-import appricottsoftware.clarity.adapters.RecyclerListItem;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
@@ -42,8 +40,6 @@ import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
-
-import static appricottsoftware.clarity.sync.ClarityApp.getGson;
 
 public class ChannelFragment extends Fragment {
 
@@ -84,6 +80,11 @@ public class ChannelFragment extends Fragment {
 
     private PlayerInterface playerInterface;
 
+    private SendChannelsInterface sendChannelCallback;
+    public interface SendChannelsInterface {
+        void sendChannels(List<Channel> channels);
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -93,6 +94,21 @@ public class ChannelFragment extends Fragment {
             Log.e(TAG, context.toString() + " must implement PlayerInterface");
             throw new ClassCastException(context.toString() + " must implement PlayerInterface");
         }
+
+        // Send channels from ChannelFragment to BrowseFragment
+        try {
+            sendChannelCallback = (SendChannelsInterface) getActivity();
+        }
+        catch(ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement SendChannelsInterface");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        sendChannelCallback = null; // => avoid leaking
+        super.onDetach();
     }
 
     @Nullable
@@ -401,6 +417,10 @@ public class ChannelFragment extends Fragment {
             channels.remove(channel);
             rAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void sendChannelsToBrowse() {
+        sendChannelCallback.sendChannels(channels);
     }
 
     // TODO: does this need to be separate from search recycler?

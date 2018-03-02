@@ -41,6 +41,10 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
 
+import java.util.List;
+
+import appricottsoftware.clarity.fragments.BrowseFragment;
+import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.fragments.ChannelSearchFragment;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
@@ -59,7 +63,8 @@ import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener {
+public class HomeActivity extends AppCompatActivity implements PlayerInterface,
+        FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.RequestChannelsInterface {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
@@ -74,6 +79,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private ActionBarDrawerToggle drawerToggle;
     private String loginType;   // "1" is e-mail password, "2" is facebook, "3" is google
 
+    private static BrowseFragment browseFragment;
     private static HomeFragment homeFragment;
     private static LikeFragment likeFragment;
     private static SettingFragment settingFragment;
@@ -557,5 +563,33 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                     });
         }
         clarityApp.clearGoogleSignInClient();
+    }
+
+    @Override
+    public void sendChannels(List<Channel> channels) {
+        // Get reference to BrowseFragment
+        String homeFragmentTag = getString(R.string.home_fragment_tag);
+        Fragment page = getSupportFragmentManager().findFragmentByTag(homeFragmentTag);
+        HomeFragment homeFragment = (HomeFragment) page;
+
+        // If successful use HomeFragment as medium to communicate between Channels and Browse
+        if (homeFragment != null) {
+            Log.i(TAG, "Receive callback from ChannelFragment, sending data to browse");
+            homeFragment.sendDataToBrowseFragment(channels);
+        }
+    }
+
+    @Override
+    public void requestChannels() {
+        // Get reference to BrowseFragment
+        String homeFragmentTag = getString(R.string.home_fragment_tag);
+        Fragment page = getSupportFragmentManager().findFragmentByTag(homeFragmentTag);
+        HomeFragment homeFragment = (HomeFragment) page;
+
+        // If successful use HomeFragment as medium to communicate between Channels and Browse
+        if (homeFragment != null) {
+            Log.i(TAG, "Receive callback from BrowseFragment, requesting data from ChannelFrag");
+            homeFragment.requestDataFromChannelFragment();
+        }
     }
 }

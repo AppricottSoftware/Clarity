@@ -1,6 +1,8 @@
 package appricottsoftware.clarity.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -24,6 +26,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.adapters.BrowseAdapter;
@@ -45,10 +48,14 @@ public class BrowseFragment extends Fragment {
 
     private BrowseAdapter adapter;
     private PlayerInterface playerInterface;
-    private ArrayList<Podcast> podcasts;
     private ArrayList<Channel> channels;
-    private String query;
-    private int offset;
+    private JSONObject browseChannels;
+    private int position;
+
+    private RequestChannelsInterface requestChannelsCallback;
+    public interface RequestChannelsInterface {
+        void requestChannels();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -58,6 +65,15 @@ public class BrowseFragment extends Fragment {
         } else {
             Log.e(TAG, context.toString() + " must implement PlayerInterface");
             throw new ClassCastException(context.toString() + " must implement PlayerInterface");
+        }
+
+        // Send channels from ChannelFragment to BrowseFragment
+        try {
+            requestChannelsCallback = (RequestChannelsInterface) getActivity();
+        }
+        catch(ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement RequestChannelsInterface");
         }
     }
 
@@ -72,7 +88,6 @@ public class BrowseFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
-        podcasts = new ArrayList<>();
         channels = new ArrayList<>();
 
         // Parse browse.json from assets to populate Channel array.
@@ -122,11 +137,14 @@ public class BrowseFragment extends Fragment {
     }
 
     private void populateBrowseGrid() {
+        // Initialize adapter with channels array
         adapter = new BrowseAdapter(getActivity(), channels);
+
+        // Populate gridview
         gridView.setAdapter(adapter);
 
         // Code for long press context menu. May be used to remove uninteresting channels
-        //registerForContextMenu(gridView);
+        registerForContextMenu(gridView);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -141,14 +159,8 @@ public class BrowseFragment extends Fragment {
                                             + " " + channels.get(position).getMetadata().get(0).getScore(),
                         Toast.LENGTH_SHORT).show();
 
-                // Get the channel that was clicked on
-                Channel channel = channels.get(position);
-
-                // Play the channel
-                playerInterface.playChannel(channels.get(position));
-
-                // Add it to the user's channels
-                addToChannels(channel, position);
+                // Get user confirmation
+                showDialog(channels.get(position), position);
 
                 // TODO: write getter interface to retreive all Channels from ChannelFragment to avoid displaying duplicate Channels Here
                 // TODO: or add default browse database and take the set difference of the user's channels on the backend
@@ -156,25 +168,39 @@ public class BrowseFragment extends Fragment {
         });
     }
 
+    // May use for long-press actions
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+
+        // Set header
         menu.setHeaderTitle("Context Menu");
+
+        // Get context menu
         AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+        // Get long-press position
+        position = cmi.position;
+
+        // Add menu items
         menu.add(1, cmi.position, 0, "Action 1");
         menu.add(2, cmi.position, 0, "Action 2");
     }
 
+    // May use for long-press actions
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        GridView g = getActivity().findViewById(R.id.gv_browse);
-        String s = (String) g.getItemAtPosition(item.getItemId());
+        String name = channels.get(position).getTitle();
+
+        // Forcing channels to be received
+        requestChannelsFromChannelFragment();
+
         switch (item.getGroupId()) {
             case 1:
-                Toast.makeText(getActivity(), "Action 1, Item "+s, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Action 1, Item "+name, Toast.LENGTH_SHORT).show();
                 break;
             case 2:
-                Toast.makeText(getActivity(), "Action 2, Item "+s, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Action 2, Item "+name, Toast.LENGTH_SHORT).show();
                 break;
         }
         return true;
@@ -184,13 +210,17 @@ public class BrowseFragment extends Fragment {
         int uid = ClarityApp.getSession(getContext()).getUserID();
 
         // TODO: re-add onSuccess and on Failure methods to be handled in future.
-        ClarityApp.getRestClient().createChannel(uid, channel, getContext(), new JsonHttpResponseHandler() {
+        ClarityApp.getRestClient().createChannel(uid, channel, getActivity(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Toast.makeText(getContext(), "Added channel!", Toast.LENGTH_LONG).show();
+
                 // Removes channel from browse once user clicks it
                 channels.remove(position);
                 adapter.notifyDataSetChanged();
+
+                // Play channel
+                playerInterface.playChannel(channels.get(position));
             }
 
             @Override
@@ -205,5 +235,40 @@ public class BrowseFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void showDialog(final Channel channel, final int position) {
+        new AlertDialog.Builder(getActivity())
+                // Prompt message
+                .setMessage("Add " + channel.getTitle() + " to your channels?")
+
+                // Yes button
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // On confirmation from user, add channel via backend call
+                        addToChannels(channel, position);
+                    }})
+
+                // No button
+                .setNegativeButton(android.R.string.no, null).show();
+    }
+
+    public void receiveChannelsFromChannelFragment(List<Channel> channels) {
+        Log.i(TAG, "Success, channels received!");
+        if (channels != null) {
+            for (int i = 0; i < channels.size(); i++) {
+                Log.e(TAG, "Channel 1: " + channels.get(i).getTitle());
+            }
+        }
+    }
+
+    void requestChannelsFromChannelFragment() {
+        Log.i(TAG, "Requesting channels from contextual menu");
+        requestChannelsCallback.requestChannels();
+    }
+
+    private void mergeUserChannelsWithBrowseChannels() {
+
     }
 }

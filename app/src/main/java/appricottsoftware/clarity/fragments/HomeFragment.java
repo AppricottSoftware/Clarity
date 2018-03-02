@@ -12,8 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.adapters.TabPagerAdapter;
+import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import butterknife.BindView;
@@ -56,5 +59,13 @@ public class HomeFragment extends Fragment {
         if(vpTabs.getCurrentItem() != 0) {
             vpTabs.setCurrentItem(0);
         }
+    }
+
+    public void sendDataToBrowseFragment(List<Channel> channels) {
+        tpaAdapter.sendDataToBrowseFragment(channels);
+    }
+
+    public void requestDataFromChannelFragment() {
+        tpaAdapter.requestDataFromChannelFragment();
     }
 }
