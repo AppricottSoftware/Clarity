@@ -565,6 +565,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         clarityApp.clearGoogleSignInClient();
     }
 
+    // Fragment to Fragment communication achieved through methods by Tony Chan on:
+    // https://stackoverflow.com/questions/14035090/how-to-get-existing-fragments-when-using-fragmentpageradapter
+    // Had to override instantiateItem in TabPagerAdapter and use it to reference Fragments in ViewPager
     @Override
     public void sendChannels(List<Channel> channels) {
         // Get reference to BrowseFragment
