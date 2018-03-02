@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.Pair;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -26,6 +27,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import appricottsoftware.clarity.R;
@@ -49,7 +51,7 @@ public class BrowseFragment extends Fragment {
     private BrowseAdapter adapter;
     private PlayerInterface playerInterface;
     private ArrayList<Channel> channels;
-    private JSONObject browseChannels;
+    private JSONObject browseJson;
     private int position;
 
     private BrowseToChannelInterface interfaceCallback;
@@ -141,7 +143,7 @@ public class BrowseFragment extends Fragment {
         // Initialize adapter with channels array
         adapter = new BrowseAdapter(getActivity(), channels);
 
-        // Populate gridview
+        // Populate GridView
         gridView.setAdapter(adapter);
 
         // Code for long press context menu. May be used to remove uninteresting channels
@@ -151,60 +153,28 @@ public class BrowseFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                // TODO write interface to send onClicked Channel object to ChannelFragment
-                Toast.makeText(getActivity(), "Title: " + channels.get(position).getTitle()
-                                            + "\nCid: " + channels.get(position).getCid()
-                                            + "\nUid: " + channels.get(position).getUid()
-                                            + "\nMetadata: " + channels.get(position).getMetadata().get(0).getGenre()
-                                            + " " + channels.get(position).getMetadata().get(0).getMid()
-                                            + " " + channels.get(position).getMetadata().get(0).getScore(),
-                        Toast.LENGTH_SHORT).show();
 
                 // Get user confirmation
                 showDialog(channels.get(position), position);
-
-                // TODO: write getter interface to retreive all Channels from ChannelFragment to avoid displaying duplicate Channels Here
-                // TODO: or add default browse database and take the set difference of the user's channels on the backend
             }
         });
     }
 
-    // May use for long-press actions
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
+    private void showDialog(final Channel channel, final int position) {
+        new AlertDialog.Builder(getActivity())
+                // Prompt message
+                .setMessage("Add " + channel.getTitle() + " to your channels?")
 
-        // Set header
-        menu.setHeaderTitle("Context Menu");
+                // Yes button
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-        // Get context menu
-        AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // On confirmation from user, add channel via backend call
+                        addToChannels(channel, position);
+                    }})
 
-        // Get long-press position
-        position = cmi.position;
-
-        // Add menu items
-        menu.add(1, cmi.position, 0, "Action 1");
-        menu.add(2, cmi.position, 0, "Action 2");
-    }
-
-    // May use for long-press actions
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        String name = channels.get(position).getTitle();
-
-        // Forcing channels to be received
-        requestChannelsFromChannelFragment();
-
-        switch (item.getGroupId()) {
-            case 1:
-                Toast.makeText(getActivity(), "Action 1, Item "+name, Toast.LENGTH_SHORT).show();
-                break;
-            case 2:
-                Toast.makeText(getActivity(), "Action 2, Item "+name, Toast.LENGTH_SHORT).show();
-                break;
-        }
-        return true;
+                // No button
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
     private void addToChannels(final Channel channel, final int position) {
@@ -241,32 +211,39 @@ public class BrowseFragment extends Fragment {
         });
     }
 
-    private void showDialog(final Channel channel, final int position) {
-        new AlertDialog.Builder(getActivity())
-                // Prompt message
-                .setMessage("Add " + channel.getTitle() + " to your channels?")
-
-                // Yes button
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // On confirmation from user, add channel via backend call
-                        addToChannels(channel, position);
-                    }})
-
-                // No button
-                .setNegativeButton(android.R.string.no, null).show();
-    }
-
     public void receiveChannelsFromChannelFragment(List<Channel> channels) {
         Log.i(TAG, "Success, channels received!");
+        HashMap<Pair<String, String>, Boolean> hm = new HashMap<>();
+
         if (channels != null) {
-            for (int i = 0; i < channels.size(); i++) {
-                Log.e(TAG, "Channel 1: " + channels.get(i).getTitle());
+            for (Channel channel : channels) {
+                // Hash each Channel from ChannelFragment by title and image, value is boolean
+                Pair<String, String> pair = new Pair<>(channel.getTitle(), channel.getImage());
+                hm.put(pair, true);
             }
+
+            mergeUserChannelsWithBrowseChannels(hm);
         }
     }
 
+    private void mergeUserChannelsWithBrowseChannels(HashMap<Pair<String, String>, Boolean> hm) {
+        if (channels != null) {
+            // Maintain separate list of Channel's to remove because of concurrency issues
+            List<Channel> list = new ArrayList<>();
+            for (Channel channel : channels) {
+                Pair<String, String> pair = new Pair<>(channel.getTitle(), channel.getImage());
+                if (hm.containsKey(pair)) {
+                    // Find Channel's that a user already added
+                    list.add(channel);
+                }
+            }
+            // Remove Channel's and update GridView
+            channels.removeAll(list);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    // Interface callbacks
     void requestChannelsFromChannelFragment() {
         Log.i(TAG, "Requesting channels from contextual menu");
         interfaceCallback.requestChannels();
@@ -277,7 +254,41 @@ public class BrowseFragment extends Fragment {
         interfaceCallback.addChannel(channel);
     }
 
-    private void mergeUserChannelsWithBrowseChannels() {
+    // Context menu functions. May use for long-press actions in the future
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
 
+        // Set header
+        menu.setHeaderTitle("Context Menu");
+
+        // Get context menu
+        AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+        // Get long-press position
+        position = cmi.position;
+
+        // Add menu items
+        menu.add(1, cmi.position, 0, "Action 1");
+        menu.add(2, cmi.position, 0, "Action 2");
+    }
+
+    // May use for long-press actions
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        String name = channels.get(position).getTitle();
+
+        // Forcing channels to be received
+        requestChannelsFromChannelFragment();
+
+        switch (item.getGroupId()) {
+            case 1:
+                Toast.makeText(getActivity(), "Action 1, Item "+name, Toast.LENGTH_SHORT).show();
+                break;
+            case 2:
+                Toast.makeText(getActivity(), "Action 2, Item "+name, Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
     }
 }

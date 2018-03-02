@@ -310,6 +310,7 @@ public class ChannelFragment extends Fragment {
                     channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
                     rAdapter = new ChannelsAdapter(channels, getContext(), true, channelFragment);
                     channelRecycler.setAdapter(rAdapter);
+                    sendChannelsToBrowse();
 
                     // Turn off loading circle
                     swipeContainer.setRefreshing(false);
@@ -416,6 +417,7 @@ public class ChannelFragment extends Fragment {
         if (channels.contains(channel) && rAdapter != null) {
             channels.remove(channel);
             rAdapter.notifyDataSetChanged();
+            sendChannelsToBrowse();
         }
     }
 
