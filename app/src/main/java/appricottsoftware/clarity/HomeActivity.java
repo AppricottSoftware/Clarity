@@ -103,9 +103,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         // Initialize search bar members
         resetSearch();
 
-        // Set max length if it hasn't been set
-
-
         // Get Login Type
         loginType = getIntent().getStringExtra("loginType");
 
@@ -185,6 +182,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         if(drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -194,12 +192,15 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawers();
         } else if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-                suplPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                playerFragment.closePanel();
+            suplPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            playerFragment.closePanel();
         } else {
-            moveTaskToBack(true);
+            returnToHomeFragment();
+//            moveTaskToBack(true);
         }
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -249,10 +250,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     @Override
     public void returnToHomeFragment() {
         // Show the home fragment
-        searchItem.collapseActionView();
-        insertFragment(homeFragment, getString(R.string.home_fragment_tag));
-        // TODO: Fix this or see if we need to return to home fragment after adding a new channel
-        homeFragment.showChannelFragment();
+        setUpDrawer();
+        searchItem.setVisible(true);
+        setTitle("Home");
     }
 
     private void resetSearch() {
@@ -263,7 +263,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private void searchEpisodes(String query) {
         // Show channel search fragment, hide home fragment
         insertFragment(channelSearchFragment, getString(R.string.channel_search_fragment_tag));
-
 
         // Run the search when the fragment is ready
         searchChannel = true;
