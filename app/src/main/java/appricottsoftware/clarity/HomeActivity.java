@@ -41,6 +41,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
 
+import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.fragments.ChannelSearchFragment;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
@@ -188,15 +189,22 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
 
     @Override
     public void onBackPressed() {
-        // Close the nav drawer and keep the app on this page for onStart()
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawers();
-        } else if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-            suplPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            playerFragment.closePanel();
-        } else {
-            returnToHomeFragment();
-//            moveTaskToBack(true);
+        // Get current fragment in view (Home, Likes, or Settings)
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fl_home_activity_main);
+        if (fragment != null) {
+
+            // Close the nav drawer and keep the app on this page for onStart()
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawers();
+            } else if (suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                suplPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                playerFragment.closePanel();
+            } else if (!(fragment instanceof HomeFragment)) {
+                returnToHomeFragment();
+            } else {
+                // Exit app
+                finish();
+            }
         }
 
     }
