@@ -64,7 +64,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class HomeActivity extends AppCompatActivity implements PlayerInterface,
-        FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.RequestChannelsInterface {
+        FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.BrowseToChannelInterface {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
@@ -593,6 +593,20 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         if (homeFragment != null) {
             Log.i(TAG, "Receive callback from BrowseFragment, requesting data from ChannelFrag");
             homeFragment.requestDataFromChannelFragment();
+        }
+    }
+
+    @Override
+    public void addChannel(Channel channel) {
+        // Get reference to BrowseFragment
+        String homeFragmentTag = getString(R.string.home_fragment_tag);
+        Fragment page = getSupportFragmentManager().findFragmentByTag(homeFragmentTag);
+        HomeFragment homeFragment = (HomeFragment) page;
+
+        // If successful use HomeFragment as medium to communicate between Channels and Browse
+        if (homeFragment != null) {
+            Log.i(TAG, "Receive callback from BrowseFragment, requesting data from ChannelFrag");
+            homeFragment.addChannelToChannelFragment(channel);
         }
     }
 }

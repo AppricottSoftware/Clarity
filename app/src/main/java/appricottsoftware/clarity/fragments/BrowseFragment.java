@@ -52,9 +52,10 @@ public class BrowseFragment extends Fragment {
     private JSONObject browseChannels;
     private int position;
 
-    private RequestChannelsInterface requestChannelsCallback;
-    public interface RequestChannelsInterface {
+    private BrowseToChannelInterface interfaceCallback;
+    public interface BrowseToChannelInterface {
         void requestChannels();
+        void addChannel(Channel channel);
     }
 
     @Override
@@ -69,11 +70,11 @@ public class BrowseFragment extends Fragment {
 
         // Send channels from ChannelFragment to BrowseFragment
         try {
-            requestChannelsCallback = (RequestChannelsInterface) getActivity();
+            interfaceCallback = (BrowseToChannelInterface) getActivity();
         }
         catch(ClassCastException e) {
             throw new ClassCastException(getActivity().toString()
-                    + " must implement RequestChannelsInterface");
+                    + " must implement BrowseToChannelInterface");
         }
     }
 
@@ -206,7 +207,7 @@ public class BrowseFragment extends Fragment {
         return true;
     }
 
-    private void addToChannels(Channel channel, final int position) {
+    private void addToChannels(final Channel channel, final int position) {
         int uid = ClarityApp.getSession(getContext()).getUserID();
 
         // TODO: re-add onSuccess and on Failure methods to be handled in future.
@@ -214,6 +215,9 @@ public class BrowseFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Toast.makeText(getContext(), "Added channel!", Toast.LENGTH_LONG).show();
+
+                // Add channel to ChannelFragment front-end
+                addChannelToChannelFragment(channel);
 
                 // Removes channel from browse once user clicks it
                 channels.remove(position);
@@ -265,7 +269,12 @@ public class BrowseFragment extends Fragment {
 
     void requestChannelsFromChannelFragment() {
         Log.i(TAG, "Requesting channels from contextual menu");
-        requestChannelsCallback.requestChannels();
+        interfaceCallback.requestChannels();
+    }
+
+    void addChannelToChannelFragment(Channel channel) {
+        Log.i(TAG, "Attempt to send channel " + channel.getTitle() + " to ChannelFragment front-end");
+        interfaceCallback.addChannel(channel);
     }
 
     private void mergeUserChannelsWithBrowseChannels() {

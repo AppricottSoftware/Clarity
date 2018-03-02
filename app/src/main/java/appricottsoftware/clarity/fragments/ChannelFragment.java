@@ -419,6 +419,13 @@ public class ChannelFragment extends Fragment {
         }
     }
 
+    public void addChannelFromBrowse(Channel channel) {
+        Log.i(TAG, "Received channel " + channel.getTitle() + " from Browse");
+        // TODO sort channels by letter since backend sends info sorted
+        channels.add(channel);
+        rAdapter.notifyDataSetChanged();
+    }
+
     public void sendChannelsToBrowse() {
         sendChannelCallback.sendChannels(channels);
     }

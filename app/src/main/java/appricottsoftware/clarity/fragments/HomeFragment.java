@@ -68,4 +68,8 @@ public class HomeFragment extends Fragment {
     public void requestDataFromChannelFragment() {
         tpaAdapter.requestDataFromChannelFragment();
     }
+
+    public void addChannelToChannelFragment(Channel channel) {
+        tpaAdapter.addChannelToChannelFragment(channel);
+    }
 }

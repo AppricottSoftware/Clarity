@@ -72,15 +72,19 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
 
     public void sendDataToBrowseFragment(List<Channel> channels) {
         if (browseFragment != null) {
-            // doSomeWorkToo();
             browseFragment.receiveChannelsFromChannelFragment(channels);
         }
     }
 
     public void requestDataFromChannelFragment() {
         if (channelFragment != null) {
-            // doWork();
             channelFragment.sendChannelsToBrowse();
+        }
+    }
+
+    public void addChannelToChannelFragment(Channel channel) {
+        if (channelFragment != null) {
+            channelFragment.addChannelFromBrowse(channel);
         }
     }
 }
