@@ -41,6 +41,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
 
+import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.fragments.ChannelSearchFragment;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
@@ -182,21 +183,32 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         if(drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBackPressed() {
-        // Close the nav drawer and keep the app on this page for onStart()
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawers();
-        } else if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+        // Get current fragment in view (Home, Likes, or Settings)
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fl_home_activity_main);
+        if (fragment != null) {
+
+            // Close the nav drawer and keep the app on this page for onStart()
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawers();
+            } else if (suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
                 suplPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 playerFragment.closePanel();
-        } else {
-            moveTaskToBack(true);
+            } else if (!(fragment instanceof HomeFragment)) {
+                returnToHomeFragment();
+            } else {
+                // Exit app
+                finish();
+            }
         }
+
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -246,10 +258,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     @Override
     public void returnToHomeFragment() {
         // Show the home fragment
-        searchItem.collapseActionView();
-        insertFragment(homeFragment, getString(R.string.home_fragment_tag));
-        // TODO: Fix this or see if we need to return to home fragment after adding a new channel
-        homeFragment.showChannelFragment();
+        setUpDrawer();
+        searchItem.setVisible(true);
+        setTitle("Home");
     }
 
     private void resetSearch() {
@@ -260,7 +271,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private void searchEpisodes(String query) {
         // Show channel search fragment, hide home fragment
         insertFragment(channelSearchFragment, getString(R.string.channel_search_fragment_tag));
-
 
         // Run the search when the fragment is ready
         searchChannel = true;

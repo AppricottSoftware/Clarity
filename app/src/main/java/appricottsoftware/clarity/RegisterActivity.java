@@ -128,7 +128,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
 
-    public String hashPassword(String originalPassword) {
+    public static String hashPassword(String originalPassword) {
         String hashedPassword = null;
         try
         {
