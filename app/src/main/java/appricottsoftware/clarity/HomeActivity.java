@@ -77,9 +77,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
     private static final String TAG = "HomeActivity";
 
     private ActionBarDrawerToggle drawerToggle;
-    private String loginType;   // "1" is e-mail password, "2" is facebook, "3" is google
+    private String loginType;
 
-    private static BrowseFragment browseFragment;
     private static HomeFragment homeFragment;
     private static LikeFragment likeFragment;
     private static SettingFragment settingFragment;
@@ -267,12 +266,12 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         // Show channel search fragment, hide home fragment
         insertFragment(channelSearchFragment, getString(R.string.channel_search_fragment_tag));
 
-
         // Run the search when the fragment is ready
         searchChannel = true;
         searchChannelQuery = query;
     }
 
+    // Clears user ID (uid) and returns to LoginActivity
     private void logout() {
         ClarityApp.getSession(getApplicationContext()).setUserID(-1);
         Intent loginActivityIntent = new Intent(this, LoginActivity.class);
@@ -326,14 +325,14 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
                     case facebookLoginType:
                         // Logout Facebook
                         LoginManager.getInstance().logOut();
-                        logout();                       // This function returns to LoginActivity
+                        logout();
                         break;
                     case googleLoginType:
                         // Logout Google
                         googleSignOut();
                         break;
                     default:
-                        Toast.makeText(context,"Default", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error with logout. Shouldn't reach default statement");
                         logout();
                         break;
                 }
@@ -565,9 +564,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         clarityApp.clearGoogleSignInClient();
     }
 
-    // Fragment to Fragment communication achieved through methods by Tony Chan on:
-    // https://stackoverflow.com/questions/14035090/how-to-get-existing-fragments-when-using-fragmentpageradapter
-    // Had to override instantiateItem in TabPagerAdapter and use it to reference Fragments in ViewPager
+    // This method interfaced within ChannelFragment
     @Override
     public void sendChannels(List<Channel> channels) {
         // Get reference to BrowseFragment
@@ -582,6 +579,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         }
     }
 
+    // This method interfaced within BrowseFragment
     @Override
     public void requestChannels() {
         // Get reference to BrowseFragment
@@ -596,6 +594,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         }
     }
 
+    // This method interfaced within BrowseFragment
     @Override
     public void addChannel(Channel channel) {
         // Get reference to BrowseFragment

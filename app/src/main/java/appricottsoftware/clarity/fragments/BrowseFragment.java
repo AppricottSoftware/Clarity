@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -63,6 +64,8 @@ public class BrowseFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        // Initialize interface for the PlayerFragment
         if(context instanceof PlayerInterface) {
             playerInterface = (PlayerInterface) context;
         } else {
@@ -70,26 +73,26 @@ public class BrowseFragment extends Fragment {
             throw new ClassCastException(context.toString() + " must implement PlayerInterface");
         }
 
-        // Send channels from ChannelFragment to BrowseFragment
+        // Initialize interface for BrowseFragment to ChannelFragment communication
         try {
             interfaceCallback = (BrowseToChannelInterface) getActivity();
         }
         catch(ClassCastException e) {
-            throw new ClassCastException(getActivity().toString()
+            throw new ClassCastException(context.toString()
                     + " must implement BrowseToChannelInterface");
         }
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_browse, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Initialize view lookups, listeners
         channels = new ArrayList<>();
 
@@ -193,8 +196,8 @@ public class BrowseFragment extends Fragment {
                 channels.remove(position);
                 adapter.notifyDataSetChanged();
 
-                // Play channel
-                playerInterface.playChannel(channels.get(position));
+                // Play added channel
+                playerInterface.playChannel(channel);
             }
 
             @Override
@@ -212,38 +215,41 @@ public class BrowseFragment extends Fragment {
     }
 
     public void receiveChannelsFromChannelFragment(List<Channel> channels) {
-        Log.i(TAG, "Success, channels received!");
-        HashMap<Pair<String, String>, Boolean> hm = new HashMap<>();
+        HashMap<Pair<String, String>, Boolean> userChannels = new HashMap<>();
 
         if (channels != null) {
             for (Channel channel : channels) {
-                // Hash each Channel from ChannelFragment by title and image, value is boolean
-                Pair<String, String> pair = new Pair<>(channel.getTitle(), channel.getImage());
-                hm.put(pair, true);
+
+                // Hash each Channel from ChannelFragment by title and image, storing a boolean.
+                // Choosing to hash this way because each Channel object has a unique cid given
+                // from the database, so the best way to check similarity is with title & image.
+                userChannels.put(new Pair<>(channel.getTitle(), channel.getImage()), true);
             }
 
-            mergeUserChannelsWithBrowseChannels(hm);
+            mergeUserChannelsWithBrowseChannels(userChannels);
         }
     }
 
-    private void mergeUserChannelsWithBrowseChannels(HashMap<Pair<String, String>, Boolean> hm) {
+    private void mergeUserChannelsWithBrowseChannels(HashMap<Pair<String, String>, Boolean> userChannels) {
         if (channels != null) {
-            // Maintain separate list of Channel's to remove because of concurrency issues
-            List<Channel> list = new ArrayList<>();
+            // Maintain this separate list of Channel's to make a bulk removal at the end of loop.
+            // Had to do this because of a Concurrency Modification Exception.
+            List<Channel> duplicateChannels = new ArrayList<>();
+
             for (Channel channel : channels) {
-                Pair<String, String> pair = new Pair<>(channel.getTitle(), channel.getImage());
-                if (hm.containsKey(pair)) {
-                    // Find Channel's that a user already added
-                    list.add(channel);
+
+                // If Channel matches one in the hash table, then it is a duplicate. Add to list.
+                if (userChannels.containsKey(new Pair<>(channel.getTitle(), channel.getImage()))) {
+                    duplicateChannels.add(channel);
                 }
             }
-            // Remove Channel's and update GridView
-            channels.removeAll(list);
+
+            // Remove duplicates and update GridView
+            channels.removeAll(duplicateChannels);
             adapter.notifyDataSetChanged();
         }
     }
 
-    // Interface callbacks
     void requestChannelsFromChannelFragment() {
         Log.i(TAG, "Requesting channels from contextual menu");
         interfaceCallback.requestChannels();
