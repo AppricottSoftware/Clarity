@@ -187,19 +187,31 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         if(drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBackPressed() {
-        // Close the nav drawer and keep the app on this page for onStart()
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawers();
-        } else if(suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+        // Get current fragment in view (Home, Likes, or Settings)
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fl_home_activity_main);
+        if (fragment != null) {
+
+            // Close the nav drawer and keep the app on this page for onStart()
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawers();
+            } else if (suplPanel.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
                 suplPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 playerFragment.closePanel();
-        } else {
-            moveTaskToBack(true);
+            } else if (!(fragment instanceof HomeFragment)) {
+                returnToHomeFragment();
+            } else {
+                // Exits app
+                finish();
+
+                // Statement below used to be here. Keeping just in case.
+                // moveTaskToBack(true);
+            }
         }
     }
 
@@ -251,10 +263,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
     @Override
     public void returnToHomeFragment() {
         // Show the home fragment
-        searchItem.collapseActionView();
-        insertFragment(homeFragment, getString(R.string.home_fragment_tag));
-        // TODO: Fix this or see if we need to return to home fragment after adding a new channel
-        homeFragment.showChannelFragment();
+        setUpDrawer();
+        searchItem.setVisible(true);
+        setTitle("Home");
     }
 
     private void resetSearch() {
