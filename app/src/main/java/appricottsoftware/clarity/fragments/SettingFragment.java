@@ -3,6 +3,7 @@ package appricottsoftware.clarity.fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
 
+import appricottsoftware.clarity.LoginActivity;
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.RegisterActivity;
 import appricottsoftware.clarity.sync.ClarityApp;
@@ -69,15 +71,16 @@ public class SettingFragment extends Fragment {
     }
 
     private void setDeleteAccountListener() {
-        int uid = ClarityApp.getSession(getContext()).getUserID();
+        final int uid = ClarityApp.getSession(getContext()).getUserID();
         btDeleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i(TAG, "User clicked on Delete Account Button");
                 // Creating an
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(true);
                 builder.setTitle("Delete Your Account?");
-                builder.setMessage("Removing this account will PERMANENTLY DELETE all user's data from Clarity! " +
+                builder.setMessage("\nRemoving this account will PERMANENTLY DELETE all user's data from Clarity! \n\n" +
                                     "Are you sure you want to PERMANENTLY delete your account?");
 
                 // If user presses Yes
@@ -86,7 +89,21 @@ public class SettingFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             // TODO Implmenet on confirmation request
-                            Log.e(TAG, "On Confirm needs implementation");
+                            ClarityApp.getRestClient().deleteAccount(uid, getContext(), new JsonHttpResponseHandler() {
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    Log.i(TAG, "User: " + uid + " was successfully deleted");
+                                    ClarityApp.getSession(getContext()).setUserID(-1);
+                                    Intent loginActivityIntent = new Intent(getContext(), LoginActivity.class);
+                                    startActivity(loginActivityIntent);
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                    Log.e(TAG, "deleteAccount OnFailure!!!");
+                                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                                }
+                            });
                         }
                     });
 
@@ -94,12 +111,13 @@ public class SettingFragment extends Fragment {
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG, "User canceled Delete Account");
+                        return;
                     }
                 });
 
                 AlertDialog dialog = builder.create();
                 dialog.show();
-                Log.e(TAG, "Calling Delete Account");
             }
         });
     }
