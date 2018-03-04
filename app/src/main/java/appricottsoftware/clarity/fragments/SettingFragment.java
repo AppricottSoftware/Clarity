@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ public class SettingFragment extends Fragment {
     @BindView(R.id.tv_setting_length_current) TextView tvCurrent;
     @BindView(R.id.Email) EditText email;
     @BindView(R.id.Password) EditText password;
+    @BindView(R.id.DeleteAccount) Button btDeleteAccount;
 
     @Nullable
     @Override
@@ -52,11 +54,28 @@ public class SettingFragment extends Fragment {
         // Initialize view lookups, listener
         // TODO: write a listener for when fragment is done drawing UI
         tvProgress.setVisibility(View.GONE);
+        setUp();
+    }
+
+    private void setUp() {
         getPodcastLength();
         setSeekBar();
         getOldEmail();
         setEmailListener();
         setPasswordListener();
+        setDeleteAccountListener();
+    }
+
+    private void setDeleteAccountListener() {
+        int uid = ClarityApp.getSession(getContext()).getUserID();
+        btDeleteAccount.setOnClickListener(new TextView().OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                return false;
+            }
+
+        });
     }
 
     private void getOldEmail() {
