@@ -588,6 +588,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
             Log.i(TAG, "Receive callback from ChannelFragment, sending data to browse");
             homeFragment.sendDataToBrowseFragment(channels);
         }
+        else {
+            Log.e(TAG, "HomeFragment is null");
+        }
     }
 
     // This method interfaced within BrowseFragment
@@ -603,6 +606,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
             Log.i(TAG, "Receive callback from BrowseFragment, requesting data from ChannelFrag");
             homeFragment.requestDataFromChannelFragment();
         }
+        else {
+            Log.e(TAG, "HomeFragment is null");
+        }
     }
 
     // This method interfaced within BrowseFragment
@@ -617,6 +623,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         if (homeFragment != null) {
             Log.i(TAG, "Receive callback from BrowseFragment, requesting data from ChannelFrag");
             homeFragment.addChannelToChannelFragment(channel);
+        }
+        else {
+            Log.e(TAG, "HomeFragment is null");
         }
     }
 }

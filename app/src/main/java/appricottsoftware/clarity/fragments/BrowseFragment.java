@@ -164,6 +164,7 @@ public class BrowseFragment extends Fragment {
     }
 
     private void showDialog(final Channel channel, final int position) {
+        Log.i(TAG, "Asking user confirmation for selected Browse channel");
         new AlertDialog.Builder(getActivity())
                 // Prompt message
                 .setMessage("Add " + channel.getTitle() + " to your channels?")
@@ -174,6 +175,8 @@ public class BrowseFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // On confirmation from user, add channel via backend call
                         addToChannels(channel, position);
+
+                        Log.i(TAG, "User confirmed choice");
                     }})
 
                 // No button

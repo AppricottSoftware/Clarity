@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.models.Channel;
 
 public class TabPagerAdapter extends FragmentPagerAdapter {
+
+    private static final String TAG = "TabPagerAdapter";
 
     final int COUNT = 2;
     private String tabs[] = new String[] {"My Channels", "Browse"};
@@ -74,17 +77,26 @@ public class TabPagerAdapter extends FragmentPagerAdapter {
         if (browseFragment != null) {
             browseFragment.receiveChannelsFromChannelFragment(channels);
         }
+        else {
+            Log.e(TAG, "BrowseFragment is null");
+        }
     }
 
     public void requestDataFromChannelFragment() {
         if (channelFragment != null) {
             channelFragment.sendChannelsToBrowse();
         }
+        else {
+            Log.e(TAG, "ChannelFragment is null");
+        }
     }
 
     public void addChannelToChannelFragment(Channel channel) {
         if (channelFragment != null) {
             channelFragment.addChannelFromBrowse(channel);
+        }
+        else {
+            Log.e(TAG, "ChannelFragment is null");
         }
     }
 }
