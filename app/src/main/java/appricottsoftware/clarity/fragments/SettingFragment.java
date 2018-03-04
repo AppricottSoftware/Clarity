@@ -1,6 +1,8 @@
 package appricottsoftware.clarity.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -68,13 +70,37 @@ public class SettingFragment extends Fragment {
 
     private void setDeleteAccountListener() {
         int uid = ClarityApp.getSession(getContext()).getUserID();
-        btDeleteAccount.setOnClickListener(new TextView().OnEditorActionListener() {
-
+        btDeleteAccount.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                return false;
-            }
+            public void onClick(View v) {
+                // Creating an
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setCancelable(true);
+                builder.setTitle("Delete Your Account?");
+                builder.setMessage("Removing this account will PERMANENTLY DELETE all user's data from Clarity! " +
+                                    "Are you sure you want to PERMANENTLY delete your account?");
 
+                // If user presses Yes
+                builder.setPositiveButton("Confirm",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // TODO Implmenet on confirmation request
+                            Log.e(TAG, "On Confirm needs implementation");
+                        }
+                    });
+
+                // If user presses No
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                Log.e(TAG, "Calling Delete Account");
+            }
         });
     }
 
