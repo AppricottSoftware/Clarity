@@ -41,6 +41,9 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.parceler.Parcels;
 
+import java.util.List;
+
+import appricottsoftware.clarity.fragments.BrowseFragment;
 import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.fragments.ChannelSearchFragment;
 import appricottsoftware.clarity.fragments.HomeFragment;
@@ -60,7 +63,8 @@ import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener {
+public class HomeActivity extends AppCompatActivity implements PlayerInterface,
+        FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.BrowseToChannelInterface {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
@@ -73,7 +77,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private static final String TAG = "HomeActivity";
 
     private ActionBarDrawerToggle drawerToggle;
-    private String loginType;   // "1" is e-mail password, "2" is facebook, "3" is google
+    private String loginType;
 
     private static HomeFragment homeFragment;
     private static LikeFragment likeFragment;
@@ -202,13 +206,14 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
             } else if (!(fragment instanceof HomeFragment)) {
                 returnToHomeFragment();
             } else {
-                // Exit app
+                // Exits app
                 finish();
+
+                // Statement below used to be here. Keeping just in case.
+                // moveTaskToBack(true);
             }
         }
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -277,6 +282,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         searchChannelQuery = query;
     }
 
+    // Clears user ID (uid) and returns to LoginActivity
     private void logout() {
         ClarityApp.getSession(getApplicationContext()).setUserID(-1);
         Intent loginActivityIntent = new Intent(this, LoginActivity.class);
@@ -330,14 +336,14 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                     case facebookLoginType:
                         // Logout Facebook
                         LoginManager.getInstance().logOut();
-                        logout();                       // This function returns to LoginActivity
+                        logout();
                         break;
                     case googleLoginType:
                         // Logout Google
                         googleSignOut();
                         break;
                     default:
-                        Toast.makeText(context,"Default", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error with logout. Shouldn't reach default statement");
                         logout();
                         break;
                 }
@@ -567,5 +573,59 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                     });
         }
         clarityApp.clearGoogleSignInClient();
+    }
+
+    // This method interfaced within ChannelFragment
+    @Override
+    public void sendChannels(List<Channel> channels) {
+        // Get reference to BrowseFragment
+        String homeFragmentTag = getString(R.string.home_fragment_tag);
+        Fragment page = getSupportFragmentManager().findFragmentByTag(homeFragmentTag);
+        HomeFragment homeFragment = (HomeFragment) page;
+
+        // If successful use HomeFragment as medium to communicate between Channels and Browse
+        if (homeFragment != null) {
+            Log.i(TAG, "Receive callback from ChannelFragment, sending data to browse");
+            homeFragment.sendDataToBrowseFragment(channels);
+        }
+        else {
+            Log.e(TAG, "HomeFragment is null");
+        }
+    }
+
+    // This method interfaced within BrowseFragment
+    @Override
+    public void requestChannels() {
+        // Get reference to BrowseFragment
+        String homeFragmentTag = getString(R.string.home_fragment_tag);
+        Fragment page = getSupportFragmentManager().findFragmentByTag(homeFragmentTag);
+        HomeFragment homeFragment = (HomeFragment) page;
+
+        // If successful use HomeFragment as medium to communicate between Channels and Browse
+        if (homeFragment != null) {
+            Log.i(TAG, "Receive callback from BrowseFragment, requesting data from ChannelFrag");
+            homeFragment.requestDataFromChannelFragment();
+        }
+        else {
+            Log.e(TAG, "HomeFragment is null");
+        }
+    }
+
+    // This method interfaced within BrowseFragment
+    @Override
+    public void addChannel(Channel channel) {
+        // Get reference to BrowseFragment
+        String homeFragmentTag = getString(R.string.home_fragment_tag);
+        Fragment page = getSupportFragmentManager().findFragmentByTag(homeFragmentTag);
+        HomeFragment homeFragment = (HomeFragment) page;
+
+        // If successful use HomeFragment as medium to communicate between Channels and Browse
+        if (homeFragment != null) {
+            Log.i(TAG, "Receive callback from BrowseFragment, requesting data from ChannelFrag");
+            homeFragment.addChannelToChannelFragment(channel);
+        }
+        else {
+            Log.e(TAG, "HomeFragment is null");
+        }
     }
 }

@@ -80,7 +80,7 @@ public class ClarityClient {
             AsyncHttpClient client = new AsyncHttpClient();
             JSONObject jsonParams = new JSONObject();
             try {
-                client.setMaxRetriesAndTimeout(1, 1000);
+                client.setMaxRetriesAndTimeout(0, 1000);
 
                 jsonParams.put("email", email);
                 jsonParams.put("password", password);
@@ -119,7 +119,7 @@ public class ClarityClient {
             AsyncHttpClient client = new AsyncHttpClient();
             JSONObject jsonParams = new JSONObject();
             try {
-                client.setMaxRetriesAndTimeout(1, 1000);
+                client.setMaxRetriesAndTimeout(0, 1000);
 
                 jsonParams.put("email", email);
                 jsonParams.put("password", password);
