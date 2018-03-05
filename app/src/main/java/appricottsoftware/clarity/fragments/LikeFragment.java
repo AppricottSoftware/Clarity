@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.models.Episode;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -24,6 +25,13 @@ public class LikeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_like, container, false);
         ButterKnife.bind(this, view);
+
+        likesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // this is data fro recycler view
+        Episode itemsData;
+
+
         return view;
     }
 

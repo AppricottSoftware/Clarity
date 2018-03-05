@@ -52,7 +52,7 @@ public class ChannelFragment extends Fragment {
     @BindView(R.id.textView_CreateChannel) TextView createChannelTextView;
     @BindView(R.id.textView_SearchResult) TextView searchResultTextView;
     @BindView(R.id.editText_search) EditText searchEditText;
-    @BindView(R.id.imageButton_serachIcon) ImageButton searchIconImageButton;
+    @BindView(R.id.imageButton_searchIcon) ImageButton searchIconImageButton;
     @BindView(R.id.imageButton_back) ImageButton backImageButton;
     @BindView(R.id.constraintLayout_Header) ConstraintLayout headerConstraintLayout;
 

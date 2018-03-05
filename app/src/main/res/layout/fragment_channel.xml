@@ -88,10 +88,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageButton_serachIcon" />
+            app:layout_constraintTop_toBottomOf="@+id/imageButton_searchIcon" />
 
         <ImageButton
-            android:id="@+id/imageButton_serachIcon"
+            android:id="@+id/imageButton_searchIcon"
             android:layout_width="112dp"
             android:layout_height="112dp"
             android:layout_marginTop="56dp"
