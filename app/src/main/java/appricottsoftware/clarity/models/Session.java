@@ -20,6 +20,15 @@ public class Session {
         return userID;
     }
 
+    public void setMaxLength(int maxLength) {
+        preferences.edit().putInt("maxLength", maxLength).apply();
+    }
+
+    public int getMaxLength() {
+        int maxLength = preferences.getInt("maxLength", -1);
+        return maxLength;
+    }
+
     public void setPlaybackSpeed(float playbackSpeed) {
         // If the playback speed is invalid, set it to 1
         if(playbackSpeed < 0.5f || playbackSpeed > 3f) {

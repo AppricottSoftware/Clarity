@@ -33,8 +33,6 @@ import java.util.List;
 
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.adapters.ChannelsAdapter;
-import appricottsoftware.clarity.adapters.RecyclerAdapter;
-import appricottsoftware.clarity.adapters.RecyclerListItem;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
@@ -42,8 +40,6 @@ import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.PlayerInterface;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
-
-import static appricottsoftware.clarity.sync.ClarityApp.getGson;
 
 public class ChannelFragment extends Fragment {
 
@@ -73,6 +69,8 @@ public class ChannelFragment extends Fragment {
     private RecyclerView.Adapter rAdapterSearch;
     private List<Channel> searchChannels;
 
+    private ChannelFragment channelFragment;
+
     int offset = 0;
 
     // To set - query to see if channels exist for user.
@@ -81,6 +79,11 @@ public class ChannelFragment extends Fragment {
     private static final String TAG = "ChannelFragment";
 
     private PlayerInterface playerInterface;
+
+    private SendChannelsInterface sendChannelCallback;
+    public interface SendChannelsInterface {
+        void sendChannels(List<Channel> channels);
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -91,6 +94,21 @@ public class ChannelFragment extends Fragment {
             Log.e(TAG, context.toString() + " must implement PlayerInterface");
             throw new ClassCastException(context.toString() + " must implement PlayerInterface");
         }
+
+        // Send channels from ChannelFragment to BrowseFragment
+        try {
+            sendChannelCallback = (SendChannelsInterface) getActivity();
+        }
+        catch(ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement SendChannelsInterface");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        sendChannelCallback = null; // => avoid leaking
+        super.onDetach();
     }
 
     @Nullable
@@ -98,6 +116,8 @@ public class ChannelFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_channel, container, false);
         ButterKnife.bind(this, view);
+
+        channelFragment = this;
 
         //View view;
 
@@ -122,8 +142,8 @@ public class ChannelFragment extends Fragment {
         channels = new ArrayList<>();
         searchChannels = new ArrayList<>();
 
-        rAdapter = new ChannelsAdapter(channels, getContext(), true);
-        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
+        rAdapter = new ChannelsAdapter(channels, getContext(), true, this);
+        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false, this);
         channelRecycler.setAdapter(rAdapter);
 
         return view;
@@ -161,7 +181,7 @@ public class ChannelFragment extends Fragment {
                         public void onClick(View view) {
 
                             searchChannels = new ArrayList<>();
-                            rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
+                            rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false, channelFragment);
                             channelRecycler.setAdapter(rAdapterSearch);
 
                             String searchKeyword = searchEditText.getText().toString();
@@ -288,8 +308,9 @@ public class ChannelFragment extends Fragment {
                     // Convert the response to Channels
                     TypeToken<ArrayList<Channel>> token = new TypeToken<ArrayList<Channel>>() {};
                     channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
-                    rAdapter = new ChannelsAdapter(channels, getContext(), true);
+                    rAdapter = new ChannelsAdapter(channels, getContext(), true, channelFragment);
                     channelRecycler.setAdapter(rAdapter);
+                    sendChannelsToBrowse();
 
                     // Turn off loading circle
                     swipeContainer.setRefreshing(false);
@@ -388,8 +409,27 @@ public class ChannelFragment extends Fragment {
 
     private void addChannelToSearchRecycler(Channel channel) {
         searchChannels.add(channel);
-        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false);
+        rAdapterSearch = new ChannelsAdapter(searchChannels, getContext(), false, this);
         channelRecycler.setAdapter(rAdapterSearch);
+    }
+
+    public void deleteChannel(Channel channel) {
+        if (channels.contains(channel) && rAdapter != null) {
+            channels.remove(channel);
+            rAdapter.notifyDataSetChanged();
+            sendChannelsToBrowse();
+        }
+    }
+
+    public void addChannelFromBrowse(Channel channel) {
+        Log.i(TAG, "Received channel " + channel.getTitle() + " from Browse");
+        // TODO sort channels by letter since backend sends info sorted
+        channels.add(channel);
+        rAdapter.notifyDataSetChanged();
+    }
+
+    public void sendChannelsToBrowse() {
+        sendChannelCallback.sendChannels(channels);
     }
 
     // TODO: does this need to be separate from search recycler?

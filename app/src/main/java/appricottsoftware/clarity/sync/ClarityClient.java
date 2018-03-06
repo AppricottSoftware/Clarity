@@ -44,6 +44,10 @@ public class ClarityClient {
         // Next, we add the parameters for the api call (see function description above)
         RequestParams params = new RequestParams();
         params.put("genre_ids", genre_ids);
+        int maxLength = ClarityApp.getSession(context).getMaxLength();
+        if(maxLength > 0) {
+            params.put("len_max", maxLength);
+        }
         params.put("offset", offset);
         params.put("q", q);
         params.put("sort_by_date", sort_by_date);
@@ -76,7 +80,7 @@ public class ClarityClient {
             AsyncHttpClient client = new AsyncHttpClient();
             JSONObject jsonParams = new JSONObject();
             try {
-                client.setMaxRetriesAndTimeout(1, 1000);
+                client.setMaxRetriesAndTimeout(0, 1000);
 
                 jsonParams.put("email", email);
                 jsonParams.put("password", password);
@@ -89,7 +93,6 @@ public class ClarityClient {
             }
         }
     }
-
 
     public void registerRequest(String email, String password, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
@@ -115,7 +118,7 @@ public class ClarityClient {
             AsyncHttpClient client = new AsyncHttpClient();
             JSONObject jsonParams = new JSONObject();
             try {
-                client.setMaxRetriesAndTimeout(1, 1000);
+                client.setMaxRetriesAndTimeout(0, 1000);
 
                 jsonParams.put("email", email);
                 jsonParams.put("password", password);
@@ -183,7 +186,6 @@ public class ClarityClient {
         AsyncHttpClient client = new AsyncHttpClient();
         JSONObject jsonParams = new JSONObject();
 
-        // TODO: Metadata are currently hardcoded below. Get metadata from selected podcast in search so it may be added to db.
         try {
             client.setMaxRetriesAndTimeout(1, 1000);
 
@@ -208,7 +210,6 @@ public class ClarityClient {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void getChannel(int uid, Context context, JsonHttpResponseHandler handler) {
@@ -227,6 +228,112 @@ public class ClarityClient {
             e.printStackTrace();
         }
     }
+
+    public void getEmail(int uid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.get(context, context.getString(R.string.get_email_request_url), entity, "application/json", handler);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteChannel(int uid, int cid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("cid", cid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.delete_channel_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateEmail(int uid, String newEmail, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("newEmail", newEmail);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.update_email_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updatePassword(int uid, String newPassword, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("newPassword", newPassword);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.update_password_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getPodcastLength(int uid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.get(context, context.getString(R.string.get_podcastLength_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updatePodcastLength(int uid, float newPodcastSpeed, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("podcastLength", newPodcastSpeed);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.update_podcastLength_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void getPlaybackSpeed(int uid, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
