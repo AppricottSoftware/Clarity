@@ -43,71 +43,41 @@ public class PlaybackSpeedDialogFragment extends DialogFragment {
     }
 
     private PlaybackSpeedDialogListener dialogListener;
-//
-//    @Override
-//    public void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-////        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Holo_Light_Dialog);
-//    }
-//
-//    @Nullable
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_playback_speed_dialog, container, false);
-//        ButterKnife.bind(this, view);
-//        return view;
-//    }
-//
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        setSpeed(sbSpeed.getProgress());
-//    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Build the dialog
+        // Build the dialog, attach it to HomeActivity, set parent view to null to go in dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.fragment_playback_speed_dialog, null);
 
-        sbSpeed = (AppCompatSeekBar) view.findViewById(R.id.sb_playback_speed_dialog);
-        tvSpeed = (TextView) view.findViewById(R.id.tv_playback_speed_dialog);
+        // Note: Manual binding without Butterknife because we are using Dialog onCreate
+        sbSpeed = view.findViewById(R.id.sb_playback_speed_dialog);
+        tvSpeed = view.findViewById(R.id.tv_playback_speed_dialog);
+
+        // Set the initial state of the playback speed
         initializeSeekBar();
 
-        //        // Inflate the fragment layout, set parent view to null to go in dialog
+        // Configure the dialog fragment
         builder.setIcon(android.R.drawable.ic_media_play)
-                .setTitle("Playback Speed")
+                .setTitle(getActivity().getString(R.string.fragment_dialog_playback_speed_title))
                 .setView(view)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getActivity().getString(R.string.fragment_dialog_playback_speed_ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         setSpeed(sbSpeed.getProgress());
                     }
                 })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNegativeButton(getActivity().getString(R.string.fragment_dialog_playback_speed_cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
-        Dialog d = builder.create();
-        return d;
+
+        // Create the dialog fragment
+        return builder.create();
     }
 
-
-
-//    @Override
-//    public void onActivityCreated(Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-////        sbSpeed = (AppCompatSeekBar) getActivity().findViewById(R.id.sb_playback_speed_dialog);
-////        tvSpeed = (TextView) getActivity().findViewById(R.id.tv_playback_speed_dialog);
-//    }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-////        initializeSeekBar();
-//    }
-//
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -119,66 +89,68 @@ public class PlaybackSpeedDialogFragment extends DialogFragment {
         }
     }
 
+    private void initializeSeekBar() {
+        // Set the seekbar and text to show the user's current playback speed
+        float playbackSpeed = ClarityApp.getSession(getActivity()).getPlaybackSpeed();
+        sbSpeed.setProgress(playbackSpeedToProgress(playbackSpeed));
+        tvSpeed.setText(playbackSpeed + "x");
+        setSeekBarListener();
+    }
+
     private void setSeekBarListener() {
         sbSpeed.setOnSeekBarChangeListener(new AppCompatSeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser) {
                     showSpeed(progress);
-                    Log.e(TAG, "onProgressChanged: " + progress);
                 }
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) { }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) { }
         });
     }
 
-    private void initializeSeekBar() {
-        float playbackSpeed = ClarityApp.getSession(getActivity()).getPlaybackSpeed();
-        Log.e(TAG, "initializeSeekbar: " + playbackSpeed);
-        sbSpeed.setProgress(playbackSpeedToProgress(playbackSpeed));
-        tvSpeed.setText(playbackSpeed + "x");
-        setSeekBarListener();
-    }
 
     private int playbackSpeedToProgress(float speed) {
-        // Convert from 0.5, 1.0, ... 3.0 to progress for the seekbar
+        // Convert from [0.5, 3.0] to progress [0, 5] for the seekbar
         return (int) ((speed * 2) - 1);
     }
 
     private float progressToPlaybackSpeed(int progress) {
+        // Convert the raw progress [0, 5] to playback speed [0.5, 3.0]
         return ((float) progress + 1.0f) / 2.0f;
     }
 
     private void showSpeed(int progress) {
+        // Update the text that shows the playback speed
         float playbackSpeed = progressToPlaybackSpeed(progress);
         tvSpeed.setText(playbackSpeed + "x");
     }
 
     private void setSpeed(int progress) {
         final float playbackSpeed = progressToPlaybackSpeed(progress);
-        dialogListener.onDialogOK(playbackSpeed);
-        tvSpeed.setText(playbackSpeed + "x");
+
+        // Update the backend with the new progress
         int uid = ClarityApp.getSession(getContext()).getUserID();
         ClarityApp.getRestClient().updatePlaybackSpeed(uid, playbackSpeed, getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                // Save the playback speed to shared preferences
                 ClarityApp.getSession(getActivity()).setPlaybackSpeed(playbackSpeed);
+
+                // Alert the parent activity the playback speed has been updated
                 dialogListener.onDialogOK(playbackSpeed);
-                Log.e(TAG, "SetSpeed: Success");
+
+                Log.v(TAG, "SetSpeed: Success: " + playbackSpeed);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.e(TAG, "SetSpeed: Failure");
+                Log.e(TAG, "SetSpeed: Failure", throwable);
             }
         });
     }

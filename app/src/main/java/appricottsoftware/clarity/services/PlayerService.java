@@ -630,7 +630,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 }
 
                 if(rating.isThumbUp()) {
-                    // TODO: get client, post thumbs up
                     ClarityApp.getRestClient().metadataUpVoteRequest(cid, genres, context, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -646,7 +645,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                     });
 
                 } else {
-                    // TODO: get client, post thumbs down
                     ClarityApp.getRestClient().metadataDownVoteRequest(cid, genres, context, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -693,19 +691,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
             playChannel(channel);
         }
 
-        /*
-        @Override
-        TODO: Figure out if this works for changing speed
-        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-            player.setPlaybackParameters(new PlaybackParameters(2.0f, 1.0f));
-            return super.onMediaButtonEvent(mediaButtonEvent);
-            https://medium.com/google-exoplayer/variable-speed-playback-with-exoplayer-e6e6a71e0343
-        }
-        */
-
         @Override
         public void onCustomAction(String action, Bundle extras) {
-            Log.e(TAG, "onCustomAction: " + action);
+            Log.v(TAG, "onCustomAction: action: " + action + " extras: " + extras.toString());
             // If the action requested is changing the playback speed
             if(action.equals(context.getString(R.string.playback_speed_action))) {
                 // Get the bundled playback speed
@@ -715,8 +703,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 if(speed < 0.5f || speed > 3f) {
                     speed = 1.0f;
                 }
-
-                Log.e(TAG, "onCustomAction: " + speed);
 
                 // Set the media player to play at the playback speed
                 PlaybackParameters playbackParameters = new PlaybackParameters(speed, 1.0f);

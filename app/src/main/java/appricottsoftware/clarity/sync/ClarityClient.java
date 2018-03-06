@@ -349,7 +349,6 @@ public class ClarityClient {
         }
     }
 
-
     public void getPlaybackSpeed(int uid, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
         JSONObject jsonParams = new JSONObject();

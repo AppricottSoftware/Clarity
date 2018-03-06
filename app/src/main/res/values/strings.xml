@@ -63,4 +63,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="playback_speed_key">PLAYBACK_SPEED</string>
     <string name="playback_speed_action">PLAYBACK_SPEED_ACTION</string>
+    <string name="fragment_dialog_playback_speed_title">Playback Speed</string>
+    <string name="fragment_dialog_playback_speed_ok">OK</string>
+    <string name="fragment_dialog_playback_speed_cancel">Cancel</string>
 </resources>

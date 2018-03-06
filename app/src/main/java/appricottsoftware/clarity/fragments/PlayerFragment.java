@@ -108,31 +108,28 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
     public void populatePlaybackSpeed() {
+        // Get the user's playback speed from the backend
         int uid = ClarityApp.getSession(getContext()).getUserID();
         ClarityApp.getRestClient().getPlaybackSpeed(uid, getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
                     float playbackSpeed = Float.parseFloat(response.get("playbackSpeed").toString());
-                    Log.e(TAG, "populatePlaybackSpeed: " + playbackSpeed);
+                    Log.v(TAG, "populatePlaybackSpeed: " + playbackSpeed);
+
+                    // Make sure playback speed is valid
                     if(playbackSpeed < 0.5f || playbackSpeed > 3f) {
                         playbackSpeed = 1f;
                     }
+
+                    // Set the playback speed on the player fragment
                     tvExpandSpeed.setText(playbackSpeed + "x");
+
+                    // Save the playback speed to shared preferences
                     ClarityApp.getSession(getContext()).setPlaybackSpeed(playbackSpeed);
                 } catch(Exception e) {
-                    Log.e(TAG, "populatePlaybackSpeed: onSuccess", e);
+                    Log.e(TAG, "populatePlaybackSpeed: Error parsing", e);
                 }
             }
 
@@ -144,6 +141,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     }
 
     public void setPlaybackSpeed(float playbackSpeed) {
+        // Update the playback speed text
         tvExpandSpeed.setText(playbackSpeed + "x");
     }
 
@@ -293,6 +291,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         }
         ft.addToBackStack(null);
 
+        // Show the playback speed bar fragment
         PlaybackSpeedDialogFragment dialog = new PlaybackSpeedDialogFragment();
         dialog.show(ft, "PlaybackSpeedFragment");
     }
