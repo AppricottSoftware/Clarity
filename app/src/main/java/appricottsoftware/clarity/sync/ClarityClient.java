@@ -26,10 +26,51 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 public class ClarityClient {
 
     private boolean searchQuotaRemaining;
+    private int lid;
+    private static final String TAG = "ClarityClient";
+    private String apiKey;
 
     public ClarityClient() {
         searchQuotaRemaining = true;
+        lid = 1;
+        apiKey = "";
     }
+
+
+    private void getListenNotesKey(Context context) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+        try {
+            client.setMaxRetriesAndTimeout(0, 1000);
+            jsonParams.put("lid", lid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.get(context, context.getString(R.string.get_listenNotes_key), entity, "application/json", new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    try {
+                        apiKey = response.getString("key");
+                        Log.e(TAG, "RESPONSE" + response.toString());
+                    }
+                    catch (Exception e) {
+                        Log.e(TAG, "getListenNotesKey: ", e);
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    Log.e(TAG, "PRINTING statusCode: " + statusCode + ": ");
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
     // Insert API calls here //
     // Calls the /search endpoint (fulltextsearch)
     // Parameters //
@@ -40,7 +81,12 @@ public class ClarityClient {
     public void getFullTextSearch(String genre_ids, int offset, String q, int sort_by_date, String type, Context context, JsonHttpResponseHandler handler) {
         // Create the rest client and add header(s)
         AsyncHttpClient client = new AsyncHttpClient();
-        client.addHeader("X-Mashape-Key", context.getString(R.string.listen_notes_api_key));
+
+        getListenNotesKey(context);
+
+        Log.e(TAG, "key: " + apiKey);
+
+        client.addHeader("X-Mashape-Key", apiKey);
         // Next, we add the parameters for the api call (see function description above)
         RequestParams params = new RequestParams();
         params.put("genre_ids", genre_ids);
