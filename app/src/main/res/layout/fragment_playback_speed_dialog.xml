@@ -11,8 +11,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:max="5"
-        android:progressTint="@android:color/black"
-        android:thumbTint="@android:color/black"
+        android:progressTint="@color/colorAccent"
+        android:thumbTint="@color/colorAccent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/tv_playback_speed_dialog"/>
 
