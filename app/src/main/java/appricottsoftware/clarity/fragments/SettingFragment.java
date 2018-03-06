@@ -1,6 +1,9 @@
 package appricottsoftware.clarity.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -22,6 +26,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
 
+import appricottsoftware.clarity.LoginActivity;
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.RegisterActivity;
 import appricottsoftware.clarity.sync.ClarityApp;
@@ -38,6 +43,7 @@ public class SettingFragment extends Fragment {
     @BindView(R.id.tv_setting_length_current) TextView tvCurrent;
     @BindView(R.id.Email) EditText email;
     @BindView(R.id.Password) EditText password;
+    @BindView(R.id.DeleteAccount) Button btDeleteAccount;
 
     @Nullable
     @Override
@@ -52,11 +58,70 @@ public class SettingFragment extends Fragment {
         // Initialize view lookups, listener
         // TODO: write a listener for when fragment is done drawing UI
         tvProgress.setVisibility(View.GONE);
+        setUp();
+    }
+
+    private void setUp() {
         getPodcastLength();
         setSeekBar();
         getOldEmail();
         setEmailListener();
         setPasswordListener();
+        setDeleteAccountListener();
+    }
+
+    private void setDeleteAccountListener() {
+        final int uid = ClarityApp.getSession(getContext()).getUserID();
+        btDeleteAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG, "User clicked on Delete Account Button");
+                // Creating an
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setCancelable(true);
+                builder.setTitle("Delete Your Account?");
+                builder.setMessage("\nAre you sure you want to permanently delete your account?");
+
+                // If user presses Yes
+                builder.setPositiveButton("Confirm",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // TODO Implmenet on confirmation request
+                            ClarityApp.getRestClient().deleteAccount(uid, getContext(), new JsonHttpResponseHandler() {
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    Log.i(TAG, "User: " + uid + " was successfully deleted");
+                                    ClarityApp.getSession(getContext()).setUserID(-1);
+                                    Intent loginActivityIntent = new Intent(getContext(), LoginActivity.class);
+                                    startActivity(loginActivityIntent);
+                                    getActivity().finish();
+                                    return;
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                                    Log.e(TAG, "deleteAccount OnFailure!!!");
+                                    Toast.makeText(getContext(), "TESTING", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                            });
+                        }
+                    });
+
+                // If user presses No
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG, "User canceled Delete Account");
+                        return;
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     private void getOldEmail() {

@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/standardMargins"
         android:layout_marginTop="36dp"
         android:text="Max Length: "
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
@@ -23,11 +23,11 @@
 
     <TextView
         android:id="@+id/tv_setting_length6"
-        android:layout_width="102dp"
-        android:layout_height="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/standardMargins"
         android:layout_marginTop="36dp"
         android:text="Password"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
@@ -39,12 +39,12 @@
 
     <TextView
         android:id="@+id/tv_setting_length4"
-        android:layout_width="71dp"
-        android:layout_height="31dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="36dp"
+        android:layout_marginStart="@dimen/standardMargins"
+        android:layout_marginTop="16dp"
         android:text="Email"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
         android:textSize="20sp"
@@ -113,16 +113,16 @@
 
     <EditText
         android:id="@+id/Email"
-        android:layout_width="358dp"
+        android:layout_width="0dp"
         android:layout_height="43dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:singleLine="true"
-        android:lines="1"
-        android:inputType="textEmailAddress"
         android:imeOptions="actionDone"
+        android:inputType="textEmailAddress"
+        android:lines="1"
+        android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -131,7 +131,7 @@
 
     <EditText
         android:id="@+id/Password"
-        android:layout_width="358dp"
+        android:layout_width="0dp"
         android:layout_height="43dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="16dp"
@@ -140,12 +140,27 @@
         android:ems="10"
         android:hint="*********"
         android:imeOptions="actionDone"
-        android:singleLine="true"
-        android:lines="1"
         android:inputType="textPassword"
+        android:lines="1"
+        android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_setting_length6" />
+
+    <Button
+        android:id="@+id/DeleteAccount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="88dp"
+        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="Delete Your Account"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sb_setting_length_set" />
 
 </android.support.constraint.ConstraintLayout>
