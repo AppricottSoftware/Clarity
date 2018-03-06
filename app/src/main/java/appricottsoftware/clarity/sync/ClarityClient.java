@@ -133,6 +133,21 @@ public class ClarityClient {
         }
     }
 
+    public void deleteAccount(int Uid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", Uid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.post_delete_account_url), entity, "application/json", handler);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void metadataUpVoteRequest(int cid, ArrayList<Integer> genres, Context context, JsonHttpResponseHandler handler) {
         AsyncHttpClient client = new AsyncHttpClient();
         JSONObject jsonParams = new JSONObject();
