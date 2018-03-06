@@ -80,8 +80,7 @@ public class SettingFragment extends Fragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setCancelable(true);
                 builder.setTitle("Delete Your Account?");
-                builder.setMessage("\nRemoving this account will PERMANENTLY DELETE all user's data from Clarity! \n\n" +
-                                    "Are you sure you want to PERMANENTLY delete your account?");
+                builder.setMessage("\nAre you sure you want to permanently delete your account?");
 
                 // If user presses Yes
                 builder.setPositiveButton("Confirm",
@@ -96,12 +95,15 @@ public class SettingFragment extends Fragment {
                                     ClarityApp.getSession(getContext()).setUserID(-1);
                                     Intent loginActivityIntent = new Intent(getContext(), LoginActivity.class);
                                     startActivity(loginActivityIntent);
+                                    getActivity().finish();
+                                    return;
                                 }
 
                                 @Override
                                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                                     Log.e(TAG, "deleteAccount OnFailure!!!");
-                                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                                    Toast.makeText(getContext(), "TESTING", Toast.LENGTH_LONG).show();
+                                    return;
                                 }
                             });
                         }
