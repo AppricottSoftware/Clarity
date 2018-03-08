@@ -38,6 +38,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.Extractor;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -422,8 +423,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
         DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(context,
                 null,
                 httpDataSourceFactory);
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        return new ExtractorMediaSource(Uri.parse(episode.getAudio()), dataSourceFactory, extractorsFactory, null, null);
+        ExtractorMediaSource.Factory extractorFactory = new ExtractorMediaSource.Factory(dataSourceFactory);
+
+        return extractorFactory.createMediaSource(Uri.parse(episode.getAudio()), null, null);
     }
 
     private void clearQueue() {
