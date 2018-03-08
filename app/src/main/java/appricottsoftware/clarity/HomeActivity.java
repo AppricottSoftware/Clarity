@@ -55,6 +55,7 @@ import appricottsoftware.clarity.fragments.SettingFragment;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.FragmentListener;
+import appricottsoftware.clarity.models.PlaybackSpeedDialogListener;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
@@ -67,7 +68,7 @@ import butterknife.ButterKnife;
 
 import static appricottsoftware.clarity.R.string.playback_speed_key;
 
-public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.BrowseToChannelInterface, PlaybackSpeedDialogFragment.PlaybackSpeedDialogListener {
+public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.BrowseToChannelInterface, PlaybackSpeedDialogListener {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;

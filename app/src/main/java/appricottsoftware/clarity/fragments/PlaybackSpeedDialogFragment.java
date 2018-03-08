@@ -24,6 +24,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONObject;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.models.PlaybackSpeedDialogListener;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,15 +34,8 @@ public class PlaybackSpeedDialogFragment extends DialogFragment {
 
     private static final String TAG = "PlaybackSpeedDialog";
 
-    //@BindView(R.id.sb_playback_speed_dialog)
-    AppCompatSeekBar sbSpeed;
-    //@BindView(R.id.tv_playback_speed_dialog)
-    TextView tvSpeed;
-
-    // Listen to clicks
-    public interface PlaybackSpeedDialogListener {
-        void onDialogOK(float speed);
-    }
+    private AppCompatSeekBar sbSpeed;
+    private TextView tvSpeed;
 
     private PlaybackSpeedDialogListener dialogListener;
 
@@ -114,7 +108,6 @@ public class PlaybackSpeedDialogFragment extends DialogFragment {
             public void onStopTrackingTouch(SeekBar seekBar) { }
         });
     }
-
 
     private int playbackSpeedToProgress(float speed) {
         // Convert from [0.5, 3.0] to progress [0, 5] for the seekbar

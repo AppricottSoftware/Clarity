@@ -41,6 +41,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import appricottsoftware.clarity.R;
+import appricottsoftware.clarity.models.PlaybackSpeedDialogListener;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
@@ -73,7 +74,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @BindView(R.id.tv_expand_description) TextView tvExpandDescription;
     @BindView(R.id.iv_expand_cover) ImageView ivExpandCover;
 
-    PlaybackSpeedDialogFragment.PlaybackSpeedDialogListener playbackSpeedDialogListener;
+    PlaybackSpeedDialogListener playbackSpeedDialogListener;
 
     private MediaMetadataCompat currentMetadata;
     private boolean currentPlayState;
@@ -100,8 +101,8 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof PlaybackSpeedDialogFragment.PlaybackSpeedDialogListener) {
-            playbackSpeedDialogListener = (PlaybackSpeedDialogFragment.PlaybackSpeedDialogListener) context;
+        if(context instanceof PlaybackSpeedDialogListener) {
+            playbackSpeedDialogListener = (PlaybackSpeedDialogListener) context;
         } else {
             Log.e(TAG, "Calling activity must implement PlaybackSpeedDialogListener");
             throw new ClassCastException("Must implement PlaybackSpeedDialogListener");
