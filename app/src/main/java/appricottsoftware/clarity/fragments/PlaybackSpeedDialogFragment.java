@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -139,19 +140,26 @@ public class PlaybackSpeedDialogFragment extends DialogFragment {
         ClarityApp.getRestClient().updatePlaybackSpeed(uid, playbackSpeed, getContext(), new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                // Save the playback speed to shared preferences
-                ClarityApp.getSession(getActivity()).setPlaybackSpeed(playbackSpeed);
-
-                // Alert the parent activity the playback speed has been updated
-                dialogListener.onDialogOK(playbackSpeed);
-
+                saveSpeed(playbackSpeed);
                 Log.v(TAG, "SetSpeed: Success: " + playbackSpeed);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                saveSpeed(playbackSpeed);
+
+                // Alert the user the server's not responding
+                Toast.makeText(getContext(), "Unable to sync playback speed", Toast.LENGTH_LONG).show();
                 Log.e(TAG, "SetSpeed: Failure", throwable);
             }
         });
+    }
+
+    private void saveSpeed(final float playbackSpeed) {
+        // Save the playback speed to shared preferences
+        ClarityApp.getSession(getActivity()).setPlaybackSpeed(playbackSpeed);
+
+        // Alert the parent activity the playback speed has been updated
+        dialogListener.onDialogOK(playbackSpeed);
     }
 }
