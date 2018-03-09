@@ -28,4 +28,17 @@ public class Session {
         int maxLength = preferences.getInt("maxLength", -1);
         return maxLength;
     }
+
+    public void setPlaybackSpeed(float playbackSpeed) {
+        // If the playback speed is invalid, set it to 1
+        if(playbackSpeed < 0.5f || playbackSpeed > 3f) {
+            playbackSpeed = 1f;
+        }
+        preferences.edit().putFloat("playbackSpeed", playbackSpeed).apply();
+    }
+
+    public float getPlaybackSpeed() {
+        float playbackSpeed = preferences.getFloat("playbackSpeed", 1);
+        return playbackSpeed;
+    }
 }

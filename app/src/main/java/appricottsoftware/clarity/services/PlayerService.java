@@ -38,6 +38,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.extractor.Extractor;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -67,6 +68,8 @@ import appricottsoftware.clarity.models.Metadata;
 import appricottsoftware.clarity.sync.ClarityApp;
 import appricottsoftware.clarity.sync.ClarityClient;
 import cz.msebera.android.httpclient.Header;
+
+import static appricottsoftware.clarity.R.string.playback_speed_key;
 
 public class PlayerService extends MediaBrowserServiceCompat {
 
@@ -420,8 +423,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
         DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(context,
                 null,
                 httpDataSourceFactory);
-        ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-        return new ExtractorMediaSource(Uri.parse(episode.getAudio()), dataSourceFactory, extractorsFactory, null, null);
+        ExtractorMediaSource.Factory extractorFactory = new ExtractorMediaSource.Factory(dataSourceFactory);
+
+        return extractorFactory.createMediaSource(Uri.parse(episode.getAudio()), null, null);
     }
 
     private void clearQueue() {
@@ -628,7 +632,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 }
 
                 if(rating.isThumbUp()) {
-                    // TODO: get client, post thumbs up
                     ClarityApp.getRestClient().metadataUpVoteRequest(cid, genres, context, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -644,7 +647,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                     });
 
                 } else {
-                    // TODO: get client, post thumbs down
                     ClarityApp.getRestClient().metadataDownVoteRequest(cid, genres, context, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -691,13 +693,24 @@ public class PlayerService extends MediaBrowserServiceCompat {
             playChannel(channel);
         }
 
-        /*
         @Override
-        TODO: Figure out if this works for changing speed
-        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-            return super.onMediaButtonEvent(mediaButtonEvent);
+        public void onCustomAction(String action, Bundle extras) {
+            Log.v(TAG, "onCustomAction: action: " + action + " extras: " + extras.toString());
+            // If the action requested is changing the playback speed
+            if(action.equals(context.getString(R.string.playback_speed_action))) {
+                // Get the bundled playback speed
+                float speed = extras.getFloat(context.getString(playback_speed_key));
+
+                // Validate the speed
+                if(speed < 0.5f || speed > 3f) {
+                    speed = 1.0f;
+                }
+
+                // Set the media player to play at the playback speed
+                PlaybackParameters playbackParameters = new PlaybackParameters(speed, 1.0f);
+                exoMediaPlayer.setPlaybackParameters(playbackParameters);
+            }
         }
-        */
     }
 
     public String getStateChanged(int playbackState) {

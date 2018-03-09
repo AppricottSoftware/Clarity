@@ -1,5 +1,6 @@
 package appricottsoftware.clarity;
 
+import android.app.DialogFragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -48,11 +49,13 @@ import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.fragments.ChannelSearchFragment;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
+import appricottsoftware.clarity.fragments.PlaybackSpeedDialogFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.FragmentListener;
+import appricottsoftware.clarity.models.PlaybackSpeedDialogListener;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
@@ -63,8 +66,9 @@ import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeActivity extends AppCompatActivity implements PlayerInterface,
-        FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.BrowseToChannelInterface {
+import static appricottsoftware.clarity.R.string.playback_speed_key;
+
+public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.BrowseToChannelInterface, PlaybackSpeedDialogListener {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
@@ -135,7 +139,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
                 connectionCallback,
                 null);
 
-        Log.e(TAG, "Login Type: " + loginType + "\tuserId: " + ClarityApp.getSession(this).getUserID());
+        Log.i(TAG, "Login Type: " + loginType + "\tuserId: " + ClarityApp.getSession(this).getUserID());
     }
 
     @Override
@@ -522,6 +526,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
     @Override
     public void playChannel(Channel channel) {
         // TODO: Figure out why bundle is not transmitting data
+        onDialogOK(ClarityApp.getSession(this).getPlaybackSpeed());
+
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_channel_bundle), Parcels.wrap(channel));
         mediaController.getTransportControls()
@@ -544,6 +550,15 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface,
         bundle.putParcelable(getString(R.string.home_activity_podcast_bundle), Parcels.wrap(podcast));
         mediaController.getTransportControls()
                 .playFromSearch(podcast.getTitle_original(), bundle);
+    }
+
+    @Override
+    public void onDialogOK(float speed) {
+        playerFragment.setPlaybackSpeed(speed);
+        Bundle bundle = new Bundle();
+        bundle.putFloat(getString(playback_speed_key), speed);
+        mediaController.getTransportControls()
+                .sendCustomAction(getString(R.string.playback_speed_action), bundle);
     }
 
     public void googleSignOut() {
