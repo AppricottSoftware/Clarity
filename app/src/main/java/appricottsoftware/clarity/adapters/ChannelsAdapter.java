@@ -162,15 +162,16 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
                         int uid = ClarityApp.getSession(theContext).getUserID();
                         int cid = channels.get(long_hold_position).getCid();
 
-                        // Delete channel front-end
-                        channelFragment.deleteChannel(channels.get(long_hold_position));
-
                         // Delete channel back-end
                         ClarityApp.getRestClient().deleteChannel(uid, cid, theContext, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                                 try {
                                     Toast.makeText(context, "Channel Deleted", Toast.LENGTH_SHORT).show();
+
+                                    // Re-populate channels since this function calls GetChannels in backend
+                                    channelFragment.goToChannelList();
+
                                 } catch(Exception e) {
                                     Log.e(TAG, "Failed to delete channels", e);
                                 }
@@ -194,6 +195,14 @@ public class ChannelsAdapter extends RecyclerView.Adapter<ChannelsAdapter.Channe
                                     e.printStackTrace();
                                 }
                                 super.onFailure(statusCode, headers, throwable, errorResponse);
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable throwable) {
+                                super.onFailure(statusCode, headers, errorResponse, throwable);
+
+                                // It keeps returning "Error response: 1"
+                                Log.e(TAG, "Delete channel onFailure returned a string. \nError response: " + errorResponse);
                             }
                         });
 

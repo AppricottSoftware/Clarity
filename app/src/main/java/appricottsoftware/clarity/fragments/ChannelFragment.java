@@ -290,7 +290,7 @@ public class ChannelFragment extends Fragment {
         searchResultTextView.setVisibility(View.INVISIBLE);
     }
 
-    private void goToChannelList() {
+    public void goToChannelList() {
 
         channelButtonCardView.setVisibility(View.VISIBLE);
         channelRecycler.setVisibility(View.VISIBLE);
@@ -413,19 +413,12 @@ public class ChannelFragment extends Fragment {
         channelRecycler.setAdapter(rAdapterSearch);
     }
 
-    public void deleteChannel(Channel channel) {
-        if (channels.contains(channel) && rAdapter != null) {
-            channels.remove(channel);
-            rAdapter.notifyDataSetChanged();
-            sendChannelsToBrowse();
-        }
-    }
-
     public void addChannelFromBrowse(Channel channel) {
         Log.i(TAG, "Received channel " + channel.getTitle() + " from Browse");
-        // TODO sort channels by letter since backend sends info sorted
-        channels.add(channel);
-        rAdapter.notifyDataSetChanged();
+
+        // Used to add channel object directly to front-end but opting to
+        // pull channels from database using the following function now
+        goToChannelList();
     }
 
     public void sendChannelsToBrowse() {
