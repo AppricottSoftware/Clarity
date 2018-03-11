@@ -230,8 +230,29 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
             public boolean onQueryTextSubmit(String query) {
                 // Respond to the user pressing search/enter
                 searchView.clearFocus();
-                searchEpisodes(query);
-                return true;
+
+                // Checking if searchFragment is visible or not
+                String searchFragmentTag = getString(R.string.channel_search_fragment_tag);
+                Fragment frag = getSupportFragmentManager().findFragmentByTag(searchFragmentTag);
+                ChannelSearchFragment channelSearchFragment = (ChannelSearchFragment) frag;
+
+                // If not visible, set it up
+                if (frag == null) {
+                    initializeSearchFragmentAndSearchEpisodes(query);
+                    return true;
+                }
+
+                // Fragment already visible so call search on it if the query isn't empty
+                else {
+                    if (!query.equals("")) {
+                        searchChannelQuery = query;
+                        channelSearchFragment.search(searchChannelQuery);
+                        resetSearch();
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
             @Override
@@ -277,7 +298,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         searchChannel = false;
     }
 
-    private void searchEpisodes(String query) {
+    private void initializeSearchFragmentAndSearchEpisodes(String query) {
         // Show channel search fragment, hide home fragment
         insertFragment(channelSearchFragment, getString(R.string.channel_search_fragment_tag));
 
