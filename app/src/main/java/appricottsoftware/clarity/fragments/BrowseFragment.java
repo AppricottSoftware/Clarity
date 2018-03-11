@@ -119,7 +119,6 @@ public class BrowseFragment extends Fragment {
             TypeToken<ArrayList<Channel>> token = new TypeToken<ArrayList<Channel>>() {};
             channels = ClarityApp.getGson().fromJson(response.toString(), token.getType());
 
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -197,7 +196,7 @@ public class BrowseFragment extends Fragment {
 
                 // Removes channel from browse once user clicks it
                 channels.remove(position);
-                adapter.notifyDataSetChanged();
+                populateBrowseGrid();
 
                 // Play added channel
                 playerInterface.playChannel(channel);
@@ -214,10 +213,18 @@ public class BrowseFragment extends Fragment {
                         break;
                 }
             }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable throwable) {
+                super.onFailure(statusCode, headers, errorResponse, throwable);
+
+                Log.e(TAG, "Create channel onFailure returned a string. \nError response: " + errorResponse);
+            }
         });
     }
 
     public void receiveChannelsFromChannelFragment(List<Channel> channels) {
+        Log.i(TAG, "Receiving Channels from HomeActivity");
         HashMap<Pair<String, String>, Boolean> userChannels = new HashMap<>();
 
         if (channels != null) {
@@ -229,6 +236,7 @@ public class BrowseFragment extends Fragment {
                 userChannels.put(new Pair<>(channel.getTitle(), channel.getImage()), true);
             }
 
+            parseJSON();
             mergeUserChannelsWithBrowseChannels(userChannels);
         }
     }
@@ -249,7 +257,7 @@ public class BrowseFragment extends Fragment {
 
             // Remove duplicates and update GridView
             channels.removeAll(duplicateChannels);
-            adapter.notifyDataSetChanged();
+            populateBrowseGrid();
         }
     }
 
