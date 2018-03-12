@@ -287,13 +287,10 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
 
             @Override
             public boolean onQueryTextChange(String query) {
-                if (query.length() % 3 == 0 && query.length() > 0) {
-                    Log.e(TAG, "onQueryTextChange");
+                if (query.length() % 2 == 0 && query.length() > 0) {
+                    Log.e(TAG, "onQueryTextChange" + query);
                     getPodcastsTypeAhead(query);
-
-                    Log.e(TAG, "FUCK: " + listenNotesTypeAhead.size());
                 }
-
 
                 return false;
             }
@@ -799,10 +796,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
                     String queryString=(String)adapterView.getItemAtPosition(itemIndex);
-                    searchAutoComplete.setText("" + queryString);
+                    searchAutoComplete.setText(queryString);
                 }
             });
-//            Log.e(TAG, "HERE: " + listenNotesTypeAhead.size());
         } catch(JSONException e) {
             Log.e(TAG, "ERROR IN addPodcastsTypeAhead: \n" + e);
         }
