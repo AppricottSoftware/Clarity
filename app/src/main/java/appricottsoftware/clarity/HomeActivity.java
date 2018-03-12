@@ -96,6 +96,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private static ChannelSearchFragment channelSearchFragment;
 
     private ArrayList<String> listenNotesTypeAhead;
+    private SearchView.SearchAutoComplete searchAutoComplete;
+    private ArrayAdapter<String> newsAdapter;
 
     private MenuItem searchItem;
 
@@ -252,9 +254,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         });
 
         final SearchView searchView = (SearchView) searchItem.getActionView();
-        final ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
-        final SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-
+        newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
+        searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -290,25 +291,14 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                     Log.e(TAG, "onQueryTextChange");
                     getPodcastsTypeAhead(query);
 
-
                     Log.e(TAG, "FUCK: " + listenNotesTypeAhead.size());
-
-
-                    // Create a new ArrayAdapter and add data to search auto complete object.
-                    searchAutoComplete.setAdapter(newsAdapter);
-                    // Listen to search view item on click event.
-                    searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
-                            String queryString=(String)adapterView.getItemAtPosition(itemIndex);
-                            searchAutoComplete.setText("" + queryString);
-                        }
-                    });
-
                 }
+
+
                 return false;
             }
         });
+
 
         searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
@@ -796,19 +786,23 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
             JSONArray terms = response.getJSONArray("terms");
             Log.i(TAG, terms.toString());
             listenNotesTypeAhead.clear();
-            listenNotesTypeAhead.add("Patrick1");
-            listenNotesTypeAhead.add("Patrick1");
-            listenNotesTypeAhead.add("Patrick1");
-            listenNotesTypeAhead.add("Patrick1");
-            listenNotesTypeAhead.add("Patrick1");
 
-//            Log.e(TAG, terms.getJSONObject(0).names().toString());
-//            for (int i = 0; i < terms.length(); i++) {
-//                listenNotesTypeAhead.add(terms.getJSONObject(i));
-//            }
+            // Adding terms to the master listenNotesTypeAhead Container
+            for (int i = 0; i < terms.length(); i++) {
+                listenNotesTypeAhead.add(terms.get(i).toString());
+            }
 
-
-            Log.e(TAG, "HERE: " + listenNotesTypeAhead.size());
+            // Create a new ArrayAdapter and add data to search auto complete object.
+            searchAutoComplete.setAdapter(newsAdapter);
+            // Listen to search view item on click event.
+            searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
+                    String queryString=(String)adapterView.getItemAtPosition(itemIndex);
+                    searchAutoComplete.setText("" + queryString);
+                }
+            });
+//            Log.e(TAG, "HERE: " + listenNotesTypeAhead.size());
         } catch(JSONException e) {
             Log.e(TAG, "ERROR IN addPodcastsTypeAhead: \n" + e);
         }
