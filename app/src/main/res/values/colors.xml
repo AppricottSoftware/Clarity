@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#f54540</color>
-    <color name="colorPrimaryDark">#c53934</color>
-    <color name="colorAccent">#322d78</color>'
+    <color name="colorPrimaryDark">#c43834</color>
+    <!--<color name="colorPrimaryDark">#a09595</color>-->
+    <color name="colorAccent">#0184ef</color>
+    <!--<color name="colorAccent">#4540f5</color>-->
+    <!--<color name="colorAccent">#322d78</color>-->
 
     <color name="colorIconPandora">#0184ef</color>
     <color name="colorAppNamePandora">#019bc5</color>

@@ -1,13 +1,20 @@
 package appricottsoftware.clarity.services;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.drm.DrmStore;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -56,11 +63,14 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import appricottsoftware.clarity.HomeActivity;
 import appricottsoftware.clarity.R;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
@@ -78,6 +88,9 @@ public class PlayerService extends MediaBrowserServiceCompat {
     private static final String MEDIA_ROOT_ID = "media_root_id";
     private static final String EMPTY_MEDIA_ROOT_ID = "empty_root_id";
     private static final String NOTIFICATION_CHANNEL_ID = "clarity_channel_id";
+    private static final String NOTIFICATION_CHANNEL_NAME = "clarity_channel_name";
+    private static final String NOTIFICATION_CHANNEL_DESCRIPTION = "clarity_channel_description";
+
     private static final int NOTIFICATION_ID = 1;
     private static final int PREFETCH_CONSTANT = 5;
 
@@ -124,6 +137,17 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
         // TODO: use this to update notification
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // Starting with Android O, a Notification Channel needs to be configured
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                    NOTIFICATION_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_LOW);
+
+            // Configure Notification Channel
+            notificationChannel.setDescription(NOTIFICATION_CHANNEL_DESCRIPTION);
+            notificationChannel.setShowBadge(false);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
 
         // Initialize media player
         initializeExoMediaPlayer();
@@ -303,11 +327,13 @@ public class PlayerService extends MediaBrowserServiceCompat {
                                     1.0f,
                                     exoMediaPlayer.getDuration());
                     mediaSession.setPlaybackState(stateBuilder.build());
+                    playbackState = PlaybackStateCompat.STATE_PAUSED;
                     Log.v(TAG, "onPlayerStateChanged: NOT PLAYING currentPosition: "  + exoMediaPlayer.getCurrentPosition() / 1000 + " duration: " + exoMediaPlayer.getDuration() / 1000);
                 }
                 
-                // TODO: Set the notification
-                // setNotification(playbackState);
+                // Set the notification
+                setNotification(playbackState);
+                notificationManager.notify(NOTIFICATION_ID, notification);
             }
 
             @Override
@@ -348,7 +374,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             // If there are items left in the playlist, pop and move to the next item
             dynamicConcatenatingMediaSource.removeMediaSource(0);
             playlist.remove();
-            mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
+            setMetadata(playlist.peek());
         }
 
         // Prefetch the next page of results
@@ -376,7 +402,6 @@ public class PlayerService extends MediaBrowserServiceCompat {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         // Add the response to the playlist
-                        Log.e(TAG, response.toString());
                         ClarityApp.getRestClient().setSearchQuotaRemaining(headers, context);
                         playPlaylist(response);
                     }
@@ -473,7 +498,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             if(prevPlaylistSize < 1) {
                 exoMediaPlayer.prepare(dynamicConcatenatingMediaSource);
                 exoMediaPlayer.setPlayWhenReady(true);
-                mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
+                setMetadata(playlist.peek());
             }
 
         } catch(Exception e) {
@@ -481,62 +506,101 @@ public class PlayerService extends MediaBrowserServiceCompat {
         }
     }
 
-    private void setNotification(int playbackState) {
-        try {
-            // Get metadata for the current audio being played
-            MediaControllerCompat controller = mediaSession.getController();
-            MediaMetadataCompat metadata = controller.getMetadata();
-            MediaDescriptionCompat description = metadata.getDescription();
-
-            // TODO: Make the notification play/pause button update
-            int rDrawable = R.drawable.ic_player_pause;
-            String actionState = getString(R.string.player_service_pause);
-            int playState = PlaybackStateCompat.STATE_PAUSED;
-            if(playbackState != PlaybackStateCompat.STATE_PLAYING) {
-                rDrawable = R.drawable.ic_player_play;
-                actionState = getString(R.string.player_service_play);
-                playState = PlaybackStateCompat.STATE_PLAYING;
+    private void setMetadata(final Episode episode) {
+        // Launch a thread to download the Bitmap for the Metadata
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mediaSession.setMetadata(episode.toMediaMetadataCompat());
             }
+        });
+        thread.start();
+    }
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
-            builder // Metadata on notification bar
-                    .setContentTitle(description.getTitle())
-                    .setContentText(description.getDescription())
-                    .setSubText(description.getSubtitle())
-                    .setLargeIcon(description.getIconBitmap())
+    private void setNotification(int playbackState) {
+       try {
+           // Get metadata for the current audio being played
+           MediaControllerCompat controller = mediaSession.getController();
+           MediaMetadataCompat metadata = controller.getMetadata();
 
-                    // Launch activity by clicking notification
-                    .setContentIntent(controller.getSessionActivity())
+           // By default, the media is paused and ready to play
+           int rDrawable = R.drawable.ic_notification_play;
+           String actionState = "Play";
+           int nextPlayState = PlaybackStateCompat.STATE_PLAYING;
 
-                    // Swipe notification away to stop service
-                    .setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context,
-                            PlaybackStateCompat.ACTION_STOP))
+           // If the media is paused, set the icon appropriately
+           if(playbackState == PlaybackState.STATE_PLAYING) {
+               rDrawable = R.drawable.ic_notification_pause;
+               actionState = "Pause";
+               nextPlayState = PlaybackStateCompat.STATE_PAUSED;
+           }
 
-                    // Show notification on lock screen
-                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+           // Create the notification
+           NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
 
-                    // App icon + color
-                    .setSmallIcon(R.mipmap.ic_launcher_foreground)
-                    .setColor(ContextCompat.getColor(context,
-                            android.R.color.white))
+           builder // Metadata on notification bar
+                   .setContentTitle(metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE))
+                   .setContentText(metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION))
+                   .setSubText(metadata.getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE))
+                   .setLargeIcon(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART))
 
-                    // Pause button stops playback
-                    .addAction(new NotificationCompat.Action(rDrawable,
-                            actionState,
-                            MediaButtonReceiver.buildMediaButtonPendingIntent(context,
-                                    playState)))
+                   // Launch activity by clicking notification
+                   .setContentIntent(controller.getSessionActivity())
 
-                    // Use MediaStyle features
-                    .setStyle(new MediaStyle()
-                            .setMediaSession(mediaSession.getSessionToken())
-                            .setShowActionsInCompactView(0));
+                   // TODO: Swipe notification away to stop service
+                   // .setDeleteIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(context,
+                   //        PlaybackStateCompat.ACTION_STOP))
 
-            // Build notification and put service in foreground
-            notification = builder.build();
-            startForeground(NOTIFICATION_ID, notification);
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+                   // Show notification on lock screen
+                   .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+                   // App icon + color
+                   .setSmallIcon(R.drawable.ic_notification_small_icon)
+                   .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+
+                   // Pause button stops playback
+                   .addAction(new NotificationCompat.Action(rDrawable,
+                           actionState,
+                           MediaButtonReceiver.buildMediaButtonPendingIntent(context,
+                                   PlaybackStateCompat.ACTION_PLAY_PAUSE)))
+
+                   // Use MediaStyle features
+                   .setStyle(new MediaStyle()
+                           .setMediaSession(mediaSession.getSessionToken())
+                           .setShowActionsInCompactView(0))
+
+                   // Hide the time
+                   .setShowWhen(false)
+
+                    .setChannelId(NOTIFICATION_CHANNEL_ID);
+
+           // Build notification
+           notification = builder.build();
+       } catch(Exception e) {
+           // Construct default notification
+           NotificationCompat.Builder builder = new NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID);
+           builder // Metadata on notification bar
+                   .setContentTitle("")
+                   .setContentText("")
+                   .setSubText("Podcasts Unlimited")
+                   .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher_round))
+
+                   // Show notification on lock screen
+                   .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+                   // App icon + color
+                   .setSmallIcon(R.drawable.ic_notification_small_icon)
+                   .setColor(ContextCompat.getColor(context,
+                           android.R.color.white))
+
+                   // Hide the time
+                   .setShowWhen(false)
+
+                   .setChannelId(NOTIFICATION_CHANNEL_ID);
+
+           // Build notification
+           notification = builder.build();
+       }
     }
 
     public class PlayerCallback extends MediaSessionCompat.Callback {
@@ -565,6 +629,8 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
                 // Register the broadcast receiver
                 registerReceiver(playbackReceiver, intentFilter);
+                setNotification(PlaybackStateCompat.STATE_PLAYING);
+                startForeground(NOTIFICATION_ID, notification);
             }
         }
 
@@ -578,8 +644,17 @@ public class PlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onPause() {
             Log.v(TAG, "onPause");
+            AudioManager audioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
             // Pause the player
             exoMediaPlayer.setPlayWhenReady(false);
+            // Unregister the BroadcastReceiver
+            try {
+                unregisterReceiver(playbackReceiver);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            // Take the service out of the foreground, leave the notification
+            stopForeground(false);
         }
 
         @Override
@@ -680,7 +755,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 exoMediaPlayer.setPlayWhenReady(true);
 
                 // Update the metadata for this session
-                mediaSession.setMetadata(episode.toMediaMetadataCompat());
+                setMetadata(episode);
             } catch(Exception e) {
                 e.printStackTrace();
             }

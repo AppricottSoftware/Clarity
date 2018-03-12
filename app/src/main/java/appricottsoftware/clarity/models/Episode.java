@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadata;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import org.parceler.Parcel;
 
@@ -256,13 +257,12 @@ public class Episode {
 
     public MediaMetadataCompat toMediaMetadataCompat() {
         Bitmap bitmap = null;
-        // TODO: Write service to grab bitmap
-        /* try {
+        try {
             URL url = new URL(image);
             bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
         } catch(IOException e) {
-            e.printStackTrace();
-        } */
+            Log.e("Episode", "Failed to download album art", e);
+        }
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
         builder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title_original)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title_original)

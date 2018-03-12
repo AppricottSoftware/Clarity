@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -473,7 +474,11 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
             @Override
             public void run() {
                 playerServiceIntent = new Intent(context, PlayerService.class);
-                context.startService(playerServiceIntent);
+                if(Build.VERSION.SDK_INT >= 26) {
+                    context.startForegroundService(playerServiceIntent);
+                } else {
+                    context.startService(playerServiceIntent);
+                }
             }
         };
 
