@@ -29,6 +29,9 @@ public class PlaybackReceiver extends BroadcastReceiver {
         } else if(PlaybackStateCompat.ACTION_PLAY == Long.parseLong(intent.getAction())) {
             // TODO: Show pause on notification
             Log.v(TAG, "onReceive: Pause");
+        } else if(PlaybackStateCompat.ACTION_STOP == Long.parseLong(intent.getAction())) {
+            // TODO: Stop service
+            Log.v(TAG, "onReceive: Stop");
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Action: " + intent.getAction() + "\n");
