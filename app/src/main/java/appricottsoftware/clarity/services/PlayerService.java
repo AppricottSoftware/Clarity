@@ -398,7 +398,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             try {
                 // Fetch the next page of results from this channel
                 ClarityApp.getRestClient()
-                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getSearchTerm(context), 0, "episode", context, new JsonHttpResponseHandler() {
+                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getSearchTerm(context), ClarityApp.getSession(context).getSortByDate(), "episode", context, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         // Add the response to the playlist
