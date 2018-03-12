@@ -287,11 +287,10 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
 
             @Override
             public boolean onQueryTextChange(String query) {
-                if (query.length() % 2 == 0 && query.length() > 0) {
+                if (query.length() % 5 == 0 && query.length() > 0 || query.length() == 3) {
                     Log.e(TAG, "onQueryTextChange" + query);
                     getPodcastsTypeAhead(query);
                 }
-
                 return false;
             }
         });
