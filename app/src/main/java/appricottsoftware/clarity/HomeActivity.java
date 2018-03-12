@@ -254,7 +254,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         });
 
         final SearchView searchView = (SearchView) searchItem.getActionView();
-        newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
+        newsAdapter = new ArrayAdapter<String>(this, R.layout.item_typeahead_result, listenNotesTypeAhead);
         searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
