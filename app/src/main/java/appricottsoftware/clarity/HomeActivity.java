@@ -117,6 +117,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         setUpDrawer();
         setNavHeader();
 
+        // Get the sortByDate info
+        getSortByDate();
+
         // Set up drawer toggling
         drawerToggle = setUpDrawerToggle();
         drawerLayout.addDrawerListener(drawerToggle);
@@ -734,6 +737,28 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     Log.e(TAG, "syncCurrentChannel: onFailure", throwable);
+                }
+            });
+        }
+    }
+
+    private void getSortByDate() {
+        int uid = ClarityApp.getSession(this).getUserID();
+        if(uid > 0) {
+            ClarityApp.getRestClient().getSortByDate(uid, this, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    try {
+                        ClarityApp.getSession(context).setSortByDate(response.getInt("sortByDate"));
+                    } catch (Exception e) {
+                        Log.e(TAG, "getSortByDate: onSuccess: Failed to parse response", e);
+                    }
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    Log.e(TAG, "getSortByDate: onFailure", throwable);
                 }
             });
         }
