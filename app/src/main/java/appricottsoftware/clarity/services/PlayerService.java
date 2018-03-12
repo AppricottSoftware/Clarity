@@ -502,7 +502,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             }
 
         } catch(Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "playPlaylist", e);
         }
     }
 
@@ -671,7 +671,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             try {
                 unregisterReceiver(playbackReceiver);
             } catch(Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "onPause", e);
             }
             // Take the service out of the foreground, leave the notification
             stopForeground(false);
@@ -687,7 +687,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             try {
                 unregisterReceiver(playbackReceiver);
             } catch(Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "onStop", e);
             }
 
             // Stop the player
@@ -778,7 +778,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 // Update the metadata for this session
                 setMetadata(episode);
             } catch(Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "onPlayFromMediaId", e);
             }
         }
 

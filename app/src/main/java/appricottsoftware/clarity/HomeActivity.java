@@ -52,7 +52,7 @@ import appricottsoftware.clarity.fragments.SettingFragment;
 import appricottsoftware.clarity.models.Channel;
 import appricottsoftware.clarity.models.Episode;
 import appricottsoftware.clarity.models.FragmentListener;
-import appricottsoftware.clarity.models.PlaybackSpeedDialogListener;
+import appricottsoftware.clarity.models.PlayerFragmentListener;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
@@ -63,7 +63,7 @@ import cz.msebera.android.httpclient.Header;
 
 import static appricottsoftware.clarity.R.string.playback_speed_key;
 
-public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.BrowseToChannelInterface, PlaybackSpeedDialogListener {
+public class HomeActivity extends AppCompatActivity implements PlayerInterface, FragmentListener, ChannelFragment.SendChannelsInterface, BrowseFragment.BrowseToChannelInterface, PlayerFragmentListener {
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawerLayout;
@@ -162,8 +162,13 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
             MediaControllerCompat.getMediaController(this)
                     .unregisterCallback(controllerCallback);
         }
+
         // Disconnect from the service
         mediaBrowser.disconnect();
+
+        // Save the current channel for next launch
+        syncCurrentChannel();
+
         super.onStop();
     }
 
@@ -546,12 +551,13 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     @Override
     public void playChannel(Channel channel) {
         // TODO: Figure out why bundle is not transmitting data
-        onDialogOK(ClarityApp.getSession(this).getPlaybackSpeed());
-
         Bundle bundle = new Bundle();
         bundle.putParcelable(getString(R.string.home_activity_channel_bundle), Parcels.wrap(channel));
         mediaController.getTransportControls()
                 .playFromSearch(channel.toString(), bundle);
+
+        // Save the channel to shared preferences
+        ClarityApp.getSession(this).setCurrentChannel(channel.getCid());
     }
 
     @Override
@@ -684,5 +690,52 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
+    }
+
+    @Override
+    public void onLoadCurrentChannel() {
+        // Get the user's id
+        int uid = ClarityApp.getSession(this).getUserID();
+        if(uid > 0) {
+            // Get the user's current channel
+            ClarityApp.getRestClient().getCurrentChannel(uid, this, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    try {
+                        // Grab the current channel and start playing
+                        Channel channel = ClarityApp.getGson().fromJson(response.getJSONObject("currentChannel").toString(), Channel.class);
+                        playChannel(channel);
+
+                        // Save the current channel to shared preferences
+                        ClarityApp.getSession(context).setCurrentChannel(channel.getCid());
+                    } catch(Exception e) {
+                        Log.e(TAG, "playCurrentChannel: Unable to parse response", e);
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    Log.e(TAG, "playCurrentChannel: onFailure", throwable);
+                }
+            });
+        }
+    }
+
+    private void syncCurrentChannel() {
+        int uid = ClarityApp.getSession(this).getUserID();
+        int cid = ClarityApp.getSession(this).getCurrentChannel();
+        if(uid > 0 && cid > 0) {
+            ClarityApp.getRestClient().updateCurrentChannel(uid, cid, this, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Log.v(TAG, "syncCurrentChannel: onSuccess");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    Log.e(TAG, "syncCurrentChannel: onFailure", throwable);
+                }
+            });
+        }
     }
 }
