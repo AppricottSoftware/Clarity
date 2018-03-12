@@ -398,7 +398,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             try {
                 // Fetch the next page of results from this channel
                 ClarityApp.getRestClient()
-                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getSearchTerm(context), 0, "episode", context, new JsonHttpResponseHandler() {
+                    .getFullTextSearch(currentChannel.getGenreIds(), nextOffset, currentChannel.getSearchTerm(context), ClarityApp.getSession(context).getSortByDate(), "episode", context, new JsonHttpResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                         // Add the response to the playlist
@@ -502,7 +502,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             }
 
         } catch(Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "playPlaylist", e);
         }
     }
 
@@ -515,6 +515,26 @@ public class PlayerService extends MediaBrowserServiceCompat {
             }
         });
         thread.start();
+    }
+
+    private void downvoteCurrent() {
+        Episode episode = playlist.peek();
+        int channelId = currentChannel.getCid();
+        if(episode != null && channelId > 0) {
+            ClarityApp.getRestClient().metadataDownVoteRequest(channelId, episode.getIntGenres(), context, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    Log.v(TAG, "onSuccess");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    Log.v(TAG, "onFailure");
+                }
+            });
+        }
     }
 
     private void setNotification(int playbackState) {
@@ -651,7 +671,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             try {
                 unregisterReceiver(playbackReceiver);
             } catch(Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "onPause", e);
             }
             // Take the service out of the foreground, leave the notification
             stopForeground(false);
@@ -667,7 +687,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             try {
                 unregisterReceiver(playbackReceiver);
             } catch(Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "onStop", e);
             }
 
             // Stop the player
@@ -689,6 +709,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onSkipToNext() {
             Log.v(TAG, "onSkipToNext");
+            downvoteCurrent();
             updatePlaylist();
         }
 
@@ -757,7 +778,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 // Update the metadata for this session
                 setMetadata(episode);
             } catch(Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "onPlayFromMediaId", e);
             }
         }
 

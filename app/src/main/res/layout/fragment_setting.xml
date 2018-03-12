@@ -148,6 +148,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_setting_length6" />
 
+    <TextView
+        android:id="@+id/tv_setting_sort_by_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort by newest"
+        android:layout_margin="16dp"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/sb_setting_length_set"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/sc_setting_sort_by_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_setting_sort_by_date"
+        app:layout_constraintBottom_toBottomOf="@id/tv_setting_sort_by_date"
+        android:textOff="Off"
+        android:textOn="On"/>
+
     <Button
         android:id="@+id/DeleteAccount"
         android:layout_width="wrap_content"
@@ -161,6 +184,6 @@
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sb_setting_length_set" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_setting_sort_by_date" />
 
 </android.support.constraint.ConstraintLayout>

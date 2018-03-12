@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatSeekBar;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -44,6 +46,7 @@ public class SettingFragment extends Fragment {
     @BindView(R.id.Email) EditText email;
     @BindView(R.id.Password) EditText password;
     @BindView(R.id.DeleteAccount) Button btDeleteAccount;
+    @BindView(R.id.sc_setting_sort_by_date) SwitchCompat scSortByDate;
 
     @Nullable
     @Override
@@ -68,6 +71,7 @@ public class SettingFragment extends Fragment {
         setEmailListener();
         setPasswordListener();
         setDeleteAccountListener();
+        setSortByDateListener();
     }
 
     private void setDeleteAccountListener() {
@@ -322,5 +326,30 @@ public class SettingFragment extends Fragment {
 
     private void setMaxLength(int maxLength) {
         ClarityApp.getSession(getContext()).setMaxLength(maxLength);
+    }
+
+    private void setSortByDateListener() {
+        scSortByDate.setChecked(ClarityApp.getSession(getContext()).getSortByDateB());
+
+        final int uid = ClarityApp.getSession(getContext()).getUserID();
+        scSortByDate.setOnCheckedChangeListener(new SwitchCompat.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+                ClarityApp.getRestClient().updateSortByDate(uid, isChecked, getContext(), new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        Log.v(TAG, "setSortByDateListener: onSuccess");
+                        ClarityApp.getSession(getContext()).setSortByDateB(isChecked);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        Log.e(TAG, "setSortByDateListener: onFailure", throwable);
+                        ClarityApp.getSession(getContext()).setSortByDateB(isChecked);
+                        Toast.makeText(getContext(),"Unable to sync", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
     }
 }

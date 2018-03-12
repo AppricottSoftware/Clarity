@@ -395,6 +395,76 @@ public class ClarityClient {
         }
     }
 
+    public void getCurrentChannel(int uid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.get(context, context.getString(R.string.get_current_channel_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateCurrentChannel(int uid, int cid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("currentChannel", cid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.update_current_channel_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getSortByDate(int uid, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.get(context, context.getString(R.string.get_sort_by_date_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateSortByDate(int uid, boolean sortByDate, Context context, JsonHttpResponseHandler handler) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        JSONObject jsonParams = new JSONObject();
+
+        try {
+            client.setMaxRetriesAndTimeout(1, 1000);
+
+            jsonParams.put("uid", uid);
+            jsonParams.put("sortByDate", sortByDate ? 1 : 0);
+
+            StringEntity entity = new StringEntity(jsonParams.toString());
+            client.post(context, context.getString(R.string.update_sort_by_date_request_url), entity, "application/json", handler);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void setSearchQuotaRemaining(Header[] headers, Context context) {
         int quota_remaining = 0;
         for(Header h : headers) {

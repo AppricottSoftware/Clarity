@@ -1,15 +1,7 @@
 package appricottsoftware.clarity.fragments;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.drm.DrmStore;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.Rating;
-import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,11 +16,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -38,11 +27,8 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import appricottsoftware.clarity.R;
-import appricottsoftware.clarity.models.PlaybackSpeedDialogListener;
-import appricottsoftware.clarity.models.Podcast;
+import appricottsoftware.clarity.models.PlayerFragmentListener;
 import appricottsoftware.clarity.sync.ClarityApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,7 +60,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @BindView(R.id.tv_expand_description) TextView tvExpandDescription;
     @BindView(R.id.iv_expand_cover) ImageView ivExpandCover;
 
-    PlaybackSpeedDialogListener playbackSpeedDialogListener;
+    PlayerFragmentListener playerFragmentListener;
 
     private MediaMetadataCompat currentMetadata;
     private boolean currentPlayState;
@@ -101,11 +87,11 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof PlaybackSpeedDialogListener) {
-            playbackSpeedDialogListener = (PlaybackSpeedDialogListener) context;
+        if(context instanceof PlayerFragmentListener) {
+            playerFragmentListener = (PlayerFragmentListener) context;
         } else {
-            Log.e(TAG, "Calling activity must implement PlaybackSpeedDialogListener");
-            throw new ClassCastException("Must implement PlaybackSpeedDialogListener");
+            Log.e(TAG, "Calling activity must implement PlayerFragmentListener");
+            throw new ClassCastException("Must implement PlayerFragmentListener");
         }
     }
 
@@ -207,7 +193,7 @@ public class PlayerFragment extends Fragment /*implements View.OnClickListener*/
         setLikeClick(activity, ibExpandLike);
         setDislikeClick(activity, ibExpandDislike);
         setPlaybackSpeedClick(activity, tvExpandSpeed);
-        // TODO: playback speed controls
+        playerFragmentListener.onLoadCurrentChannel();
     }
 
     private void setControlOnClick(@NonNull final Activity activity, ImageButton imageButton) {
