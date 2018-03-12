@@ -264,8 +264,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         final SearchView searchView = (SearchView) searchItem.getActionView();
         newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
         searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-        searchAutoComplete.setBackgroundColor(Color.WHITE);
-        searchAutoComplete.setTextColor(Color.BLACK);
         searchAutoComplete.setDropDownBackgroundResource(android.R.color.white);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -806,12 +804,15 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
             searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
-                    String queryString=(String)adapterView.getItemAtPosition(itemIndex);
+                    String queryString = (String) adapterView.getItemAtPosition(itemIndex);
                     searchAutoComplete.setText(queryString);
                 }
             });
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             Log.e(TAG, "ERROR IN addPodcastsTypeAhead: \n" + e);
+        }
+    }
+
     @Override
     public void onLoadCurrentChannel() {
         // Get the user's id
