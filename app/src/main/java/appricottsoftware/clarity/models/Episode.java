@@ -258,12 +258,12 @@ public class Episode {
     public MediaMetadataCompat toMediaMetadataCompat() {
         Bitmap bitmap = null;
         // TODO: Write service to grab bitmap
-//        try {
-//            URL url = new URL(image);
-//            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-//        } catch(IOException e) {
-//            Log.e("Episode", "Failed to download album art", e);
-//        }
+        try {
+            URL url = new URL(image);
+            bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+        } catch(IOException e) {
+            Log.e("Episode", "Failed to download album art", e);
+        }
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
         builder.putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title_original)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title_original)

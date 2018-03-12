@@ -376,7 +376,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
             dynamicConcatenatingMediaSource.removeMediaSource(0);
             playlist.remove();
             Log.e(TAG, "METADATA " + playlist.peek().toString());
-            mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
+            setMetadata(playlist.peek());
         }
 
         // Prefetch the next page of results
@@ -502,12 +502,22 @@ public class PlayerService extends MediaBrowserServiceCompat {
                 exoMediaPlayer.prepare(dynamicConcatenatingMediaSource);
                 exoMediaPlayer.setPlayWhenReady(true);
                 Log.e(TAG, "METADATA " + playlist.peek().toString());
-                mediaSession.setMetadata(playlist.peek().toMediaMetadataCompat());
+                setMetadata(playlist.peek());
             }
 
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void setMetadata(final Episode episode) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mediaSession.setMetadata(episode.toMediaMetadataCompat());
+            }
+        });
+        thread.start();
     }
 
     private void setNotification(int playbackState) {
@@ -873,7 +883,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
 
                 // Update the metadata for this session
                 Log.e(TAG, "METADATA " + playlist.peek().toString());
-                mediaSession.setMetadata(episode.toMediaMetadataCompat());
+                setMetadata(episode);
             } catch(Exception e) {
                 e.printStackTrace();
             }
