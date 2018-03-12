@@ -1,9 +1,12 @@
 package appricottsoftware.clarity;
 
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -18,6 +21,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +32,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
@@ -37,9 +44,13 @@ import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcels;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import appricottsoftware.clarity.fragments.BrowseFragment;
@@ -84,6 +95,10 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private static PlayerFragment playerFragment;
     private static ChannelSearchFragment channelSearchFragment;
 
+    private ArrayList<String> listenNotesTypeAhead;
+    private SearchView.SearchAutoComplete searchAutoComplete;
+    private ArrayAdapter<String> newsAdapter;
+
     private MenuItem searchItem;
 
     private Intent playerServiceIntent;
@@ -109,6 +124,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
 
         // Get Login Type
         loginType = getIntent().getStringExtra("loginType");
+
+        // Initializing listenNotesTypeAhead Container
+        listenNotesTypeAhead = new ArrayList<>();
 
         // Replace toolbar
         setSupportActionBar(toolbar);
@@ -228,7 +246,26 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         MenuInflater menuInflater= getMenuInflater();
         menuInflater.inflate(R.menu.menu_main, menu);
         searchItem = menu.findItem(R.id.action_search);
+
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                // Hide results, replace with home fragment
+                insertFragment(homeFragment, getString(R.string.home_fragment_tag));
+                return true;
+            }
+        });
+
         final SearchView searchView = (SearchView) searchItem.getActionView();
+        newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
+        searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchAutoComplete.setDropDownBackgroundResource(android.R.color.white);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -245,7 +282,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                     initializeSearchFragmentAndSearchEpisodes(query);
                     return true;
                 }
-
                 // Fragment already visible so call search on it if the query isn't empty
                 else {
                     if (!query.equals("")) {
@@ -255,28 +291,37 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                         return true;
                     }
                 }
-
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
+            public boolean onQueryTextChange(String query) {
+                if (query.length() % 5 == 0 && query.length() > 0 || query.length() == 3) {
+                    Log.e(TAG, "onQueryTextChange" + query);
+                    getPodcastsTypeAhead(query);
+                }
                 return false;
             }
         });
-        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
+            public boolean onSuggestionSelect(int position) {
+                Cursor cursor = (Cursor) searchView.getSuggestionsAdapter().getItem(position);
+                String term = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                Log.e(TAG,"TERM SUGGESTED: " + term);
+                cursor.close();
                 return true;
             }
 
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                // Hide results, replace with home fragment
-                insertFragment(homeFragment, getString(R.string.home_fragment_tag));
-                return true;
+            public boolean onSuggestionClick(int position) {
+                return onSuggestionSelect(position);
             }
         });
+
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -681,8 +726,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 try {
                     TextView header = findViewById(R.id.nav_header_text);
                     header.setText(response.getString("email"));
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.e(TAG, "getOldEmail: ", e);
                 }
             }
@@ -693,6 +737,80 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
+    }
+
+    private void getPodcastsTypeAhead(String newText) {
+        Log.e("HomeActivity", "On typeAhead: " + newText);
+
+        ClarityApp.getRestClient().getTypeAheadPodcast(newText, this, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.e("MainActivity 1", response.toString());
+                addPodcastsTypeAhead(response);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.e("MainActivity 2", response.toString());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                super.onSuccess(statusCode, headers, responseString);
+                Log.e("MainActivity 3", responseString);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                throwable.printStackTrace();
+                Log.e("MainActivity 4", "");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                throwable.printStackTrace();
+                Log.e("MainActivity 5", "");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                throwable.printStackTrace();
+                Log.e("MainActivity 6", "");
+            }
+
+        });
+    }
+
+
+    private void addPodcastsTypeAhead(JSONObject response) {
+        try {
+            JSONArray terms = response.getJSONArray("terms");
+            Log.i(TAG, terms.toString());
+            listenNotesTypeAhead.clear();
+
+            // Adding terms to the master listenNotesTypeAhead Container
+            for (int i = 0; i < terms.length(); i++) {
+                listenNotesTypeAhead.add(terms.get(i).toString());
+            }
+
+            // Create a new ArrayAdapter and add data to search auto complete object.
+            searchAutoComplete.setAdapter(newsAdapter);
+            // Listen to search view item on click event.
+            searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
+                    String queryString = (String) adapterView.getItemAtPosition(itemIndex);
+                    searchAutoComplete.setText(queryString);
+                }
+            });
+        } catch (JSONException e) {
+            Log.e(TAG, "ERROR IN addPodcastsTypeAhead: \n" + e);
+        }
     }
 
     @Override
