@@ -21,7 +21,7 @@
             android:id="@+id/iv_collapse_cover"
             android:layout_width="@dimen/player_fragment_cover"
             android:layout_height="@dimen/player_fragment_cover"
-            app:srcCompat="@drawable/ic_launcher_background"
+            app:srcCompat="@drawable/ic_player_default_album_art"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:padding="@dimen/player_fragment_padding"/>
@@ -37,8 +37,7 @@
             android:ellipsize="marquee"
             android:singleLine="true"
             android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:text="This is the podcast title."/>
+            android:textColor="@android:color/white"/>
 
         <TextView
             android:id="@+id/tv_collapse_description"
@@ -49,8 +48,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_collapse_title"
             android:ellipsize="marquee"
             android:singleLine="true"
-            android:textColor="@android:color/white"
-            android:text="This is a description of the podcast that is playing in this player."/>
+            android:textColor="@android:color/white"/>
 
         <ImageButton
             android:id="@+id/ib_collapse_play_pause"
@@ -199,7 +197,6 @@
                 android:textColor="@android:color/white"
                 android:ellipsize="marquee"
                 android:singleLine="true"
-                android:text="This is the podcast title."
                 android:paddingTop="@dimen/player_fragment_padding"
                 android:paddingStart="@dimen/player_fragment_padding"
                 android:paddingEnd="@dimen/player_fragment_padding"/>
@@ -224,7 +221,6 @@
                 android:ellipsize="marquee"
                 android:singleLine="true"
                 android:scrollHorizontally="true"
-                android:text="This is a description of the podcast that is playing in this player."
                 android:padding="@dimen/player_fragment_padding"/>
 
         </LinearLayout>
@@ -241,7 +237,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/ll_expand_title"
-            app:srcCompat="@drawable/ic_launcher_background" />
+            app:srcCompat="@drawable/ic_player_default_album_art" />
 
     </android.support.constraint.ConstraintLayout>
 
