@@ -93,7 +93,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
 
     private Context context;
 
-    private String userEmail;
     private String searchChannelQuery;
     private boolean searchChannel;
 
