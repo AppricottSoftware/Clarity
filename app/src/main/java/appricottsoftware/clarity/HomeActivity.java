@@ -393,10 +393,10 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 fragment = homeFragment;
                 fragmentTag = getString(R.string.home_fragment_tag);
                 break;
-            case R.id.nav_like_fragment:
-                fragment = likeFragment;
-                fragmentTag = getString(R.string.like_fragment_tag);
-                break;
+//            case R.id.nav_like_fragment:
+//                fragment = likeFragment;
+//                fragmentTag = getString(R.string.like_fragment_tag);
+//                break;
             case R.id.nav_setting_fragment:
                 fragment = settingFragment;
                 fragmentTag = getString(R.string.setting_fragment_tag);
