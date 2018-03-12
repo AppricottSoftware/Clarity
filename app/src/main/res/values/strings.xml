@@ -33,8 +33,8 @@
 
     <string name="register_button">Register</string>
     <string name="registration">Registration</string>
-    <string name="email_hint">email</string>
-    <string name="password_hint">password</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
     <string name="survey_prompt">You don\'t have any channels! Lets create one.\n
                                  Select the topics you like.\n\n</string>
 
