@@ -1,10 +1,8 @@
 package appricottsoftware.clarity;
 
-import android.app.DialogFragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.RemoteException;
@@ -13,14 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NavUtils;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -32,15 +28,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Task;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.json.JSONObject;
 import org.parceler.Parcels;
 
 import java.util.List;
@@ -50,7 +47,6 @@ import appricottsoftware.clarity.fragments.ChannelFragment;
 import appricottsoftware.clarity.fragments.ChannelSearchFragment;
 import appricottsoftware.clarity.fragments.HomeFragment;
 import appricottsoftware.clarity.fragments.LikeFragment;
-import appricottsoftware.clarity.fragments.PlaybackSpeedDialogFragment;
 import appricottsoftware.clarity.fragments.PlayerFragment;
 import appricottsoftware.clarity.fragments.SettingFragment;
 import appricottsoftware.clarity.models.Channel;
@@ -60,12 +56,10 @@ import appricottsoftware.clarity.models.PlaybackSpeedDialogListener;
 import appricottsoftware.clarity.models.PlayerInterface;
 import appricottsoftware.clarity.models.Podcast;
 import appricottsoftware.clarity.services.PlayerService;
-import appricottsoftware.clarity.models.Session;
 import appricottsoftware.clarity.sync.ClarityApp;
-import appricottsoftware.clarity.sync.ClarityApp;
-import appricottsoftware.clarity.sync.ClarityClient;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cz.msebera.android.httpclient.Header;
 
 import static appricottsoftware.clarity.R.string.playback_speed_key;
 
@@ -119,8 +113,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         // Replace toolbar
         setSupportActionBar(toolbar);
 
-        // Set up nav drawer option clicking
+        // Set up nav drawer option clicking and header
         setUpDrawer();
+        setNavHeader();
 
         // Set up drawer toggling
         drawerToggle = setUpDrawerToggle();
@@ -231,8 +226,29 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
             public boolean onQueryTextSubmit(String query) {
                 // Respond to the user pressing search/enter
                 searchView.clearFocus();
-                searchEpisodes(query);
-                return true;
+
+                // Checking if searchFragment is visible or not
+                String searchFragmentTag = getString(R.string.channel_search_fragment_tag);
+                Fragment frag = getSupportFragmentManager().findFragmentByTag(searchFragmentTag);
+                ChannelSearchFragment channelSearchFragment = (ChannelSearchFragment) frag;
+
+                // If not visible, set it up
+                if (frag == null) {
+                    initializeSearchFragmentAndSearchEpisodes(query);
+                    return true;
+                }
+
+                // Fragment already visible so call search on it if the query isn't empty
+                else {
+                    if (!query.equals("")) {
+                        searchChannelQuery = query;
+                        channelSearchFragment.search(searchChannelQuery);
+                        resetSearch();
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
             @Override
@@ -278,7 +294,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         searchChannel = false;
     }
 
-    private void searchEpisodes(String query) {
+    private void initializeSearchFragmentAndSearchEpisodes(String query) {
         // Show channel search fragment, hide home fragment
         insertFragment(channelSearchFragment, getString(R.string.channel_search_fragment_tag));
 
@@ -301,7 +317,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         likeFragment = new LikeFragment();
         settingFragment = new SettingFragment();
         channelSearchFragment = new ChannelSearchFragment();
-
 
         // Start on the home fragment
         nvDrawer.setCheckedItem(R.id.nav_home_fragment);
@@ -647,5 +662,27 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         else {
             Log.e(TAG, "HomeFragment is null");
         }
+    }
+
+    private void setNavHeader() {
+        int uid = ClarityApp.getSession(this).getUserID();
+        ClarityApp.getRestClient().getEmail(uid, this, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    TextView header = findViewById(R.id.nav_header_text);
+                    header.setText(response.getString("email"));
+                }
+                catch (Exception e) {
+                    Log.e(TAG, "getOldEmail: ", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.e(TAG, "getOldEmail Failed");
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
     }
 }
