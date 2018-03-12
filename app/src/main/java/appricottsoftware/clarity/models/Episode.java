@@ -257,7 +257,6 @@ public class Episode {
 
     public MediaMetadataCompat toMediaMetadataCompat() {
         Bitmap bitmap = null;
-        // TODO: Write service to grab bitmap
         try {
             URL url = new URL(image);
             bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
