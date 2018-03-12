@@ -256,6 +256,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         final SearchView searchView = (SearchView) searchItem.getActionView();
         newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
         searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchAutoComplete.setBackgroundColor(Color.WHITE);
+        searchAutoComplete.setTextColor(Color.BLACK);
+        searchAutoComplete.setDropDownBackgroundResource(android.R.color.white);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
