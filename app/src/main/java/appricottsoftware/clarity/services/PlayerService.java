@@ -517,6 +517,26 @@ public class PlayerService extends MediaBrowserServiceCompat {
         thread.start();
     }
 
+    private void downvoteCurrent() {
+        Episode episode = playlist.peek();
+        int channelId = currentChannel.getCid();
+        if(episode != null && channelId > 0) {
+            ClarityApp.getRestClient().metadataDownVoteRequest(channelId, episode.getIntGenres(), context, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    Log.v(TAG, "onSuccess");
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    super.onFailure(statusCode, headers, throwable, errorResponse);
+                    Log.v(TAG, "onFailure");
+                }
+            });
+        }
+    }
+
     private void setNotification(int playbackState) {
        try {
            // Get metadata for the current audio being played
@@ -689,6 +709,7 @@ public class PlayerService extends MediaBrowserServiceCompat {
         @Override
         public void onSkipToNext() {
             Log.v(TAG, "onSkipToNext");
+            downvoteCurrent();
             updatePlaylist();
         }
 
