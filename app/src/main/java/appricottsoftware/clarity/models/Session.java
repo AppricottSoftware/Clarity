@@ -41,4 +41,16 @@ public class Session {
         float playbackSpeed = preferences.getFloat("playbackSpeed", 1);
         return playbackSpeed;
     }
+
+    public void setCurrentChannel(int cid) {
+        if(cid < 1) {
+            cid = 0;
+        }
+        preferences.edit().putInt("currentChannel", cid).apply();
+    }
+
+    public int getCurrentChannel() {
+        int currentChannel = preferences.getInt("currentChannel", 0);
+        return currentChannel;
+    }
 }

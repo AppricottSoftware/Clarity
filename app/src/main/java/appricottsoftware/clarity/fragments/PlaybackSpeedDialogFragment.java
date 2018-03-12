@@ -1,20 +1,14 @@
 package appricottsoftware.clarity.fragments;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.drm.DrmStore;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,10 +18,8 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONObject;
 
 import appricottsoftware.clarity.R;
-import appricottsoftware.clarity.models.PlaybackSpeedDialogListener;
+import appricottsoftware.clarity.models.PlayerFragmentListener;
 import appricottsoftware.clarity.sync.ClarityApp;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
 public class PlaybackSpeedDialogFragment extends DialogFragment {
@@ -37,7 +29,7 @@ public class PlaybackSpeedDialogFragment extends DialogFragment {
     private AppCompatSeekBar sbSpeed;
     private TextView tvSpeed;
 
-    private PlaybackSpeedDialogListener dialogListener;
+    private PlayerFragmentListener dialogListener;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -76,11 +68,11 @@ public class PlaybackSpeedDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(context instanceof PlaybackSpeedDialogListener) {
-            dialogListener = (PlaybackSpeedDialogListener) context;
+        if(context instanceof PlayerFragmentListener) {
+            dialogListener = (PlayerFragmentListener) context;
         } else {
-            Log.e(TAG, "Calling activity must implement PlaybackSpeedDialogListener");
-            throw new ClassCastException("Must implement PlaybackSpeedDialogListener");
+            Log.e(TAG, "Calling activity must implement PlayerFragmentListener");
+            throw new ClassCastException("Must implement PlayerFragmentListener");
         }
     }
 
