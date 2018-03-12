@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -15,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import appricottsoftware.clarity.adapters.EndlessRecyclerViewScrollListener;
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = "MainActivity";
 
     private ArrayList<Podcast> searchResults;
+    private ArrayList<String> listenNotesTypeAhead;
     private SearchResultsListAdapter searchResultsAdapter;
     private EndlessRecyclerViewScrollListener scrollListener;
 
@@ -45,17 +49,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
         searchResults = new ArrayList<>();
+        listenNotesTypeAhead = new ArrayList<>();
         searchResultsAdapter = new SearchResultsListAdapter(searchResults);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvSearchResults.setLayoutManager(linearLayoutManager);
         rvSearchResults.setAdapter(searchResultsAdapter);
+
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 getPodcasts(query);
             }
         };
+
         rvSearchResults.addOnScrollListener(scrollListener);
     }
 
@@ -64,10 +73,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        AutoCompleteTextView textAhead = (AutoCompleteTextView) menu.findItem(R.id.action_search).getActionView();
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
+        textAhead.setAdapter(adapter);
+
         final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String q) {
+                Log.e(TAG, "Triggering onQueryTextSubmit()");
                 searchResults.clear();
                 searchResultsAdapter.notifyDataSetChanged();
                 scrollListener.resetState();
@@ -83,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        MenuItem searchItem = menu.findItem(R.id.action_search);
         return super.onCreateOptionsMenu(menu);
     }
 

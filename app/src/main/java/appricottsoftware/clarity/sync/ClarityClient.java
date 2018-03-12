@@ -26,6 +26,7 @@ import cz.msebera.android.httpclient.entity.StringEntity;
 public class ClarityClient {
 
     private boolean searchQuotaRemaining;
+    private final String TAG = "ClarityClient";
 
     public ClarityClient() {
         searchQuotaRemaining = true;
@@ -53,6 +54,16 @@ public class ClarityClient {
         params.put("sort_by_date", sort_by_date);
         params.put("type", type);
         client.get(context.getString(R.string.listen_notes_api_url) + "search", params, handler);
+    }
+
+
+    public void getTypeAheadPodcast(String text, Context context, JsonHttpResponseHandler handler) {
+        Log.e(TAG, "TEXT: " + text);
+        // Create the rest client and add header(s)
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.addHeader("X-Mashape-Key", context.getString(R.string.listen_notes_api_key));
+
+        client.get(context.getString(R.string.listen_notes_api_typeAhead) + "?q=" + text, handler);
     }
 
     public void authenticateUser(String email, String password, Context context, JsonHttpResponseHandler handler) {

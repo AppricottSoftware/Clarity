@@ -36,6 +36,8 @@ import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcels;
 
@@ -252,6 +254,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                Log.e(TAG, "onQueryTextChange");
+                getPodcastsTypeAhead(newText);
                 return false;
             }
         });
@@ -679,5 +683,69 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 super.onFailure(statusCode, headers, throwable, errorResponse);
             }
         });
+    }
+
+
+
+
+    private void getPodcastsTypeAhead(String newText) {
+        Log.e("HomeActivity", "On typeAhead: " + newText);
+
+        ClarityApp.getRestClient().getTypeAheadPodcast(newText, this, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.e("MainActivity 1", response.toString());
+                addPodcastsTypeAhead(response);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.e("MainActivity 2", response.toString());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                super.onSuccess(statusCode, headers, responseString);
+                Log.e("MainActivity 3", responseString);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                throwable.printStackTrace();
+                Log.e("MainActivity 4", "");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                throwable.printStackTrace();
+                Log.e("MainActivity 5", "");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                throwable.printStackTrace();
+                Log.e("MainActivity 6", "");
+            }
+        });
+    }
+
+
+    private void addPodcastsTypeAhead(JSONObject response) {
+        try {
+            JSONArray terms = response.getJSONArray("terms");
+            Log.i(TAG, terms.toString());
+
+            for (int i = 0; i < terms.length(); i++) {
+                String loudScreaming = terms.getJSONObject(i).toString();
+                Log.e(TAG, loudScreaming);
+            }
+        } catch(JSONException e) {
+            Log.e(TAG, "ERROR IN addPodcastsTypeAhead: \n" + e);
+        }
     }
 }
