@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private final String TAG = "MainActivity";
 
     private ArrayList<Podcast> searchResults;
-    private ArrayList<String> listenNotesTypeAhead;
     private SearchResultsListAdapter searchResultsAdapter;
     private EndlessRecyclerViewScrollListener scrollListener;
 
@@ -51,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         searchResults = new ArrayList<>();
-        listenNotesTypeAhead = new ArrayList<>();
         searchResultsAdapter = new SearchResultsListAdapter(searchResults);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -69,15 +67,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        AutoCompleteTextView textAhead = (AutoCompleteTextView) menu.findItem(R.id.action_search).getActionView();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
-        textAhead.setAdapter(adapter);
-
         final SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

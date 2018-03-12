@@ -1,9 +1,12 @@
 package appricottsoftware.clarity;
 
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,6 +20,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +31,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import com.facebook.login.LoginManager;
@@ -41,6 +48,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.parceler.Parcels;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 import appricottsoftware.clarity.fragments.BrowseFragment;
@@ -85,6 +94,8 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
     private static PlayerFragment playerFragment;
     private static ChannelSearchFragment channelSearchFragment;
 
+    private ArrayList<String> listenNotesTypeAhead;
+
     private MenuItem searchItem;
 
     private Intent playerServiceIntent;
@@ -110,6 +121,9 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
 
         // Get Login Type
         loginType = getIntent().getStringExtra("loginType");
+
+        // Initializing listenNotesTypeAhead Container
+        listenNotesTypeAhead = new ArrayList<>();
 
         // Replace toolbar
         setSupportActionBar(toolbar);
@@ -221,7 +235,26 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         MenuInflater menuInflater= getMenuInflater();
         menuInflater.inflate(R.menu.menu_main, menu);
         searchItem = menu.findItem(R.id.action_search);
+
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                // Hide results, replace with home fragment
+                insertFragment(homeFragment, getString(R.string.home_fragment_tag));
+                return true;
+            }
+        });
+
         final SearchView searchView = (SearchView) searchItem.getActionView();
+        final ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, listenNotesTypeAhead);
+        final SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -238,7 +271,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                     initializeSearchFragmentAndSearchEpisodes(query);
                     return true;
                 }
-
                 // Fragment already visible so call search on it if the query isn't empty
                 else {
                     if (!query.equals("")) {
@@ -248,30 +280,52 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                         return true;
                     }
                 }
-
                 return false;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                Log.e(TAG, "onQueryTextChange");
-                getPodcastsTypeAhead(newText);
+            public boolean onQueryTextChange(String query) {
+                if (query.length() % 3 == 0 && query.length() > 0) {
+                    Log.e(TAG, "onQueryTextChange");
+                    getPodcastsTypeAhead(query);
+
+
+                    Log.e(TAG, "FUCK: " + listenNotesTypeAhead.size());
+
+
+                    // Create a new ArrayAdapter and add data to search auto complete object.
+                    searchAutoComplete.setAdapter(newsAdapter);
+                    // Listen to search view item on click event.
+                    searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
+                            String queryString=(String)adapterView.getItemAtPosition(itemIndex);
+                            searchAutoComplete.setText("" + queryString);
+                        }
+                    });
+
+                }
                 return false;
             }
         });
-        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
+            public boolean onSuggestionSelect(int position) {
+                Cursor cursor = (Cursor) searchView.getSuggestionsAdapter().getItem(position);
+                String term = cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+                Log.e(TAG,"TERM SUGGESTED: " + term);
+                cursor.close();
                 return true;
             }
 
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                // Hide results, replace with home fragment
-                insertFragment(homeFragment, getString(R.string.home_fragment_tag));
-                return true;
+            public boolean onSuggestionClick(int position) {
+                return onSuggestionSelect(position);
             }
         });
+
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -671,8 +725,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 try {
                     TextView header = findViewById(R.id.nav_header_text);
                     header.setText(response.getString("email"));
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.e(TAG, "getOldEmail: ", e);
                 }
             }
@@ -684,9 +737,6 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
             }
         });
     }
-
-
-
 
     private void getPodcastsTypeAhead(String newText) {
         Log.e("HomeActivity", "On typeAhead: " + newText);
@@ -731,6 +781,7 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
                 throwable.printStackTrace();
                 Log.e("MainActivity 6", "");
             }
+
         });
     }
 
@@ -739,11 +790,20 @@ public class HomeActivity extends AppCompatActivity implements PlayerInterface, 
         try {
             JSONArray terms = response.getJSONArray("terms");
             Log.i(TAG, terms.toString());
+            listenNotesTypeAhead.clear();
+            listenNotesTypeAhead.add("Patrick1");
+            listenNotesTypeAhead.add("Patrick1");
+            listenNotesTypeAhead.add("Patrick1");
+            listenNotesTypeAhead.add("Patrick1");
+            listenNotesTypeAhead.add("Patrick1");
 
-            for (int i = 0; i < terms.length(); i++) {
-                String loudScreaming = terms.getJSONObject(i).toString();
-                Log.e(TAG, loudScreaming);
-            }
+//            Log.e(TAG, terms.getJSONObject(0).names().toString());
+//            for (int i = 0; i < terms.length(); i++) {
+//                listenNotesTypeAhead.add(terms.getJSONObject(i));
+//            }
+
+
+            Log.e(TAG, "HERE: " + listenNotesTypeAhead.size());
         } catch(JSONException e) {
             Log.e(TAG, "ERROR IN addPodcastsTypeAhead: \n" + e);
         }

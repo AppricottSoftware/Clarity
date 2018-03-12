@@ -63,4 +63,5 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     android.defaultConfig.vectorDrawables.useSupportLibrary = true
+    compile 'com.miguelcatalan:materialsearchview:1.4.0'
 }
