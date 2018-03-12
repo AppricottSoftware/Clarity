@@ -199,7 +199,7 @@ public class BrowseFragment extends Fragment {
                 populateBrowseGrid();
 
                 // Play added channel
-                playerInterface.playChannel(channel);
+                // playerInterface.playChannel(channel);
             }
 
             @Override
