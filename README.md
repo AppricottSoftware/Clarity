@@ -41,7 +41,13 @@ Your credentials are kept secure with SHA-1 cryptography
 
 ## Screenshots
 
-// images and descriptions here
+![](https://i.imgur.com/eVUZihe.gif)
+![](https://i.imgur.com/HlUktPH.gif)
+![](https://i.imgur.com/mZNftaQ.gif)
+![](https://i.imgur.com/Cak97MO.gif)
+![](https://i.imgur.com/3O16HIA.gif)
+![](https://i.imgur.com/D6Jdwr2.gif)
+![](https://i.imgur.com/LRkKlQL.gif)
 
 
 ## Libraries
